@@ -1,0 +1,6 @@
+{
+    "extends": "google",
+    "parserOptions": {
+        "sourceType": "module"
+    }
+}

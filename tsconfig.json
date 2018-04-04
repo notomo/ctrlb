@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "moduleResolution": "node",
+        "module": "es6",
+        "strict": true,
+        "noImplicitReturns": true,
+        "removeComments": true,
+        "noUnusedLocals": true,
+        "types": [
+            "chrome"
+        ]
+    }
+}
