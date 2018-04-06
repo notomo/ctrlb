@@ -1,4 +1,5 @@
 import { Tab } from "./tab";
+import { Bookmark } from "./bookmark";
 import { ActionInfo, ActionKind, ResultInfo } from "./action";
 
 // TODO
@@ -16,11 +17,12 @@ export class ActionFacade {
   public execute(json: JsonObject): Promise<ResultInfo> {
     const actionInfo = json as ActionInfo;
     const actionKinds: ActionKindConstructors = {
-      tab: Tab
+      tab: Tab,
+      bookmark: Bookmark
     };
     const actionKindClass = actionKinds[actionInfo.kindName];
     const actionKind = new actionKindClass();
-    const result = actionKind.execute(actionInfo);
+    const result = actionKind.execute(actionInfo.actionName, actionInfo.args);
     if (result instanceof Promise) {
       return result;
     }

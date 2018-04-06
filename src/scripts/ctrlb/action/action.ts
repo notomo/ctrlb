@@ -13,7 +13,7 @@ export interface ResultInfo {
 export type Result = ResultInfo | Promise<ResultInfo>;
 
 interface Action {
-  (info: ActionInfo): Result;
+  (args: ActionArgs): Result;
 }
 
 export abstract class ActionKind {
@@ -22,20 +22,19 @@ export abstract class ActionKind {
     this.chrome = new ChromePromise();
   }
 
-  public execute(actionInfo: ActionInfo): Result {
-    const actionName = actionInfo.actionName;
-    return this.getActions()[actionName](actionInfo);
+  public execute(actionName: string, args: ActionArgs): Result {
+    return this.getActions()[actionName](args);
   }
   protected abstract getActions(): ActionGroup;
 }
 
 // TODO
-interface ActionArgs {
+export interface ActionArgs {
   [index: string]: string | number | boolean;
 }
 
 export interface ActionInfo {
   kindName: string;
   actionName: string;
-  args?: ActionArgs;
+  args: ActionArgs;
 }
