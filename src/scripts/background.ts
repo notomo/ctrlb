@@ -9,7 +9,7 @@ config.getHost().then(host => {
   chrome.browserAction.onClicked.addListener(() => {
     if (!client.isOpen()) {
       config.getHost().then(host => {
-        client.open(host);
+        client.reload(host);
       });
     }
   });

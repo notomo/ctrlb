@@ -11,7 +11,7 @@ export class Client {
     this.socket = this.open(host);
   }
 
-  public open(host: string) {
+  protected open(host: string) {
     const socket = new WebSocket("ws://" + host);
     socket.onopen = () => this.onOpen();
     socket.onmessage = (ev: MessageEvent) => this.onMessage(ev);
