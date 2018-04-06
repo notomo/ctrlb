@@ -1,5 +1,6 @@
 import { Tab } from "./tab";
 import { Bookmark } from "./bookmark";
+import { History } from "./history";
 import { ActionInfo, ActionKind, ResultInfo } from "./action";
 
 // TODO
@@ -18,7 +19,8 @@ export class ActionFacade {
     const actionInfo = json as ActionInfo;
     const actionKinds: ActionKindConstructors = {
       tab: Tab,
-      bookmark: Bookmark
+      bookmark: Bookmark,
+      history: History
     };
     const actionKindClass = actionKinds[actionInfo.kindName];
     const actionKind = new actionKindClass();
