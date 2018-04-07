@@ -7,7 +7,8 @@ export class Bookmark extends ActionKind {
       list: (args: ActionArgs) => this.list(args),
       open: (args: ActionArgs) => this.open(args),
       tabOpen: (args: ActionArgs) => this.tabOpen(args),
-      search: (args: ActionArgs) => this.search(args)
+      search: (args: ActionArgs) => this.search(args),
+      update: (args: ActionArgs) => this.update(args)
     };
   }
 
@@ -95,6 +96,21 @@ export class Bookmark extends ActionKind {
 
         return { status: "ok", body: body };
       });
+  }
+
+  protected async update(args: ActionArgs): Promise<ResultInfo> {
+    if (args.id === undefined) {
+      return { status: "invalid" };
+    }
+    const id = args.id as number;
+    const info = {
+      url: args.url as string,
+      title: args.title as string
+    };
+    return this.get(id).then((bookmark: chrome.bookmarks.BookmarkTreeNode) => {
+      this.chrome.bookmarks.update(bookmark.id, info);
+      return { status: "ok" };
+    });
   }
 }
 
