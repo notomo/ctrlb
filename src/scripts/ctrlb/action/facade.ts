@@ -1,6 +1,7 @@
 import { Tab } from "./tab";
 import { Bookmark } from "./bookmark";
 import { History } from "./history";
+import { Window } from "./window";
 import { ActionInfo, ActionKind, ResultInfo } from "./action";
 
 // TODO
@@ -20,7 +21,8 @@ export class ActionFacade {
     const actionKinds: ActionKindConstructors = {
       tab: Tab,
       bookmark: Bookmark,
-      history: History
+      history: History,
+      window: Window
     };
     const actionKindClass = actionKinds[actionInfo.kindName];
     const actionKind = new actionKindClass();
