@@ -9,7 +9,11 @@ export class Tab extends ActionKind {
       activate: (args: ActionArgs) => this.activate(args),
       list: (args: ActionArgs) => this.list(args),
       tabOpen: (args: ActionArgs) => this.tabOpen(args),
-      open: (args: ActionArgs) => this.open(args)
+      open: (args: ActionArgs) => this.open(args),
+      next: (args: ActionArgs) => this.next(args),
+      previous: (args: ActionArgs) => this.previous(args),
+      first: (args: ActionArgs) => this.first(args),
+      last: (args: ActionArgs) => this.last(args)
     };
   }
 
@@ -24,6 +28,74 @@ export class Tab extends ActionKind {
         return this.update(tab, { active: true });
       })
       .then(() => {
+        return { status: "ok" };
+      });
+  }
+
+  protected async first(args: ActionArgs): Promise<ResultInfo> {
+    return this.chrome.tabs
+      .query({ index: 0 })
+      .then((tabs: chrome.tabs.Tab[]) => {
+        const tab = tabs.pop();
+        if (tab !== undefined) {
+          this.update(tab, { active: true });
+        }
+        return { status: "ok" };
+      });
+  }
+
+  protected async next(args: ActionArgs): Promise<ResultInfo> {
+    return this.getCurrentTab()
+      .then((tab: chrome.tabs.Tab) => {
+        const index = tab.index as number;
+        return this.chrome.tabs.query({ index: index + 1 });
+      })
+      .then((tabs: chrome.tabs.Tab[]) => {
+        const tab = tabs.pop();
+        if (tab !== undefined) {
+          this.update(tab, { active: true });
+        }
+        return { status: "ok" };
+      });
+  }
+
+  protected async previous(args: ActionArgs): Promise<ResultInfo> {
+    return this.getCurrentTab()
+      .then((tab: chrome.tabs.Tab) => {
+        const index = tab.index as number;
+        if (index === 0) {
+          return [];
+        }
+        return this.chrome.tabs.query({ index: index - 1 });
+      })
+      .then((tabs: chrome.tabs.Tab[]) => {
+        const tab = tabs.pop();
+        if (tab !== undefined) {
+          this.update(tab, { active: true });
+        }
+        return { status: "ok" };
+      });
+  }
+
+  protected async last(args: ActionArgs): Promise<ResultInfo> {
+    return await this.chrome.tabs
+      .query({ currentWindow: true })
+      .then((tabs: chrome.tabs.Tab[]) => {
+        const indexes = tabs.map((tab: chrome.tabs.Tab) => {
+          return tab.index;
+        });
+        indexes.push(-1);
+        const index = Math.max.apply(null, indexes);
+        if (index === -1) {
+          return [];
+        }
+        return this.chrome.tabs.query({ index: index });
+      })
+      .then((tabs: chrome.tabs.Tab[]) => {
+        const tab = tabs.pop();
+        if (tab !== undefined) {
+          this.update(tab, { active: true });
+        }
         return { status: "ok" };
       });
   }
