@@ -8,7 +8,9 @@ export class Bookmark extends ActionKind {
       open: (args: ActionArgs) => this.open(args),
       tabOpen: (args: ActionArgs) => this.tabOpen(args),
       search: (args: ActionArgs) => this.search(args),
-      update: (args: ActionArgs) => this.update(args)
+      update: (args: ActionArgs) => this.update(args),
+      remove: (args: ActionArgs) => this.remove(args),
+      create: (args: ActionArgs) => this.create(args)
     };
   }
 
@@ -53,6 +55,34 @@ export class Bookmark extends ActionKind {
         return new Tab().execute("tabOpen", { url: bookmark.url });
       }
     );
+  }
+
+  protected async remove(args: ActionArgs): Promise<ResultInfo> {
+    if (args.id === undefined) {
+      return { status: "invalid" };
+    }
+    const bookmark = await this.get(args.id as number);
+    if (bookmark.url === undefined) {
+      return this.chrome.bookmarks.removeTree(bookmark.id).then(() => {
+        return { status: "ok" };
+      });
+    }
+    return this.chrome.bookmarks.remove(bookmark.id).then(() => {
+      return { status: "ok" };
+    });
+  }
+
+  protected async create(args: ActionArgs): Promise<ResultInfo> {
+    const info = {
+      url: args.url as string,
+      title: args.title as string,
+      parentId: args.parentId as string
+    };
+    return this.chrome.bookmarks
+      .create(info)
+      .then((bookmark: chrome.bookmarks.BookmarkTreeNode) => {
+        return { status: "ok" };
+      });
   }
 
   protected async list(args: ActionArgs): Promise<ResultInfo> {
