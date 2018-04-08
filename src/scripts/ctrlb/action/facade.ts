@@ -3,6 +3,7 @@ import { Bookmark } from "./bookmark";
 import { History } from "./history";
 import { Window } from "./window";
 import { Scroll } from "./scroll";
+import { Navigation } from "./navigation";
 import { ActionInfo, ActionKind, ResultInfo } from "./action";
 
 // TODO
@@ -24,7 +25,8 @@ export class ActionFacade {
       bookmark: Bookmark,
       history: History,
       window: Window,
-      scroll: Scroll
+      scroll: Scroll,
+      navigation: Navigation
     };
     const actionKindClass = actionKinds[actionInfo.kindName];
     const actionKind = new actionKindClass();
