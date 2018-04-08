@@ -6,8 +6,16 @@ export class Window extends ActionKind {
       maximize: (args: ActionArgs) => this.maximize(args),
       minimize: (args: ActionArgs) => this.minimize(args),
       toFullScreen: (args: ActionArgs) => this.toFullScreen(args),
-      toNormal: (args: ActionArgs) => this.toNormal(args)
+      toNormal: (args: ActionArgs) => this.toNormal(args),
+      remove: (args: ActionArgs) => this.remove(args)
     };
+  }
+
+  protected async remove(args: ActionArgs): Promise<ResultInfo> {
+    return this.getLastFocused().then((win: chrome.windows.Window) => {
+      this.chrome.windows.remove(win.id);
+      return { status: "ok" };
+    });
   }
 
   protected async toNormal(args: ActionArgs): Promise<ResultInfo> {
