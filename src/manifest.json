@@ -23,6 +23,7 @@
         "tabs",
         "storage",
         "bookmarks",
-        "history"
+        "history",
+        "<all_urls>"
     ]
 }
