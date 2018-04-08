@@ -13,7 +13,15 @@ export class Tab extends ActionKind {
       next: (args: ActionArgs) => this.next(args),
       previous: (args: ActionArgs) => this.previous(args),
       first: (args: ActionArgs) => this.first(args),
-      last: (args: ActionArgs) => this.last(args)
+      last: (args: ActionArgs) => this.last(args),
+      create: (args: ActionArgs) => this.create(args),
+      closeOthers: (args: ActionArgs) => this.closeOthers(args),
+      closeRight: (args: ActionArgs) => this.closeRight(args),
+      closeLeft: (args: ActionArgs) => this.closeLeft(args),
+      moveLeft: (args: ActionArgs) => this.moveLeft(args),
+      moveRight: (args: ActionArgs) => this.moveRight(args),
+      moveFirst: (args: ActionArgs) => this.moveFirst(args),
+      moveLast: (args: ActionArgs) => this.moveLast(args)
     };
   }
 
@@ -32,9 +40,15 @@ export class Tab extends ActionKind {
       });
   }
 
+  protected async create(args: ActionArgs): Promise<ResultInfo> {
+    return this.chrome.tabs.create({}).then((tab: chrome.tabs.Tab) => {
+      return { status: "ok" };
+    });
+  }
+
   protected async first(args: ActionArgs): Promise<ResultInfo> {
     return this.chrome.tabs
-      .query({ index: 0 })
+      .query({ currentWindow: true, index: 0 })
       .then((tabs: chrome.tabs.Tab[]) => {
         const tab = tabs.pop();
         if (tab !== undefined) {
@@ -48,7 +62,10 @@ export class Tab extends ActionKind {
     return this.getCurrentTab()
       .then((tab: chrome.tabs.Tab) => {
         const index = tab.index as number;
-        return this.chrome.tabs.query({ index: index + 1 });
+        return this.chrome.tabs.query({
+          currentWindow: true,
+          index: index + 1
+        });
       })
       .then((tabs: chrome.tabs.Tab[]) => {
         const tab = tabs.pop();
@@ -66,7 +83,10 @@ export class Tab extends ActionKind {
         if (index === 0) {
           return [];
         }
-        return this.chrome.tabs.query({ index: index - 1 });
+        return this.chrome.tabs.query({
+          currentWindow: true,
+          index: index - 1
+        });
       })
       .then((tabs: chrome.tabs.Tab[]) => {
         const tab = tabs.pop();
@@ -100,12 +120,109 @@ export class Tab extends ActionKind {
       });
   }
 
+  protected moveLeft(args: ActionArgs): Promise<ResultInfo> {
+    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+      if (tab.index > 0) {
+        const id = tab.id as number;
+        this.chrome.tabs.move(id, { index: tab.index - 1 });
+      }
+      return { status: "ok" };
+    });
+  }
+
+  protected moveRight(args: ActionArgs): Promise<ResultInfo> {
+    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+      const id = tab.id as number;
+      this.chrome.tabs.move(id, { index: tab.index + 1 });
+      return { status: "ok" };
+    });
+  }
+
+  protected moveFirst(args: ActionArgs): Promise<ResultInfo> {
+    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+      const id = tab.id as number;
+      this.chrome.tabs.move(id, { index: 0 });
+      return { status: "ok" };
+    });
+  }
+
+  protected moveLast(args: ActionArgs): Promise<ResultInfo> {
+    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+      const id = tab.id as number;
+      this.chrome.tabs.move(id, { index: -1 });
+      return { status: "ok" };
+    });
+  }
+
   protected close(args: ActionArgs): Promise<ResultInfo> {
     return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
       const tabId = tab.id as number;
       chrome.tabs.remove(tabId);
       return { status: "ok" };
     });
+  }
+
+  protected closeOthers(args: ActionArgs): Promise<ResultInfo> {
+    return this.getCurrentTab()
+      .then(async (tab: chrome.tabs.Tab) => {
+        const tabId = tab.id as number;
+        const tabs = await this.chrome.tabs.query({
+          currentWindow: true,
+          pinned: false
+        });
+        return tabs.filter((tab: chrome.tabs.Tab) => {
+          return tab.id !== tabId;
+        });
+      })
+      .then((tabs: chrome.tabs.Tab[]) => {
+        const tabIds = tabs.map((tab: chrome.tabs.Tab) => {
+          return tab.id as number;
+        });
+        this.chrome.tabs.remove(tabIds);
+        return { status: "ok" };
+      });
+  }
+
+  protected closeRight(args: ActionArgs): Promise<ResultInfo> {
+    return this.getCurrentTab()
+      .then(async (tab: chrome.tabs.Tab) => {
+        const index = tab.index as number;
+        const tabs = await this.chrome.tabs.query({
+          currentWindow: true,
+          pinned: false
+        });
+        return tabs.filter((tab: chrome.tabs.Tab) => {
+          return tab.index > index;
+        });
+      })
+      .then((tabs: chrome.tabs.Tab[]) => {
+        const tabIds = tabs.map((tab: chrome.tabs.Tab) => {
+          return tab.id as number;
+        });
+        this.chrome.tabs.remove(tabIds);
+        return { status: "ok" };
+      });
+  }
+
+  protected closeLeft(args: ActionArgs): Promise<ResultInfo> {
+    return this.getCurrentTab()
+      .then(async (tab: chrome.tabs.Tab) => {
+        const index = tab.index as number;
+        const tabs = await this.chrome.tabs.query({
+          currentWindow: true,
+          pinned: false
+        });
+        return tabs.filter((tab: chrome.tabs.Tab) => {
+          return tab.index < index;
+        });
+      })
+      .then((tabs: chrome.tabs.Tab[]) => {
+        const tabIds = tabs.map((tab: chrome.tabs.Tab) => {
+          return tab.id as number;
+        });
+        this.chrome.tabs.remove(tabIds);
+        return { status: "ok" };
+      });
   }
 
   protected async tabOpen(args: ActionArgs): Promise<ResultInfo> {
