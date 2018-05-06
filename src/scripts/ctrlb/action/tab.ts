@@ -21,7 +21,8 @@ export class Tab extends ActionKind {
       moveLeft: (args: ActionArgs) => this.moveLeft(args),
       moveRight: (args: ActionArgs) => this.moveRight(args),
       moveFirst: (args: ActionArgs) => this.moveFirst(args),
-      moveLast: (args: ActionArgs) => this.moveLast(args)
+      moveLast: (args: ActionArgs) => this.moveLast(args),
+      get: (args: ActionArgs) => this.get(args)
     };
   }
 
@@ -271,6 +272,19 @@ export class Tab extends ActionKind {
         return { status: "ok", body: tabs };
       });
     return tabs;
+  }
+
+  protected async get(args: ActionArgs): Promise<ResultInfo> {
+    if (args.id === undefined) {
+      return { status: "invalid" };
+    }
+    const tabId = args.id as number;
+    const tab = await this.chrome.tabs
+      .get(tabId)
+      .then((tab: chrome.tabs.Tab) => {
+        return { status: "ok", body: tab };
+      });
+    return tab;
   }
 
   private async update(tab: chrome.tabs.Tab, properties: any) {

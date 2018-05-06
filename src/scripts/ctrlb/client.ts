@@ -45,9 +45,16 @@ export class Client {
 
   protected onMessage(ev: MessageEvent) {
     const json = JSON.parse(ev.data);
-    const requestId = json.requestId;
+    this.execute(json);
+  }
+
+  public execute(jsonArray: any) {
+    if (!this.isOpen()) {
+      return;
+    }
+    const requestId = jsonArray.requestId;
     new ActionFacade()
-      .execute(json)
+      .execute(jsonArray)
       .then((result: Result) => this.sendMessage(result, requestId));
   }
 }

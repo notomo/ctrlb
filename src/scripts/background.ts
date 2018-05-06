@@ -13,4 +13,14 @@ config.getHost().then(host => {
       });
     }
   });
+
+  chrome.tabs.onActivated.addListener((activeInfo: any) => {
+    client.execute({
+      actionName: "get",
+      kindName: "tab",
+      args: {
+        id: activeInfo.tabId
+      }
+    });
+  });
 });
