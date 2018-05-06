@@ -61,11 +61,21 @@ export class Tab extends ActionKind {
 
   protected async next(args: ActionArgs): Promise<ResultInfo> {
     return this.getCurrentTab()
-      .then((tab: chrome.tabs.Tab) => {
-        const index = tab.index as number;
+      .then(async (tab: chrome.tabs.Tab) => {
+        const lastTabs = await this.getLastTab();
+        const lastTab = lastTabs.pop();
+        if (lastTab === undefined) {
+          return [];
+        }
+        var index: number;
+        if (lastTab.index === tab.index) {
+          index = 0;
+        } else {
+          index = (tab.index as number) + 1;
+        }
         return this.chrome.tabs.query({
           currentWindow: true,
-          index: index + 1
+          index: index
         });
       })
       .then((tabs: chrome.tabs.Tab[]) => {
@@ -82,7 +92,7 @@ export class Tab extends ActionKind {
       .then((tab: chrome.tabs.Tab) => {
         const index = tab.index as number;
         if (index === 0) {
-          return [];
+          return this.getLastTab();
         }
         return this.chrome.tabs.query({
           currentWindow: true,
@@ -99,26 +109,12 @@ export class Tab extends ActionKind {
   }
 
   protected async last(args: ActionArgs): Promise<ResultInfo> {
-    return await this.chrome.tabs
-      .query({ currentWindow: true })
-      .then((tabs: chrome.tabs.Tab[]) => {
-        const indexes = tabs.map((tab: chrome.tabs.Tab) => {
-          return tab.index;
-        });
-        indexes.push(-1);
-        const index = Math.max.apply(null, indexes);
-        if (index === -1) {
-          return [];
-        }
-        return this.chrome.tabs.query({ index: index });
-      })
-      .then((tabs: chrome.tabs.Tab[]) => {
-        const tab = tabs.pop();
-        if (tab !== undefined) {
-          this.update(tab, { active: true });
-        }
-        return { status: "ok" };
-      });
+    const lastTab = await this.getLastTab();
+    const tab = lastTab.pop();
+    if (tab !== undefined) {
+      this.update(tab, { active: true });
+    }
+    return { status: "ok" };
   }
 
   protected moveLeft(args: ActionArgs): Promise<ResultInfo> {
@@ -297,6 +293,22 @@ export class Tab extends ActionKind {
       .query({ currentWindow: true, active: true })
       .then((tabs: chrome.tabs.Tab[]) => {
         return tabs.pop() as chrome.tabs.Tab;
+      });
+  }
+
+  private async getLastTab(): Promise<chrome.tabs.Tab[]> {
+    return this.chrome.tabs
+      .query({ currentWindow: true })
+      .then((tabs: chrome.tabs.Tab[]) => {
+        const indexes = tabs.map((tab: chrome.tabs.Tab) => {
+          return tab.index;
+        });
+        indexes.push(-1);
+        const index = Math.max.apply(null, indexes);
+        if (index === -1) {
+          return [];
+        }
+        return this.chrome.tabs.query({ index: index });
       });
   }
 }
