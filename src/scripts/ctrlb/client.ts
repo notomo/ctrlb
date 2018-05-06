@@ -15,6 +15,8 @@ export class Client {
     const socket = new WebSocket("ws://" + host);
     socket.onopen = () => this.onOpen();
     socket.onmessage = (ev: MessageEvent) => this.onMessage(ev);
+    socket.onerror = e => this.disableIcon();
+    socket.onclose = e => this.disableIcon();
     return socket;
   }
 
@@ -40,7 +42,12 @@ export class Client {
   }
 
   protected onOpen() {
+    chrome.browserAction.setIcon({ path: "images/icon-19.png" });
     this.sendMessage({});
+  }
+
+  protected disableIcon() {
+    chrome.browserAction.setIcon({ path: "images/icon-19-gray.png" });
   }
 
   protected onMessage(ev: MessageEvent) {
