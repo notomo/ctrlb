@@ -4,6 +4,7 @@ import { History } from "./history";
 import { Window } from "./window";
 import { Scroll } from "./scroll";
 import { Navigation } from "./navigation";
+import { TextToSpeak } from "./text_to_speak";
 import { ActionInfo, ActionKind, ResultInfo } from "./action";
 
 // TODO
@@ -26,7 +27,8 @@ export class ActionFacade {
       history: History,
       window: Window,
       scroll: Scroll,
-      navigation: Navigation
+      navigation: Navigation,
+      textToSpeak: TextToSpeak
     };
     const actionKindClass = actionKinds[actionInfo.kindName];
     const actionKind = new actionKindClass();

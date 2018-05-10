@@ -24,6 +24,7 @@
         "storage",
         "bookmarks",
         "history",
-        "<all_urls>"
+        "<all_urls>",
+        "tts"
     ]
 }
