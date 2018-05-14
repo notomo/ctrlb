@@ -22,17 +22,11 @@ function saveOptions() {
 const saveButton = document.getElementById("save") as HTMLInputElement;
 saveButton.addEventListener("click", saveOptions);
 
-function restoreOptions() {
+async function restoreOptions() {
   const defaultLabel = document.getElementById("default") as HTMLElement;
   const hostForm = document.getElementById("host") as HTMLInputElement;
   defaultLabel.textContent = config.DEFAULT_HOST;
-  config
-    .getHost()
-    .then(host => {
-      hostForm.value = host;
-    })
-    .catch(e => {
-      console.log(e);
-    });
+  const host: string = await config.getHost();
+  hostForm.value = host;
 }
 document.addEventListener("DOMContentLoaded", restoreOptions);
