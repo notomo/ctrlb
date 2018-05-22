@@ -5,6 +5,7 @@ import { Window } from "./window";
 import { Scroll } from "./scroll";
 import { Navigation } from "./navigation";
 import { TextToSpeak } from "./text_to_speak";
+import { Zoom } from "./zoom";
 import { ActionInfo, ActionKind, ResultInfo } from "./action";
 
 // TODO
@@ -28,7 +29,8 @@ export class ActionFacade {
       window: Window,
       scroll: Scroll,
       navigation: Navigation,
-      textToSpeak: TextToSpeak
+      textToSpeak: TextToSpeak,
+      zoom: Zoom
     };
     const actionKindClass = actionKinds[actionInfo.kindName];
     const actionKind = new actionKindClass();
