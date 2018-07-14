@@ -39,6 +39,7 @@
     },
     "testMatch": [
       "**/src/**/*\\.test\\.ts"
-    ]
+    ],
+    "verbose": true
   }
 }

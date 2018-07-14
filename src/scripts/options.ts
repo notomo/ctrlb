@@ -1,6 +1,8 @@
 import { Config } from "./ctrlb/config";
+import ChromePromise from "chrome-promise";
 
-const config = new Config();
+const storage = new ChromePromise().storage.sync;
+const config = new Config(storage);
 
 function saveOptions() {
   const hostForm = document.getElementById("host") as HTMLInputElement;

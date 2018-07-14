@@ -1,30 +1,29 @@
-import ChromePromise from "chrome-promise";
-
 export class Config {
   public readonly DEFAULT_HOST: string = "127.0.0.1:8888";
 
+  protected storage: ConfigStorage;
+
+  constructor(storage: ConfigStorage) {
+    this.storage = storage;
+  }
+
   public async getHost(): Promise<string> {
-    return await new ChromePromise().storage.sync
-      .get({
-        host: this.DEFAULT_HOST
-      })
-      .then(items => {
-        const host = items.host as string;
-        if (!this.validateHost(host)) {
-          throw new ValidateError(host);
-        }
-        return host;
-      });
+    const items = await this.storage.get({ host: this.DEFAULT_HOST });
+    const host = items.host as string;
+    if (!this.validateHost(host)) {
+      throw new ValidateError(host);
+    }
+
+    return host;
   }
 
   public async saveHost(host: string): Promise<void> {
     const trimmedHost = host.trim();
     if (!this.validateHost(trimmedHost)) {
-      return new Promise((resolve, reject) => {
-        throw new ValidateError(trimmedHost);
-      }).then(() => {});
+      throw new ValidateError(trimmedHost);
     }
-    return await new ChromePromise().storage.sync.set({
+
+    return this.storage.set({
       host: trimmedHost
     });
   }
@@ -50,7 +49,7 @@ export class Config {
   }
 }
 
-class ValidateError extends Error {
+export class ValidateError extends Error {
   constructor(private host: string) {
     super();
   }
@@ -58,4 +57,9 @@ class ValidateError extends Error {
   toString() {
     return "allowed only private ip or localhost. actual: " + this.host;
   }
+}
+
+export interface ConfigStorage {
+  get(keys: { [key: string]: any }): { [key: string]: any };
+  set(keys: { [key: string]: any }): Promise<void>;
 }
