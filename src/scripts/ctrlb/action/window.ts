@@ -15,33 +15,32 @@ export class WindowKind extends ActionKind {
     };
   }
 
-  protected async removeLastFocused(args: ActionArgs): Promise<ResultInfo> {
-    return this.getLastFocused().then((win: Win) => {
+  protected async removeLastFocused(args: ActionArgs): Promise<void> {
+    this.getLastFocused().then((win: Win) => {
       return this.remove({ id: win.id });
     });
   }
 
-  protected async remove(args: ActionArgs): Promise<ResultInfo> {
+  protected async remove(args: ActionArgs): Promise<void> {
     if (args.id === undefined) {
-      return { status: "invalid" };
+      return;
     }
     const windowId = args.id as number;
     this.browser.windows.remove(windowId);
-    return { status: "ok" };
   }
 
   protected async activate(args: ActionArgs): Promise<ResultInfo> {
     if (args.id === undefined) {
-      return { status: "invalid" };
+      return {};
     }
     const windowId = args.id as number;
     this.browser.windows.update(windowId, { focused: true });
-    return { status: "ok" };
+    return {};
   }
 
   protected async list(args: ActionArgs): Promise<ResultInfo> {
     const windows = await this.browser.windows.getAll({ populate: true });
-    return { status: "ok", body: windows };
+    return { body: windows };
   }
 
   protected async toNormal(args: ActionArgs): Promise<ResultInfo> {
@@ -66,7 +65,7 @@ export class WindowKind extends ActionKind {
         return this.browser.windows.update(win.id, { state: state });
       })
       .then((win: Win) => {
-        return { status: "ok" };
+        return {};
       });
   }
 

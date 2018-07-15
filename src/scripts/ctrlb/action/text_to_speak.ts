@@ -10,13 +10,13 @@ export class TextToSpeakKind extends ActionKind {
   protected async speak(args: ActionArgs): Promise<ResultInfo> {
     const text: string = args.input as string;
     if (text === undefined) {
-      return { status: "invalid" };
+      return { };
     }
     var rate: number = args.rate as number;
     if (rate === undefined) {
       rate = 1.0;
     }
     await this.browser.tts.speak(text, { rate: rate });
-    return { status: "ok" };
+    return {  };
   }
 }

@@ -30,7 +30,7 @@ export class ActionFacade {
     this.browser = browser;
   }
 
-  public execute(json: any): Promise<ResultInfo> {
+  public async execute(json: any): Promise<ResultInfo> {
     const actionInfo = json as ActionInfo;
     const actionKinds: ActionKindConstructors = {
       tab: TabKind,
@@ -44,11 +44,14 @@ export class ActionFacade {
     };
     const actionKindClass = actionKinds[actionInfo.kindName];
     const actionKind = new actionKindClass(this.browser);
-    const result = actionKind.execute(actionInfo.actionName, actionInfo.args);
-    if (result instanceof Promise) {
-      return result;
+    const result = await actionKind.execute(
+      actionInfo.actionName,
+      actionInfo.args
+    );
+    if (result == undefined || result == null) {
+      return {};
     }
-    return new Promise((resolve, reject) => resolve(result));
+    return result;
   }
 }
 

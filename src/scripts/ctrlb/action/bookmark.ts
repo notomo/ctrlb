@@ -30,42 +30,56 @@ export class BookmarkKind extends ActionKind {
 
   protected async open(args: ActionArgs): Promise<ResultInfo> {
     if (args.id === undefined) {
-      return { status: "invalid" };
+      return {};
     }
-    return await this.get(args.id as number).then((bookmark: BookmarkItem) => {
-      if (bookmark.url === undefined) {
-        return { status: "invalid" };
+    return await this.get(args.id as number).then(
+      async (bookmark: BookmarkItem) => {
+        if (bookmark.url === undefined) {
+          return {};
+        }
+        const result = await new TabKind(this.browser).execute("open", {
+          url: bookmark.url
+        });
+        if (result === undefined) {
+          return {};
+        }
+        return result;
       }
-      return new TabKind(this.browser).execute("open", { url: bookmark.url });
-    });
+    );
   }
 
   protected async tabOpen(args: ActionArgs): Promise<ResultInfo> {
     if (args.id === undefined) {
-      return { status: "invalid" };
+      return {};
     }
-    return await this.get(args.id as number).then((bookmark: BookmarkItem) => {
-      if (bookmark.url === undefined) {
-        return { status: "invalid" };
+    return await this.get(args.id as number).then(
+      async (bookmark: BookmarkItem) => {
+        if (bookmark.url === undefined) {
+          return {};
+        }
+        const result = await new TabKind(this.browser).execute("tabOpen", {
+          url: bookmark.url
+        });
+        if (result === undefined) {
+          return {};
+        }
+        return result;
       }
-      return new TabKind(this.browser).execute("tabOpen", {
-        url: bookmark.url
-      });
-    });
+    );
   }
 
   protected async remove(args: ActionArgs): Promise<ResultInfo> {
     if (args.id === undefined) {
-      return { status: "invalid" };
+      return {};
     }
     const bookmark = await this.get(args.id as number);
     if (bookmark.url === undefined) {
       return this.browser.bookmarks.removeTree(bookmark.id).then(() => {
-        return { status: "ok" };
+        return {};
       });
     }
     return this.browser.bookmarks.remove(bookmark.id).then(() => {
-      return { status: "ok" };
+      return {};
     });
   }
 
@@ -78,7 +92,7 @@ export class BookmarkKind extends ActionKind {
     return this.browser.bookmarks
       .create(info)
       .then((bookmark: BookmarkItem) => {
-        return { status: "ok" };
+        return {};
       });
   }
 
@@ -100,7 +114,7 @@ export class BookmarkKind extends ActionKind {
           };
         });
 
-        return { status: "ok", body: body };
+        return { body: body };
       });
     return bookmarks;
   }
@@ -108,7 +122,7 @@ export class BookmarkKind extends ActionKind {
   protected async search(args: ActionArgs): Promise<ResultInfo> {
     const query: string = args.input as string;
     if (query === undefined) {
-      return { status: "ok", body: [] };
+      return { body: [] };
     }
     return await this.browser.bookmarks
       .search(query)
@@ -121,13 +135,13 @@ export class BookmarkKind extends ActionKind {
           };
         });
 
-        return { status: "ok", body: body };
+        return { body: body };
       });
   }
 
   protected async update(args: ActionArgs): Promise<ResultInfo> {
     if (args.id === undefined) {
-      return { status: "invalid" };
+      return {};
     }
     const id = args.id as number;
     const info = {
@@ -136,7 +150,7 @@ export class BookmarkKind extends ActionKind {
     };
     return this.get(id).then((bookmark: BookmarkItem) => {
       this.browser.bookmarks.update(bookmark.id, info);
-      return { status: "ok" };
+      return {};
     });
   }
 }

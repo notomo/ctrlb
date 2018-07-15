@@ -1,4 +1,4 @@
-import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
+import { ActionArgs, ActionKind, ActionGroup } from "./action";
 
 export class NavigationKind extends ActionKind {
   protected getActions(): ActionGroup {
@@ -8,17 +8,15 @@ export class NavigationKind extends ActionKind {
     };
   }
 
-  protected back(args: ActionArgs): ResultInfo {
+  protected back(args: ActionArgs): void {
     this.browser.tabs.executeScript({
       code: "history.back();"
     });
-    return { status: "ok" };
   }
 
-  protected forward(args: ActionArgs): ResultInfo {
+  protected forward(args: ActionArgs): void {
     this.browser.tabs.executeScript({
       code: "history.forward();"
     });
-    return { status: "ok" };
   }
 }

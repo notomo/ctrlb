@@ -1,4 +1,4 @@
-import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
+import { ActionArgs, ActionKind, ActionGroup } from "./action";
 
 export class ScrollKind extends ActionKind {
   protected getActions(): ActionGroup {
@@ -10,31 +10,27 @@ export class ScrollKind extends ActionKind {
     };
   }
 
-  protected toTop(args: ActionArgs): ResultInfo {
+  protected toTop(args: ActionArgs): void {
     this.browser.tabs.executeScript({
       code: "window.scrollTo(window.scrollX, 0);"
     });
-    return { status: "ok" };
   }
 
-  protected toBottom(args: ActionArgs): ResultInfo {
+  protected toBottom(args: ActionArgs): void {
     this.browser.tabs.executeScript({
       code: "window.scrollTo(window.scrollX, document.body.scrollHeight);"
     });
-    return { status: "ok" };
   }
 
-  protected up(args: ActionArgs): ResultInfo {
+  protected up(args: ActionArgs): void {
     this.browser.tabs.executeScript({
       code: "window.scrollBy(0, -50);"
     });
-    return { status: "ok" };
   }
 
-  protected down(args: ActionArgs): ResultInfo {
+  protected down(args: ActionArgs): void {
     this.browser.tabs.executeScript({
       code: "window.scrollBy(0, 50);"
     });
-    return { status: "ok" };
   }
 }

@@ -5,12 +5,10 @@ export interface ActionGroup {
 }
 
 export interface ResultInfo {
-  // TODO: enum
-  status: string;
   body?: any;
 }
 
-export type Result = ResultInfo | Promise<ResultInfo>;
+export type Result = ResultInfo | Promise<ResultInfo> | void | Promise<void>;
 
 interface Action {
   (args: ActionArgs): Result;

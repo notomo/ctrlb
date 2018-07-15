@@ -1,4 +1,4 @@
-import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
+import { ActionArgs, ActionKind, ActionGroup } from "./action";
 
 export class ZoomKind extends ActionKind {
   protected getActions(): ActionGroup {
@@ -10,29 +10,25 @@ export class ZoomKind extends ActionKind {
     };
   }
 
-  protected set(args: ActionArgs): ResultInfo {
+  protected set(args: ActionArgs): void {
     const zoomFactor: number = args.zoomFactor as number;
     this.browser.tabs.setZoom(zoomFactor);
-    return { status: "ok" };
   }
 
-  protected reset(args: ActionArgs): ResultInfo {
+  protected reset(args: ActionArgs): void {
     this.browser.tabs.setZoom(0);
-    return { status: "ok" };
   }
 
-  protected async up(args: ActionArgs): Promise<ResultInfo> {
+  protected async up(args: ActionArgs): Promise<void> {
     const currentZoomFactor = await this.browser.tabs.getZoom();
     this.browser.tabs.setZoom(currentZoomFactor + 0.1);
-    return { status: "ok" };
   }
 
-  protected async down(args: ActionArgs): Promise<ResultInfo> {
+  protected async down(args: ActionArgs): Promise<void> {
     const zoomFactor = (await this.browser.tabs.getZoom()) - 0.1;
     if (zoomFactor < 0.1) {
-      return { status: "ok" };
+      return;
     }
     this.browser.tabs.setZoom(zoomFactor);
-    return { status: "ok" };
   }
 }

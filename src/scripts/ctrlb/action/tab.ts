@@ -29,7 +29,7 @@ export class TabKind extends ActionKind {
 
   protected async activate(args: ActionArgs): Promise<ResultInfo> {
     if (args.id === undefined) {
-      return { status: "invalid" };
+      return { };
     }
     const tabId = args.id as number;
     return await this.browser.tabs
@@ -38,13 +38,13 @@ export class TabKind extends ActionKind {
         return this.update(tab, { active: true });
       })
       .then(() => {
-        return { status: "ok" };
+        return {  };
       });
   }
 
   protected async create(args: ActionArgs): Promise<ResultInfo> {
     return this.browser.tabs.create({}).then((tab: Tab) => {
-      return { status: "ok" };
+      return {  };
     });
   }
 
@@ -56,7 +56,7 @@ export class TabKind extends ActionKind {
         if (tab !== undefined) {
           this.update(tab, { active: true });
         }
-        return { status: "ok" };
+        return {  };
       });
   }
 
@@ -84,7 +84,7 @@ export class TabKind extends ActionKind {
         if (tab !== undefined) {
           this.update(tab, { active: true });
         }
-        return { status: "ok" };
+        return {  };
       });
   }
 
@@ -105,7 +105,7 @@ export class TabKind extends ActionKind {
         if (tab !== undefined) {
           this.update(tab, { active: true });
         }
-        return { status: "ok" };
+        return {  };
       });
   }
 
@@ -115,7 +115,7 @@ export class TabKind extends ActionKind {
     if (tab !== undefined) {
       this.update(tab, { active: true });
     }
-    return { status: "ok" };
+    return {  };
   }
 
   protected moveLeft(args: ActionArgs): Promise<ResultInfo> {
@@ -124,7 +124,7 @@ export class TabKind extends ActionKind {
         const id = tab.id as number;
         this.browser.tabs.move(id, { index: tab.index - 1 });
       }
-      return { status: "ok" };
+      return {  };
     });
   }
 
@@ -132,7 +132,7 @@ export class TabKind extends ActionKind {
     return this.getCurrentTab().then((tab: Tab) => {
       const id = tab.id as number;
       this.browser.tabs.move(id, { index: tab.index + 1 });
-      return { status: "ok" };
+      return {  };
     });
   }
 
@@ -140,7 +140,7 @@ export class TabKind extends ActionKind {
     return this.getCurrentTab().then((tab: Tab) => {
       const id = tab.id as number;
       this.browser.tabs.move(id, { index: 0 });
-      return { status: "ok" };
+      return {  };
     });
   }
 
@@ -148,7 +148,7 @@ export class TabKind extends ActionKind {
     return this.getCurrentTab().then((tab: Tab) => {
       const id = tab.id as number;
       this.browser.tabs.move(id, { index: -1 });
-      return { status: "ok" };
+      return {  };
     });
   }
 
@@ -156,7 +156,7 @@ export class TabKind extends ActionKind {
     return this.getCurrentTab().then((tab: Tab) => {
       const tabId = tab.id as number;
       this.browser.tabs.remove(tabId);
-      return { status: "ok" };
+      return {  };
     });
   }
 
@@ -177,7 +177,7 @@ export class TabKind extends ActionKind {
           return tab.id as number;
         });
         this.browser.tabs.remove(tabIds);
-        return { status: "ok" };
+        return {  };
       });
   }
 
@@ -198,7 +198,7 @@ export class TabKind extends ActionKind {
           return tab.id as number;
         });
         this.browser.tabs.remove(tabIds);
-        return { status: "ok" };
+        return {  };
       });
   }
 
@@ -219,28 +219,28 @@ export class TabKind extends ActionKind {
           return tab.id as number;
         });
         this.browser.tabs.remove(tabIds);
-        return { status: "ok" };
+        return {  };
       });
   }
 
   protected async tabOpen(args: ActionArgs): Promise<ResultInfo> {
     if (args.url === undefined) {
-      return { status: "invalid" };
+      return { };
     }
     const url = args.url as string;
     return this.browser.tabs.create({ url: url }).then((tab: Tab) => {
-      return { status: "ok" };
+      return {  };
     });
   }
 
   protected async open(args: ActionArgs): Promise<ResultInfo> {
     if (args.url === undefined) {
-      return { status: "invalid" };
+      return { };
     }
     const url = args.url as string;
     return this.getCurrentTab().then((tab: Tab) => {
       this.update(tab, { url: url });
-      return { status: "ok" };
+      return {  };
     });
   }
 
@@ -248,7 +248,7 @@ export class TabKind extends ActionKind {
     return this.getCurrentTab().then((tab: Tab) => {
       const tabId = tab.id as number;
       this.browser.tabs.duplicate(tabId);
-      return { status: "ok" };
+      return {  };
     });
   }
 
@@ -256,7 +256,7 @@ export class TabKind extends ActionKind {
     return this.getCurrentTab().then((tab: Tab) => {
       const tabId = tab.id as number;
       this.browser.tabs.reload(tabId);
-      return { status: "ok" };
+      return {  };
     });
   }
 
@@ -264,18 +264,18 @@ export class TabKind extends ActionKind {
     const tabs = await this.browser.tabs
       .query({ currentWindow: true })
       .then((tabs: Tab[]) => {
-        return { status: "ok", body: tabs };
+        return { body: tabs };
       });
     return tabs;
   }
 
   protected async get(args: ActionArgs): Promise<ResultInfo> {
     if (args.id === undefined) {
-      return { status: "invalid" };
+      return { };
     }
     const tabId = args.id as number;
     const tab = await this.browser.tabs.get(tabId).then((tab: Tab) => {
-      return { status: "ok", body: tab };
+      return { body: tab };
     });
     return tab;
   }

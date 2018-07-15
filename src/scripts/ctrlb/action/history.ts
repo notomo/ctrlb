@@ -11,12 +11,12 @@ export class HistoryKind extends ActionKind {
   protected async search(args: ActionArgs): Promise<ResultInfo> {
     const text: string = args.input as string;
     if (text === undefined) {
-      return { status: "ok", body: [] };
+      return { body: [] };
     }
     return await this.browser.history
       .search({ text: text })
       .then((histories: History[]) => {
-        return { status: "ok", body: histories };
+        return { body: histories };
       });
   }
 }
