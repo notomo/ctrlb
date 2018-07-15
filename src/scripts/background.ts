@@ -1,4 +1,4 @@
-import { Client } from "./ctrlb/client";
+import { Client, Connector } from "./ctrlb/client";
 import { Config } from "./ctrlb/config";
 import ChromePromise from "chrome-promise";
 
@@ -6,14 +6,14 @@ const storage = new ChromePromise().storage.sync;
 const config = new Config(storage);
 
 config.getHost().then((host: string) => {
-  const client = new Client(host);
+  const connector = new Connector();
+  const view = chrome.browserAction;
+  const client = new Client(connector, view);
+  client.open(host);
 
   chrome.browserAction.onClicked.addListener(async () => {
-    if (client.isOpen()) {
-      return;
-    }
     const host: string = await config.getHost();
-    client.reload(host);
+    client.open(host);
   });
 
   chrome.tabs.onActivated.addListener((activeInfo: any) => {

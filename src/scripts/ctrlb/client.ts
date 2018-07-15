@@ -2,34 +2,36 @@ import { ActionFacade } from "./action/facade";
 import { Result } from "./action/action";
 
 export class Client {
-  private host: string;
-  private socket: WebSocket;
-  private readonly NAME: string = "ctrlb";
+  protected socket: IWebSocket | null;
+  protected readonly NAME: string = "ctrlb";
+  protected readonly connector: Connector;
+  protected readonly view: View;
+  public readonly ENABLE_ICON = "images/icon-19.png";
+  public readonly DISABLE_ICON = "images/icon-19-gray.png";
 
-  constructor(host: string) {
-    this.host = host;
-    this.socket = this.open(host);
+  constructor(connector: Connector, view: View) {
+    this.socket = null;
+    this.connector = connector;
+    this.view = view;
   }
 
-  protected open(host: string) {
-    const socket = new WebSocket("ws://" + host);
-    socket.onopen = () => this.onOpen();
-    socket.onmessage = (ev: MessageEvent) => this.onMessage(ev);
-    socket.onerror = e => this.disableIcon();
-    socket.onclose = e => this.disableIcon();
-    return socket;
-  }
-
-  public reload(host?: string) {
-    if (host === undefined) {
-      this.socket = this.open(this.host);
-    } else {
-      this.socket = this.open(host);
+  public open(host: string) {
+    if (this.isOpen()) {
+      return;
     }
+    const socket = this.connector.connect(host);
+    socket.onopen = (ev: Event) => this.onOpen();
+    socket.onmessage = (ev: MessageEvent) => this.onMessage(ev);
+    socket.onerror = (ev: Event) => this.disableIcon();
+    socket.onclose = (ev: CloseEvent) => this.disableIcon();
+    this.socket = socket;
   }
 
-  public isOpen(): boolean {
-    return this.socket.readyState === WebSocket.OPEN;
+  protected isOpen(): boolean {
+    if (this.socket == null) {
+      return false;
+    }
+    return this.socket.readyState === this.socket.OPEN;
   }
 
   protected sendMessage(data: any, requestId?: string) {
@@ -38,16 +40,17 @@ export class Client {
       data.requestId = requestId;
     }
     const json = JSON.stringify(data);
-    this.socket.send(json);
+    const socket = this.socket as IWebSocket;
+    socket.send(json);
   }
 
   protected onOpen() {
-    chrome.browserAction.setIcon({ path: "images/icon-19.png" });
+    this.view.setIcon({ path: this.ENABLE_ICON });
     this.sendMessage({});
   }
 
   protected disableIcon() {
-    chrome.browserAction.setIcon({ path: "images/icon-19-gray.png" });
+    this.view.setIcon({ path: this.DISABLE_ICON });
   }
 
   protected onMessage(ev: MessageEvent) {
@@ -55,13 +58,35 @@ export class Client {
     this.execute(json);
   }
 
-  public execute(jsonArray: any) {
+  public execute(jsonArray: any): boolean {
     if (!this.isOpen()) {
-      return;
+      return false;
     }
     const requestId = jsonArray.requestId;
     new ActionFacade()
       .execute(jsonArray)
       .then((result: Result) => this.sendMessage(result, requestId));
+    return true;
+  }
+}
+
+export interface View {
+  setIcon(details: { path: string }): void;
+}
+
+export interface IWebSocket {
+  onclose: ((ev: CloseEvent) => any) | null;
+  onerror: ((ev: Event) => any) | null;
+  onmessage: ((ev: MessageEvent) => any) | null;
+  onopen: ((ev: Event) => any) | null;
+  readonly readyState: number;
+  close(code?: number, reason?: string): void;
+  send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void;
+  readonly OPEN: number;
+}
+
+export class Connector {
+  public connect(host: string): IWebSocket {
+    return new WebSocket("ws://" + host);
   }
 }
