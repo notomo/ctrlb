@@ -1,6 +1,5 @@
 const gulp = require("gulp");
 const del = require("del");
-const gulpSequence = require("gulp-sequence");
 const webpack = require("webpack");
 const gulpWebpack = require("webpack-stream");
 const plumber = require("gulp-plumber");
@@ -22,18 +21,11 @@ gulp.task("pages", () => {
   return gulp.src("src/**/*.html").pipe(gulp.dest("dist"));
 });
 
-gulp.task(
-  "build",
-  gulpSequence("clean", ["manifest", "scripts", "images", "pages"])
-);
-
-gulp.task("default", ["build"]);
-
 gulp.task("watch", () => {
-  gulp.watch("src/manifest.json", ["manifest"]);
-  gulp.watch("src/scripts/**/*.ts", ["scripts"]);
-  gulp.watch("src/images/**/*.png", ["images"]);
-  gulp.watch("src/pages/**/*.html", ["pages"]);
+  gulp.watch("src/manifest.json", gulp.task("manifest"));
+  gulp.watch("src/scripts/**/*.ts", gulp.task("scripts"));
+  gulp.watch("src/images/**/*.png", gulp.task("images"));
+  gulp.watch("src/pages/**/*.html", gulp.task("pages"));
 });
 
 gulp.task("scripts", cb => {
@@ -75,3 +67,13 @@ gulp.task("scripts", cb => {
     )
     .pipe(gulp.dest("dist/scripts"));
 });
+
+gulp.task(
+  "build",
+  gulp.series(
+    gulp.task("clean"),
+    gulp.parallel("manifest", "scripts", "images", "pages")
+  )
+);
+
+gulp.task("default", gulp.task("build"));
