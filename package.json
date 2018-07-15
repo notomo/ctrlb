@@ -23,7 +23,10 @@
   },
   "dependencies": {},
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "build": "gulp",
+    "watch": "gulp watch"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -39,7 +42,10 @@
     "testMatch": [
       "**/src/**/*\\.test\\.ts"
     ],
-    "verbose": true
+    "verbose": true,
+    "collectCoverageFrom": [
+      "**/src/scripts/**/*.ts"
+    ],
+    "coverageDirectory": "./coverage/"
   }
 }
-
