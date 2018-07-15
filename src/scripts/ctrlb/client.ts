@@ -1,18 +1,20 @@
-import { ActionFacade } from "./action/facade";
 import { Result } from "./action/action";
+import { ResultInfo } from "./action/action";
 
 export class Client {
   protected socket: IWebSocket | null;
   protected readonly NAME: string = "ctrlb";
   protected readonly connector: Connector;
   protected readonly view: View;
+  protected readonly invoker: ActionInvoker;
   public readonly ENABLE_ICON = "images/icon-19.png";
   public readonly DISABLE_ICON = "images/icon-19-gray.png";
 
-  constructor(connector: Connector, view: View) {
+  constructor(connector: Connector, view: View, invoker: ActionInvoker) {
     this.socket = null;
     this.connector = connector;
     this.view = view;
+    this.invoker = invoker;
   }
 
   public open(host: string) {
@@ -63,7 +65,7 @@ export class Client {
       return false;
     }
     const requestId = jsonArray.requestId;
-    new ActionFacade()
+    this.invoker
       .execute(jsonArray)
       .then((result: Result) => this.sendMessage(result, requestId));
     return true;
@@ -89,4 +91,8 @@ export class Connector {
   public connect(host: string): IWebSocket {
     return new WebSocket("ws://" + host);
   }
+}
+
+export interface ActionInvoker {
+  execute(json: any): Promise<ResultInfo>;
 }

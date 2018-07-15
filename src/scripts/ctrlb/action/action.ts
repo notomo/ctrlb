@@ -1,4 +1,4 @@
-import ChromePromise from "chrome-promise";
+import { Browser } from "./facade";
 
 export interface ActionGroup {
   [index: string]: Action;
@@ -17,9 +17,10 @@ interface Action {
 }
 
 export abstract class ActionKind {
-  protected chrome: ChromePromise;
-  constructor() {
-    this.chrome = new ChromePromise();
+  protected browser: Browser;
+
+  constructor(browser: Browser) {
+    this.browser = browser;
   }
 
   public execute(actionName: string, args: ActionArgs): Result {

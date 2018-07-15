@@ -1,6 +1,6 @@
 import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
 
-export class TextToSpeak extends ActionKind {
+export class TextToSpeakKind extends ActionKind {
   protected getActions(): ActionGroup {
     return {
       speak: (args: ActionArgs) => this.speak(args)
@@ -16,7 +16,7 @@ export class TextToSpeak extends ActionKind {
     if (rate === undefined) {
       rate = 1.0;
     }
-    await this.chrome.tts.speak(text, { rate: rate });
+    await this.browser.tts.speak(text, { rate: rate });
     return { status: "ok" };
   }
 }

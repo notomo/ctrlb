@@ -1,6 +1,7 @@
 import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
+import { History } from "./facade";
 
-export class History extends ActionKind {
+export class HistoryKind extends ActionKind {
   protected getActions(): ActionGroup {
     return {
       search: (args: ActionArgs) => this.search(args)
@@ -12,9 +13,9 @@ export class History extends ActionKind {
     if (text === undefined) {
       return { status: "ok", body: [] };
     }
-    return await this.chrome.history
+    return await this.browser.history
       .search({ text: text })
-      .then((histories: chrome.history.HistoryItem[]) => {
+      .then((histories: History[]) => {
         return { status: "ok", body: histories };
       });
   }

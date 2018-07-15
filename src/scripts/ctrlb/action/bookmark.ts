@@ -1,7 +1,8 @@
 import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
-import { Tab } from "./tab";
+import { TabKind } from "./tab";
+import { BookmarkItem } from "./facade";
 
-export class Bookmark extends ActionKind {
+export class BookmarkKind extends ActionKind {
   protected getActions(): ActionGroup {
     return {
       list: (args: ActionArgs) => this.list(args),
@@ -14,13 +15,11 @@ export class Bookmark extends ActionKind {
     };
   }
 
-  private async get(
-    bookmarkId: number
-  ): Promise<chrome.bookmarks.BookmarkTreeNode> {
+  private async get(bookmarkId: number): Promise<BookmarkItem> {
     const id = String(bookmarkId);
-    return await this.chrome.bookmarks
+    return await this.browser.bookmarks
       .get(id)
-      .then((bookmarks: chrome.bookmarks.BookmarkTreeNode[]) => {
+      .then((bookmarks: BookmarkItem[]) => {
         const bookmark = bookmarks.pop();
         if (bookmark === undefined) {
           throw new NotFoundBookmark(id);
@@ -33,28 +32,26 @@ export class Bookmark extends ActionKind {
     if (args.id === undefined) {
       return { status: "invalid" };
     }
-    return await this.get(args.id as number).then(
-      (bookmark: chrome.bookmarks.BookmarkTreeNode) => {
-        if (bookmark.url === undefined) {
-          return { status: "invalid" };
-        }
-        return new Tab().execute("open", { url: bookmark.url });
+    return await this.get(args.id as number).then((bookmark: BookmarkItem) => {
+      if (bookmark.url === undefined) {
+        return { status: "invalid" };
       }
-    );
+      return new TabKind(this.browser).execute("open", { url: bookmark.url });
+    });
   }
 
   protected async tabOpen(args: ActionArgs): Promise<ResultInfo> {
     if (args.id === undefined) {
       return { status: "invalid" };
     }
-    return await this.get(args.id as number).then(
-      (bookmark: chrome.bookmarks.BookmarkTreeNode) => {
-        if (bookmark.url === undefined) {
-          return { status: "invalid" };
-        }
-        return new Tab().execute("tabOpen", { url: bookmark.url });
+    return await this.get(args.id as number).then((bookmark: BookmarkItem) => {
+      if (bookmark.url === undefined) {
+        return { status: "invalid" };
       }
-    );
+      return new TabKind(this.browser).execute("tabOpen", {
+        url: bookmark.url
+      });
+    });
   }
 
   protected async remove(args: ActionArgs): Promise<ResultInfo> {
@@ -63,11 +60,11 @@ export class Bookmark extends ActionKind {
     }
     const bookmark = await this.get(args.id as number);
     if (bookmark.url === undefined) {
-      return this.chrome.bookmarks.removeTree(bookmark.id).then(() => {
+      return this.browser.bookmarks.removeTree(bookmark.id).then(() => {
         return { status: "ok" };
       });
     }
-    return this.chrome.bookmarks.remove(bookmark.id).then(() => {
+    return this.browser.bookmarks.remove(bookmark.id).then(() => {
       return { status: "ok" };
     });
   }
@@ -78,9 +75,9 @@ export class Bookmark extends ActionKind {
       title: args.title as string,
       parentId: args.parentId as string
     };
-    return this.chrome.bookmarks
+    return this.browser.bookmarks
       .create(info)
-      .then((bookmark: chrome.bookmarks.BookmarkTreeNode) => {
+      .then((bookmark: BookmarkItem) => {
         return { status: "ok" };
       });
   }
@@ -92,9 +89,9 @@ export class Bookmark extends ActionKind {
     } else {
       numberOfItems = 50;
     }
-    const bookmarks = await this.chrome.bookmarks
+    const bookmarks = await this.browser.bookmarks
       .getRecent(numberOfItems)
-      .then((bookmarks: chrome.bookmarks.BookmarkTreeNode[]) => {
+      .then((bookmarks: BookmarkItem[]) => {
         const body = bookmarks.map(book => {
           return {
             id: book.id,
@@ -113,9 +110,9 @@ export class Bookmark extends ActionKind {
     if (query === undefined) {
       return { status: "ok", body: [] };
     }
-    return await this.chrome.bookmarks
+    return await this.browser.bookmarks
       .search(query)
-      .then((bookmarks: chrome.bookmarks.BookmarkTreeNode[]) => {
+      .then((bookmarks: BookmarkItem[]) => {
         const body = bookmarks.map(book => {
           return {
             id: book.id,
@@ -137,8 +134,8 @@ export class Bookmark extends ActionKind {
       url: args.url as string,
       title: args.title as string
     };
-    return this.get(id).then((bookmark: chrome.bookmarks.BookmarkTreeNode) => {
-      this.chrome.bookmarks.update(bookmark.id, info);
+    return this.get(id).then((bookmark: BookmarkItem) => {
+      this.browser.bookmarks.update(bookmark.id, info);
       return { status: "ok" };
     });
   }

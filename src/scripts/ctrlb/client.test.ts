@@ -1,4 +1,4 @@
-import { Client, View, Connector, IWebSocket } from "./client";
+import { Client, View, Connector, IWebSocket, ActionInvoker } from "./client";
 
 describe("Client", () => {
   it("execute returns false if closed", () => {
@@ -6,7 +6,9 @@ describe("Client", () => {
     const connector = new ConnectorClass();
     const ViewClass = jest.fn<View>(() => ({}));
     const view = new ViewClass();
-    const client = new Client(connector, view);
+    const InvokerClass = jest.fn<ActionInvoker>(() => ({}));
+    const invoker = new InvokerClass();
+    const client = new Client(connector, view, invoker);
 
     expect(client.execute({})).toBe(false);
   });
@@ -26,7 +28,9 @@ describe("Client", () => {
       setIcon: setIcon
     }));
     const view = new ViewClass();
-    const client = new Client(connector, view);
+    const InvokerClass = jest.fn<ActionInvoker>(() => ({}));
+    const invoker = new InvokerClass();
+    const client = new Client(connector, view, invoker);
 
     client.open("dummyhost");
     expect(socket.onclose).not.toBeNull();

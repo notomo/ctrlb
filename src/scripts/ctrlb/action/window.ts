@@ -1,6 +1,7 @@
 import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
+import { Win } from "./facade";
 
-export class Window extends ActionKind {
+export class WindowKind extends ActionKind {
   protected getActions(): ActionGroup {
     return {
       maximize: (args: ActionArgs) => this.maximize(args),
@@ -15,7 +16,7 @@ export class Window extends ActionKind {
   }
 
   protected async removeLastFocused(args: ActionArgs): Promise<ResultInfo> {
-    return this.getLastFocused().then((win: chrome.windows.Window) => {
+    return this.getLastFocused().then((win: Win) => {
       return this.remove({ id: win.id });
     });
   }
@@ -25,7 +26,7 @@ export class Window extends ActionKind {
       return { status: "invalid" };
     }
     const windowId = args.id as number;
-    this.chrome.windows.remove(windowId);
+    this.browser.windows.remove(windowId);
     return { status: "ok" };
   }
 
@@ -34,12 +35,12 @@ export class Window extends ActionKind {
       return { status: "invalid" };
     }
     const windowId = args.id as number;
-    this.chrome.windows.update(windowId, { focused: true });
+    this.browser.windows.update(windowId, { focused: true });
     return { status: "ok" };
   }
 
   protected async list(args: ActionArgs): Promise<ResultInfo> {
-    const windows = await this.chrome.windows.getAll({ populate: true });
+    const windows = await this.browser.windows.getAll({ populate: true });
     return { status: "ok", body: windows };
   }
 
@@ -61,15 +62,15 @@ export class Window extends ActionKind {
 
   private async updateState(state: string): Promise<ResultInfo> {
     return await this.getLastFocused()
-      .then((win: chrome.windows.Window) => {
-        return this.chrome.windows.update(win.id, { state: state });
+      .then((win: Win) => {
+        return this.browser.windows.update(win.id, { state: state });
       })
-      .then((win: chrome.windows.Window) => {
+      .then((win: Win) => {
         return { status: "ok" };
       });
   }
 
-  private async getLastFocused(): Promise<chrome.windows.Window> {
-    return await this.chrome.windows.getLastFocused();
+  private async getLastFocused(): Promise<Win> {
+    return await this.browser.windows.getLastFocused();
   }
 }

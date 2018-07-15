@@ -1,18 +1,22 @@
-import { Tab } from "./tab";
-import { Bookmark } from "./bookmark";
-import { History } from "./history";
-import { Window } from "./window";
-import { Scroll } from "./scroll";
-import { Navigation } from "./navigation";
-import { TextToSpeak } from "./text_to_speak";
-import { Zoom } from "./zoom";
+import { TabKind } from "./tab";
+import { BookmarkKind } from "./bookmark";
+import { HistoryKind } from "./history";
+import { WindowKind } from "./window";
+import { ScrollKind } from "./scroll";
+import { NavigationKind } from "./navigation";
+import { TextToSpeakKind } from "./text_to_speak";
+import { ZoomKind } from "./zoom";
 import { ActionInfo, ActionKind, ResultInfo } from "./action";
+import ChromePromise from "chrome-promise";
 
-// TODO
-interface JsonObject {}
+export interface Browser extends ChromePromise {}
+export interface Tab extends chrome.tabs.Tab {}
+export interface Win extends chrome.windows.Window {}
+export interface History extends chrome.history.HistoryItem {}
+export interface BookmarkItem extends chrome.bookmarks.BookmarkTreeNode {}
 
 interface ActionKindConstructor {
-  new (): ActionKind;
+  new (browser: Browser): ActionKind;
 }
 
 interface ActionKindConstructors {
@@ -20,20 +24,26 @@ interface ActionKindConstructors {
 }
 
 export class ActionFacade {
-  public execute(json: JsonObject): Promise<ResultInfo> {
+  protected readonly browser: Browser;
+
+  constructor(browser: Browser) {
+    this.browser = browser;
+  }
+
+  public execute(json: any): Promise<ResultInfo> {
     const actionInfo = json as ActionInfo;
     const actionKinds: ActionKindConstructors = {
-      tab: Tab,
-      bookmark: Bookmark,
-      history: History,
-      window: Window,
-      scroll: Scroll,
-      navigation: Navigation,
-      textToSpeak: TextToSpeak,
-      zoom: Zoom
+      tab: TabKind,
+      bookmark: BookmarkKind,
+      history: HistoryKind,
+      window: WindowKind,
+      scroll: ScrollKind,
+      navigation: NavigationKind,
+      textToSpeak: TextToSpeakKind,
+      zoom: ZoomKind
     };
     const actionKindClass = actionKinds[actionInfo.kindName];
-    const actionKind = new actionKindClass();
+    const actionKind = new actionKindClass(this.browser);
     const result = actionKind.execute(actionInfo.actionName, actionInfo.args);
     if (result instanceof Promise) {
       return result;

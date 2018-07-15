@@ -1,6 +1,7 @@
 import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
+import { Tab } from "./facade";
 
-export class Tab extends ActionKind {
+export class TabKind extends ActionKind {
   protected getActions(): ActionGroup {
     return {
       close: (args: ActionArgs) => this.close(args),
@@ -31,9 +32,9 @@ export class Tab extends ActionKind {
       return { status: "invalid" };
     }
     const tabId = args.id as number;
-    return await this.chrome.tabs
+    return await this.browser.tabs
       .get(tabId)
-      .then((tab: chrome.tabs.Tab) => {
+      .then((tab: Tab) => {
         return this.update(tab, { active: true });
       })
       .then(() => {
@@ -42,15 +43,15 @@ export class Tab extends ActionKind {
   }
 
   protected async create(args: ActionArgs): Promise<ResultInfo> {
-    return this.chrome.tabs.create({}).then((tab: chrome.tabs.Tab) => {
+    return this.browser.tabs.create({}).then((tab: Tab) => {
       return { status: "ok" };
     });
   }
 
   protected async first(args: ActionArgs): Promise<ResultInfo> {
-    return this.chrome.tabs
+    return this.browser.tabs
       .query({ currentWindow: true, index: 0 })
-      .then((tabs: chrome.tabs.Tab[]) => {
+      .then((tabs: Tab[]) => {
         const tab = tabs.pop();
         if (tab !== undefined) {
           this.update(tab, { active: true });
@@ -61,7 +62,7 @@ export class Tab extends ActionKind {
 
   protected async next(args: ActionArgs): Promise<ResultInfo> {
     return this.getCurrentTab()
-      .then(async (tab: chrome.tabs.Tab) => {
+      .then(async (tab: Tab) => {
         const lastTabs = await this.getLastTab();
         const lastTab = lastTabs.pop();
         if (lastTab === undefined) {
@@ -73,12 +74,12 @@ export class Tab extends ActionKind {
         } else {
           index = (tab.index as number) + 1;
         }
-        return this.chrome.tabs.query({
+        return this.browser.tabs.query({
           currentWindow: true,
           index: index
         });
       })
-      .then((tabs: chrome.tabs.Tab[]) => {
+      .then((tabs: Tab[]) => {
         const tab = tabs.pop();
         if (tab !== undefined) {
           this.update(tab, { active: true });
@@ -89,17 +90,17 @@ export class Tab extends ActionKind {
 
   protected async previous(args: ActionArgs): Promise<ResultInfo> {
     return this.getCurrentTab()
-      .then((tab: chrome.tabs.Tab) => {
+      .then((tab: Tab) => {
         const index = tab.index as number;
         if (index === 0) {
           return this.getLastTab();
         }
-        return this.chrome.tabs.query({
+        return this.browser.tabs.query({
           currentWindow: true,
           index: index - 1
         });
       })
-      .then((tabs: chrome.tabs.Tab[]) => {
+      .then((tabs: Tab[]) => {
         const tab = tabs.pop();
         if (tab !== undefined) {
           this.update(tab, { active: true });
@@ -118,106 +119,106 @@ export class Tab extends ActionKind {
   }
 
   protected moveLeft(args: ActionArgs): Promise<ResultInfo> {
-    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+    return this.getCurrentTab().then((tab: Tab) => {
       if (tab.index > 0) {
         const id = tab.id as number;
-        this.chrome.tabs.move(id, { index: tab.index - 1 });
+        this.browser.tabs.move(id, { index: tab.index - 1 });
       }
       return { status: "ok" };
     });
   }
 
   protected moveRight(args: ActionArgs): Promise<ResultInfo> {
-    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+    return this.getCurrentTab().then((tab: Tab) => {
       const id = tab.id as number;
-      this.chrome.tabs.move(id, { index: tab.index + 1 });
+      this.browser.tabs.move(id, { index: tab.index + 1 });
       return { status: "ok" };
     });
   }
 
   protected moveFirst(args: ActionArgs): Promise<ResultInfo> {
-    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+    return this.getCurrentTab().then((tab: Tab) => {
       const id = tab.id as number;
-      this.chrome.tabs.move(id, { index: 0 });
+      this.browser.tabs.move(id, { index: 0 });
       return { status: "ok" };
     });
   }
 
   protected moveLast(args: ActionArgs): Promise<ResultInfo> {
-    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+    return this.getCurrentTab().then((tab: Tab) => {
       const id = tab.id as number;
-      this.chrome.tabs.move(id, { index: -1 });
+      this.browser.tabs.move(id, { index: -1 });
       return { status: "ok" };
     });
   }
 
   protected close(args: ActionArgs): Promise<ResultInfo> {
-    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+    return this.getCurrentTab().then((tab: Tab) => {
       const tabId = tab.id as number;
-      chrome.tabs.remove(tabId);
+      this.browser.tabs.remove(tabId);
       return { status: "ok" };
     });
   }
 
   protected closeOthers(args: ActionArgs): Promise<ResultInfo> {
     return this.getCurrentTab()
-      .then(async (tab: chrome.tabs.Tab) => {
+      .then(async (tab: Tab) => {
         const tabId = tab.id as number;
-        const tabs = await this.chrome.tabs.query({
+        const tabs = await this.browser.tabs.query({
           currentWindow: true,
           pinned: false
         });
-        return tabs.filter((tab: chrome.tabs.Tab) => {
+        return tabs.filter((tab: Tab) => {
           return tab.id !== tabId;
         });
       })
-      .then((tabs: chrome.tabs.Tab[]) => {
-        const tabIds = tabs.map((tab: chrome.tabs.Tab) => {
+      .then((tabs: Tab[]) => {
+        const tabIds = tabs.map((tab: Tab) => {
           return tab.id as number;
         });
-        this.chrome.tabs.remove(tabIds);
+        this.browser.tabs.remove(tabIds);
         return { status: "ok" };
       });
   }
 
   protected closeRight(args: ActionArgs): Promise<ResultInfo> {
     return this.getCurrentTab()
-      .then(async (tab: chrome.tabs.Tab) => {
+      .then(async (tab: Tab) => {
         const index = tab.index as number;
-        const tabs = await this.chrome.tabs.query({
+        const tabs = await this.browser.tabs.query({
           currentWindow: true,
           pinned: false
         });
-        return tabs.filter((tab: chrome.tabs.Tab) => {
+        return tabs.filter((tab: Tab) => {
           return tab.index > index;
         });
       })
-      .then((tabs: chrome.tabs.Tab[]) => {
-        const tabIds = tabs.map((tab: chrome.tabs.Tab) => {
+      .then((tabs: Tab[]) => {
+        const tabIds = tabs.map((tab: Tab) => {
           return tab.id as number;
         });
-        this.chrome.tabs.remove(tabIds);
+        this.browser.tabs.remove(tabIds);
         return { status: "ok" };
       });
   }
 
   protected closeLeft(args: ActionArgs): Promise<ResultInfo> {
     return this.getCurrentTab()
-      .then(async (tab: chrome.tabs.Tab) => {
+      .then(async (tab: Tab) => {
         const index = tab.index as number;
-        const tabs = await this.chrome.tabs.query({
+        const tabs = await this.browser.tabs.query({
           currentWindow: true,
           pinned: false
         });
-        return tabs.filter((tab: chrome.tabs.Tab) => {
+        return tabs.filter((tab: Tab) => {
           return tab.index < index;
         });
       })
-      .then((tabs: chrome.tabs.Tab[]) => {
-        const tabIds = tabs.map((tab: chrome.tabs.Tab) => {
+      .then((tabs: Tab[]) => {
+        const tabIds = tabs.map((tab: Tab) => {
           return tab.id as number;
         });
-        this.chrome.tabs.remove(tabIds);
+        this.browser.tabs.remove(tabIds);
         return { status: "ok" };
       });
   }
@@ -227,11 +228,9 @@ export class Tab extends ActionKind {
       return { status: "invalid" };
     }
     const url = args.url as string;
-    return this.chrome.tabs
-      .create({ url: url })
-      .then((tab: chrome.tabs.Tab) => {
-        return { status: "ok" };
-      });
+    return this.browser.tabs.create({ url: url }).then((tab: Tab) => {
+      return { status: "ok" };
+    });
   }
 
   protected async open(args: ActionArgs): Promise<ResultInfo> {
@@ -239,32 +238,32 @@ export class Tab extends ActionKind {
       return { status: "invalid" };
     }
     const url = args.url as string;
-    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+    return this.getCurrentTab().then((tab: Tab) => {
       this.update(tab, { url: url });
       return { status: "ok" };
     });
   }
 
   protected duplicate(args: ActionArgs): Promise<ResultInfo> {
-    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+    return this.getCurrentTab().then((tab: Tab) => {
       const tabId = tab.id as number;
-      chrome.tabs.duplicate(tabId);
+      this.browser.tabs.duplicate(tabId);
       return { status: "ok" };
     });
   }
 
   protected reload(args: ActionArgs): Promise<ResultInfo> {
-    return this.getCurrentTab().then((tab: chrome.tabs.Tab) => {
+    return this.getCurrentTab().then((tab: Tab) => {
       const tabId = tab.id as number;
-      chrome.tabs.reload(tabId);
+      this.browser.tabs.reload(tabId);
       return { status: "ok" };
     });
   }
 
   protected async list(args: ActionArgs): Promise<ResultInfo> {
-    const tabs = await this.chrome.tabs
+    const tabs = await this.browser.tabs
       .query({ currentWindow: true })
-      .then((tabs: chrome.tabs.Tab[]) => {
+      .then((tabs: Tab[]) => {
         return { status: "ok", body: tabs };
       });
     return tabs;
@@ -275,32 +274,30 @@ export class Tab extends ActionKind {
       return { status: "invalid" };
     }
     const tabId = args.id as number;
-    const tab = await this.chrome.tabs
-      .get(tabId)
-      .then((tab: chrome.tabs.Tab) => {
-        return { status: "ok", body: tab };
-      });
+    const tab = await this.browser.tabs.get(tabId).then((tab: Tab) => {
+      return { status: "ok", body: tab };
+    });
     return tab;
   }
 
-  private async update(tab: chrome.tabs.Tab, properties: any) {
+  private async update(tab: Tab, properties: any) {
     const tabId = tab.id as number;
-    return this.chrome.tabs.update(tabId, properties);
+    return this.browser.tabs.update(tabId, properties);
   }
 
-  private async getCurrentTab(): Promise<chrome.tabs.Tab> {
-    return await this.chrome.tabs
+  private async getCurrentTab(): Promise<Tab> {
+    return await this.browser.tabs
       .query({ currentWindow: true, active: true })
-      .then((tabs: chrome.tabs.Tab[]) => {
-        return tabs.pop() as chrome.tabs.Tab;
+      .then((tabs: Tab[]) => {
+        return tabs.pop() as Tab;
       });
   }
 
-  private async getLastTab(): Promise<chrome.tabs.Tab[]> {
-    return this.chrome.tabs
+  private async getLastTab(): Promise<Tab[]> {
+    return this.browser.tabs
       .query({ currentWindow: true })
-      .then((tabs: chrome.tabs.Tab[]) => {
-        const indexes = tabs.map((tab: chrome.tabs.Tab) => {
+      .then((tabs: Tab[]) => {
+        const indexes = tabs.map((tab: Tab) => {
           return tab.index;
         });
         indexes.push(-1);
@@ -308,7 +305,7 @@ export class Tab extends ActionKind {
         if (index === -1) {
           return [];
         }
-        return this.chrome.tabs.query({ index: index });
+        return this.browser.tabs.query({ index: index });
       });
   }
 }
