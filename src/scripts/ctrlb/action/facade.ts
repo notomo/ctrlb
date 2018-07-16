@@ -48,7 +48,7 @@ export class ActionFacade {
       actionInfo.actionName,
       actionInfo.args
     );
-    if (result == undefined || result == null) {
+    if (result === null) {
       return {};
     }
     return result;

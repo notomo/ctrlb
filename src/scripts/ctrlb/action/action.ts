@@ -8,7 +8,7 @@ export interface ResultInfo {
   body?: any;
 }
 
-export type Result = ResultInfo | Promise<ResultInfo> | void | Promise<void>;
+export type Result = ResultInfo | Promise<ResultInfo> | null | Promise<null>;
 
 interface ActionMethod {
   (args: ActionArgs): Result;

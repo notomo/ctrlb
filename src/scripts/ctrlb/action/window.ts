@@ -19,18 +19,20 @@ export class WindowKind extends ActionKind {
     };
   }
 
-  protected async removeLastFocused(): Promise<void> {
-    this.getLastFocused().then((win: Win) => {
+  protected async removeLastFocused(): Promise<null> {
+    return this.getLastFocused().then((win: Win) => {
       return this.remove(win.id);
     });
   }
 
-  protected async remove(windowId: number): Promise<void> {
+  protected async remove(windowId: number): Promise<null> {
     this.browser.windows.remove(windowId);
+    return null;
   }
 
-  protected activate(windowId: number): void {
+  protected activate(windowId: number): null {
     this.browser.windows.update(windowId, { focused: true });
+    return null;
   }
 
   protected async list(): Promise<ResultInfo> {
@@ -38,9 +40,10 @@ export class WindowKind extends ActionKind {
     return { body: windows };
   }
 
-  private async updateState(state: string): Promise<void> {
+  private async updateState(state: string): Promise<null> {
     const win = await this.getLastFocused();
     this.browser.windows.update(win.id, { state: state });
+    return null;
   }
 
   private async getLastFocused(): Promise<Win> {

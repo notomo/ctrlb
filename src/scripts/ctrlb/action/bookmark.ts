@@ -25,7 +25,7 @@ export class BookmarkKind extends ActionKind {
             },
             args
           );
-          this.update(a.id, a.url, a.title);
+          return this.update(a.id, a.url, a.title);
         }
       },
       remove: { f: (args: ActionArgs) => this.remove(this.hasId(args)) },
@@ -39,7 +39,7 @@ export class BookmarkKind extends ActionKind {
             },
             args
           );
-          this.create(a.url, a.title, a.parentId);
+          return this.create(a.url, a.title, a.parentId);
         }
       }
     };
@@ -63,9 +63,9 @@ export class BookmarkKind extends ActionKind {
       if (bookmark.url === undefined) {
         return {};
       }
-      const result = await new TabKind(this.browser).execute("open", {
+      const result = (await new TabKind(this.browser).execute("open", {
         url: bookmark.url
-      });
+      })) as ResultInfo; // TODO: remove as ResultInfo;
       if (result === undefined) {
         return {};
       }
@@ -78,9 +78,9 @@ export class BookmarkKind extends ActionKind {
       if (bookmark.url === undefined) {
         return {};
       }
-      const result = await new TabKind(this.browser).execute("tabOpen", {
+      const result = (await new TabKind(this.browser).execute("tabOpen", {
         url: bookmark.url
-      });
+      })) as ResultInfo; // TODO: remove as ResultInfo;
       if (result === undefined) {
         return {};
       }
@@ -88,26 +88,28 @@ export class BookmarkKind extends ActionKind {
     });
   }
 
-  protected async remove(id: number): Promise<void> {
+  protected async remove(id: number): Promise<null> {
     const bookmark = await this.get(id);
     if (bookmark.url === undefined) {
       await this.browser.bookmarks.removeTree(bookmark.id);
-      return;
+      return null;
     }
     this.browser.bookmarks.remove(bookmark.id);
+    return null;
   }
 
   protected async create(
     url: string,
     title: string,
     parentId: string
-  ): Promise<void> {
+  ): Promise<null> {
     const info = {
       url: url,
       title: title,
       parentId: parentId
     };
     this.browser.bookmarks.create(info);
+    return null;
   }
 
   protected async list(limit?: number): Promise<ResultInfo> {
@@ -151,13 +153,14 @@ export class BookmarkKind extends ActionKind {
     id: number,
     url: string,
     title: string
-  ): Promise<void> {
+  ): Promise<null> {
     const info = {
       url: url,
       title: title
     };
     const bookmark = await this.get(id);
     this.browser.bookmarks.update(bookmark.id, info);
+    return null;
   }
 }
 

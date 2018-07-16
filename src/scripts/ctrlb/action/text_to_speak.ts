@@ -9,14 +9,15 @@ export class TextToSpeakKind extends ActionKind {
             { input: this.requiredString, rate: this.optionalNumber },
             args
           );
-          this.speak(a.input, a.rate);
+          return this.speak(a.input, a.rate);
         }
       }
     };
   }
 
-  protected async speak(text: string, rate?: number): Promise<void> {
+  protected async speak(text: string, rate?: number): Promise<null> {
     const r = rate || 1.0;
     await this.browser.tts.speak(text, { rate: r });
+    return null;
   }
 }

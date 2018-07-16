@@ -7,7 +7,7 @@ export class HistoryKind extends ActionKind {
       search: {
         f: (args: ActionArgs) => {
           const a = this.has({ input: this.optionalString }, args);
-          this.search(a.input);
+          return this.search(a.input);
         }
       }
     };

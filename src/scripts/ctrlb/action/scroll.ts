@@ -10,27 +10,31 @@ export class ScrollKind extends ActionKind {
     };
   }
 
-  protected toTop(): void {
+  protected toTop(): null {
     this.browser.tabs.executeScript({
       code: "window.scrollTo(window.scrollX, 0);"
     });
+    return null;
   }
 
-  protected toBottom(): void {
+  protected toBottom(): null {
     this.browser.tabs.executeScript({
       code: "window.scrollTo(window.scrollX, document.body.scrollHeight);"
     });
+    return null;
   }
 
-  protected up(): void {
+  protected up(): null {
     this.browser.tabs.executeScript({
       code: "window.scrollBy(0, -50);"
     });
+    return null;
   }
 
-  protected down(): void {
+  protected down(): null {
     this.browser.tabs.executeScript({
       code: "window.scrollBy(0, 50);"
     });
+    return null;
   }
 }

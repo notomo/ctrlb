@@ -8,15 +8,17 @@ export class NavigationKind extends ActionKind {
     };
   }
 
-  protected back(): void {
+  protected back(): null {
     this.browser.tabs.executeScript({
       code: "history.back();"
     });
+    return null;
   }
 
-  protected forward(): void {
+  protected forward(): null {
     this.browser.tabs.executeScript({
       code: "history.forward();"
     });
+    return null;
   }
 }

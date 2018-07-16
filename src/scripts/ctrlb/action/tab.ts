@@ -44,8 +44,9 @@ export class TabKind extends ActionKind {
       });
   }
 
-  protected create(): void {
+  protected create(): null {
     this.browser.tabs.create({});
+    return null;
   }
 
   protected async first(): Promise<ResultInfo> {
@@ -109,12 +110,13 @@ export class TabKind extends ActionKind {
       });
   }
 
-  protected async last(): Promise<void> {
+  protected async last(): Promise<null> {
     const lastTab = await this.getLastTab();
     const tab = lastTab.pop();
     if (tab !== undefined) {
       this.update(tab, { active: true });
     }
+    return null;
   }
 
   protected moveLeft(): Promise<ResultInfo> {
