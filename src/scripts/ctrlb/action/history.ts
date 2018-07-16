@@ -4,12 +4,16 @@ import { History } from "./facade";
 export class HistoryKind extends ActionKind {
   protected getActions(): ActionGroup {
     return {
-      search: (args: ActionArgs) => this.search(args)
+      search: {
+        f: (args: ActionArgs) => {
+          const a = this.has({ input: this.optionalString }, args);
+          this.search(a.input);
+        }
+      }
     };
   }
 
-  protected async search(args: ActionArgs): Promise<ResultInfo> {
-    const text: string = args.input as string;
+  protected async search(text?: string): Promise<ResultInfo> {
     if (text === undefined) {
       return { body: [] };
     }

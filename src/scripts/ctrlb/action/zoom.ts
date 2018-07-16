@@ -3,28 +3,33 @@ import { ActionArgs, ActionKind, ActionGroup } from "./action";
 export class ZoomKind extends ActionKind {
   protected getActions(): ActionGroup {
     return {
-      set: (args: ActionArgs) => this.set(args),
-      up: (args: ActionArgs) => this.up(args),
-      down: (args: ActionArgs) => this.down(args),
-      reset: (args: ActionArgs) => this.reset(args)
+      set: {
+        f: (args: ActionArgs) => {
+          this.set(
+            this.has({ zoomFactor: this.requiredNumber }, args).zoomFactor
+          );
+        }
+      },
+      up: () => this.up(),
+      down: () => this.down(),
+      reset: () => this.reset()
     };
   }
 
-  protected set(args: ActionArgs): void {
-    const zoomFactor: number = args.zoomFactor as number;
+  protected set(zoomFactor: number): void {
     this.browser.tabs.setZoom(zoomFactor);
   }
 
-  protected reset(args: ActionArgs): void {
+  protected reset(): void {
     this.browser.tabs.setZoom(0);
   }
 
-  protected async up(args: ActionArgs): Promise<void> {
+  protected async up(): Promise<void> {
     const currentZoomFactor = await this.browser.tabs.getZoom();
     this.browser.tabs.setZoom(currentZoomFactor + 0.1);
   }
 
-  protected async down(args: ActionArgs): Promise<void> {
+  protected async down(): Promise<void> {
     const zoomFactor = (await this.browser.tabs.getZoom()) - 0.1;
     if (zoomFactor < 0.1) {
       return;

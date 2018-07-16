@@ -4,51 +4,51 @@ import { Tab } from "./facade";
 export class TabKind extends ActionKind {
   protected getActions(): ActionGroup {
     return {
-      close: (args: ActionArgs) => this.close(args),
-      duplicate: (args: ActionArgs) => this.duplicate(args),
-      reload: (args: ActionArgs) => this.reload(args),
-      activate: (args: ActionArgs) => this.activate(args),
-      list: (args: ActionArgs) => this.list(args),
-      tabOpen: (args: ActionArgs) => this.tabOpen(args),
-      open: (args: ActionArgs) => this.open(args),
-      next: (args: ActionArgs) => this.next(args),
-      previous: (args: ActionArgs) => this.previous(args),
-      first: (args: ActionArgs) => this.first(args),
-      last: (args: ActionArgs) => this.last(args),
-      create: (args: ActionArgs) => this.create(args),
-      closeOthers: (args: ActionArgs) => this.closeOthers(args),
-      closeRight: (args: ActionArgs) => this.closeRight(args),
-      closeLeft: (args: ActionArgs) => this.closeLeft(args),
-      moveLeft: (args: ActionArgs) => this.moveLeft(args),
-      moveRight: (args: ActionArgs) => this.moveRight(args),
-      moveFirst: (args: ActionArgs) => this.moveFirst(args),
-      moveLast: (args: ActionArgs) => this.moveLast(args),
-      get: (args: ActionArgs) => this.get(args)
+      close: () => this.close(),
+      duplicate: () => this.duplicate(),
+      reload: () => this.reload(),
+      activate: { f: (args: ActionArgs) => this.activate(this.hasId(args)) },
+      list: () => this.list(),
+      tabOpen: {
+        f: (args: ActionArgs) =>
+          this.tabOpen(this.has({ url: this.requiredString }, args).url)
+      },
+      open: {
+        f: (args: ActionArgs) =>
+          this.open(this.has({ url: this.requiredString }, args).url)
+      },
+      next: () => this.next(),
+      previous: () => this.previous(),
+      first: () => this.first(),
+      last: () => this.last(),
+      create: () => this.create(),
+      closeOthers: () => this.closeOthers(),
+      closeRight: () => this.closeRight(),
+      closeLeft: () => this.closeLeft(),
+      moveLeft: () => this.moveLeft(),
+      moveRight: () => this.moveRight(),
+      moveFirst: () => this.moveFirst(),
+      moveLast: () => this.moveLast(),
+      get: { f: (args: ActionArgs) => this.get(this.hasId(args)) }
     };
   }
 
-  protected async activate(args: ActionArgs): Promise<ResultInfo> {
-    if (args.id === undefined) {
-      return { };
-    }
-    const tabId = args.id as number;
+  protected async activate(tabId: number): Promise<ResultInfo> {
     return await this.browser.tabs
       .get(tabId)
       .then((tab: Tab) => {
         return this.update(tab, { active: true });
       })
       .then(() => {
-        return {  };
+        return {};
       });
   }
 
-  protected async create(args: ActionArgs): Promise<ResultInfo> {
-    return this.browser.tabs.create({}).then((tab: Tab) => {
-      return {  };
-    });
+  protected create(): void {
+    this.browser.tabs.create({});
   }
 
-  protected async first(args: ActionArgs): Promise<ResultInfo> {
+  protected async first(): Promise<ResultInfo> {
     return this.browser.tabs
       .query({ currentWindow: true, index: 0 })
       .then((tabs: Tab[]) => {
@@ -56,11 +56,11 @@ export class TabKind extends ActionKind {
         if (tab !== undefined) {
           this.update(tab, { active: true });
         }
-        return {  };
+        return {};
       });
   }
 
-  protected async next(args: ActionArgs): Promise<ResultInfo> {
+  protected async next(): Promise<ResultInfo> {
     return this.getCurrentTab()
       .then(async (tab: Tab) => {
         const lastTabs = await this.getLastTab();
@@ -84,11 +84,11 @@ export class TabKind extends ActionKind {
         if (tab !== undefined) {
           this.update(tab, { active: true });
         }
-        return {  };
+        return {};
       });
   }
 
-  protected async previous(args: ActionArgs): Promise<ResultInfo> {
+  protected async previous(): Promise<ResultInfo> {
     return this.getCurrentTab()
       .then((tab: Tab) => {
         const index = tab.index as number;
@@ -105,62 +105,61 @@ export class TabKind extends ActionKind {
         if (tab !== undefined) {
           this.update(tab, { active: true });
         }
-        return {  };
+        return {};
       });
   }
 
-  protected async last(args: ActionArgs): Promise<ResultInfo> {
+  protected async last(): Promise<void> {
     const lastTab = await this.getLastTab();
     const tab = lastTab.pop();
     if (tab !== undefined) {
       this.update(tab, { active: true });
     }
-    return {  };
   }
 
-  protected moveLeft(args: ActionArgs): Promise<ResultInfo> {
+  protected moveLeft(): Promise<ResultInfo> {
     return this.getCurrentTab().then((tab: Tab) => {
       if (tab.index > 0) {
         const id = tab.id as number;
         this.browser.tabs.move(id, { index: tab.index - 1 });
       }
-      return {  };
+      return {};
     });
   }
 
-  protected moveRight(args: ActionArgs): Promise<ResultInfo> {
+  protected moveRight(): Promise<ResultInfo> {
     return this.getCurrentTab().then((tab: Tab) => {
       const id = tab.id as number;
       this.browser.tabs.move(id, { index: tab.index + 1 });
-      return {  };
+      return {};
     });
   }
 
-  protected moveFirst(args: ActionArgs): Promise<ResultInfo> {
+  protected moveFirst(): Promise<ResultInfo> {
     return this.getCurrentTab().then((tab: Tab) => {
       const id = tab.id as number;
       this.browser.tabs.move(id, { index: 0 });
-      return {  };
+      return {};
     });
   }
 
-  protected moveLast(args: ActionArgs): Promise<ResultInfo> {
+  protected moveLast(): Promise<ResultInfo> {
     return this.getCurrentTab().then((tab: Tab) => {
       const id = tab.id as number;
       this.browser.tabs.move(id, { index: -1 });
-      return {  };
+      return {};
     });
   }
 
-  protected close(args: ActionArgs): Promise<ResultInfo> {
+  protected close(): Promise<ResultInfo> {
     return this.getCurrentTab().then((tab: Tab) => {
       const tabId = tab.id as number;
       this.browser.tabs.remove(tabId);
-      return {  };
+      return {};
     });
   }
 
-  protected closeOthers(args: ActionArgs): Promise<ResultInfo> {
+  protected closeOthers(): Promise<ResultInfo> {
     return this.getCurrentTab()
       .then(async (tab: Tab) => {
         const tabId = tab.id as number;
@@ -177,11 +176,11 @@ export class TabKind extends ActionKind {
           return tab.id as number;
         });
         this.browser.tabs.remove(tabIds);
-        return {  };
+        return {};
       });
   }
 
-  protected closeRight(args: ActionArgs): Promise<ResultInfo> {
+  protected closeRight(): Promise<ResultInfo> {
     return this.getCurrentTab()
       .then(async (tab: Tab) => {
         const index = tab.index as number;
@@ -198,11 +197,11 @@ export class TabKind extends ActionKind {
           return tab.id as number;
         });
         this.browser.tabs.remove(tabIds);
-        return {  };
+        return {};
       });
   }
 
-  protected closeLeft(args: ActionArgs): Promise<ResultInfo> {
+  protected closeLeft(): Promise<ResultInfo> {
     return this.getCurrentTab()
       .then(async (tab: Tab) => {
         const index = tab.index as number;
@@ -219,48 +218,40 @@ export class TabKind extends ActionKind {
           return tab.id as number;
         });
         this.browser.tabs.remove(tabIds);
-        return {  };
+        return {};
       });
   }
 
-  protected async tabOpen(args: ActionArgs): Promise<ResultInfo> {
-    if (args.url === undefined) {
-      return { };
-    }
-    const url = args.url as string;
+  protected async tabOpen(url: string): Promise<ResultInfo> {
     return this.browser.tabs.create({ url: url }).then((tab: Tab) => {
-      return {  };
+      return {};
     });
   }
 
-  protected async open(args: ActionArgs): Promise<ResultInfo> {
-    if (args.url === undefined) {
-      return { };
-    }
-    const url = args.url as string;
+  protected async open(url: string): Promise<ResultInfo> {
     return this.getCurrentTab().then((tab: Tab) => {
       this.update(tab, { url: url });
-      return {  };
+      return {};
     });
   }
 
-  protected duplicate(args: ActionArgs): Promise<ResultInfo> {
+  protected duplicate(): Promise<ResultInfo> {
     return this.getCurrentTab().then((tab: Tab) => {
       const tabId = tab.id as number;
       this.browser.tabs.duplicate(tabId);
-      return {  };
+      return {};
     });
   }
 
-  protected reload(args: ActionArgs): Promise<ResultInfo> {
+  protected reload(): Promise<ResultInfo> {
     return this.getCurrentTab().then((tab: Tab) => {
       const tabId = tab.id as number;
       this.browser.tabs.reload(tabId);
-      return {  };
+      return {};
     });
   }
 
-  protected async list(args: ActionArgs): Promise<ResultInfo> {
+  protected async list(): Promise<ResultInfo> {
     const tabs = await this.browser.tabs
       .query({ currentWindow: true })
       .then((tabs: Tab[]) => {
@@ -269,11 +260,7 @@ export class TabKind extends ActionKind {
     return tabs;
   }
 
-  protected async get(args: ActionArgs): Promise<ResultInfo> {
-    if (args.id === undefined) {
-      return { };
-    }
-    const tabId = args.id as number;
+  protected async get(tabId: number): Promise<ResultInfo> {
     const tab = await this.browser.tabs.get(tabId).then((tab: Tab) => {
       return { body: tab };
     });
