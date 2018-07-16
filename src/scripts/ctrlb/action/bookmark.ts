@@ -47,45 +47,48 @@ export class BookmarkKind extends ActionKind {
 
   private async get(bookmarkId: number): Promise<BookmarkItem> {
     const id = String(bookmarkId);
-    return await this.browser.bookmarks
-      .get(id)
-      .then((bookmarks: BookmarkItem[]) => {
-        const bookmark = bookmarks.pop();
-        if (bookmark === undefined) {
-          throw new NotFoundBookmark(id);
-        }
-        return bookmark;
-      });
+    const bookmarks = await this.browser.bookmarks.get(id);
+    const bookmark = bookmarks.pop();
+    if (bookmark === undefined) {
+      throw new NotFoundBookmark(id);
+    }
+    return bookmark;
   }
 
   protected async open(id: number): Promise<ResultInfo> {
-    return await this.get(id).then(async (bookmark: BookmarkItem) => {
-      if (bookmark.url === undefined) {
-        return {};
-      }
-      const result = (await new TabKind(this.browser).execute("open", {
-        url: bookmark.url
-      })) as ResultInfo; // TODO: remove as ResultInfo;
-      if (result === undefined) {
-        return {};
-      }
-      return result;
-    });
+    const bookmark = await this.get(id);
+
+    if (bookmark.url === undefined) {
+      return {};
+    }
+
+    const result = (await new TabKind(this.browser).execute("open", {
+      url: bookmark.url
+    })) as ResultInfo; // TODO: remove as ResultInfo;
+
+    if (result === undefined) {
+      return {};
+    }
+
+    return result;
   }
 
   protected async tabOpen(id: number): Promise<ResultInfo> {
-    return await this.get(id).then(async (bookmark: BookmarkItem) => {
-      if (bookmark.url === undefined) {
-        return {};
-      }
-      const result = (await new TabKind(this.browser).execute("tabOpen", {
-        url: bookmark.url
-      })) as ResultInfo; // TODO: remove as ResultInfo;
-      if (result === undefined) {
-        return {};
-      }
-      return result;
-    });
+    const bookmark = await this.get(id);
+
+    if (bookmark.url === undefined) {
+      return {};
+    }
+
+    const result = (await new TabKind(this.browser).execute("tabOpen", {
+      url: bookmark.url
+    })) as ResultInfo; // TODO: remove as ResultInfo;
+
+    if (result === undefined) {
+      return {};
+    }
+
+    return result;
   }
 
   protected async remove(id: number): Promise<null> {
@@ -114,39 +117,33 @@ export class BookmarkKind extends ActionKind {
 
   protected async list(limit?: number): Promise<ResultInfo> {
     const numberOfItems = limit || 50;
-    const bookmarks = await this.browser.bookmarks
-      .getRecent(numberOfItems)
-      .then((bookmarks: BookmarkItem[]) => {
-        const body = bookmarks.map(book => {
-          return {
-            id: book.id,
-            url: book.url,
-            title: book.title
-          };
-        });
+    const bookmarks = await this.browser.bookmarks.getRecent(numberOfItems);
+    const body = bookmarks.map(book => {
+      return {
+        id: book.id,
+        url: book.url,
+        title: book.title
+      };
+    });
 
-        return { body: body };
-      });
-    return bookmarks;
+    return { body: body };
   }
 
   protected async search(query?: string): Promise<ResultInfo> {
     if (query === undefined) {
       return { body: [] };
     }
-    return await this.browser.bookmarks
-      .search(query)
-      .then((bookmarks: BookmarkItem[]) => {
-        const body = bookmarks.map(book => {
-          return {
-            id: book.id,
-            url: book.url,
-            title: book.title
-          };
-        });
 
-        return { body: body };
-      });
+    const bookmarks = await this.browser.bookmarks.search(query);
+    const body = bookmarks.map(book => {
+      return {
+        id: book.id,
+        url: book.url,
+        title: book.title
+      };
+    });
+
+    return { body: body };
   }
 
   protected async update(

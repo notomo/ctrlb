@@ -12,7 +12,6 @@ import ChromePromise from "chrome-promise";
 export interface Browser extends ChromePromise {}
 export interface Tab extends chrome.tabs.Tab {}
 export interface Win extends chrome.windows.Window {}
-export interface History extends chrome.history.HistoryItem {}
 export interface BookmarkItem extends chrome.bookmarks.BookmarkTreeNode {}
 
 interface ActionKindConstructor {

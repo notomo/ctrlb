@@ -20,9 +20,8 @@ export class WindowKind extends ActionKind {
   }
 
   protected async removeLastFocused(): Promise<null> {
-    return this.getLastFocused().then((win: Win) => {
-      return this.remove(win.id);
-    });
+    const win = await this.getLastFocused();
+    return this.remove(win.id);
   }
 
   protected async remove(windowId: number): Promise<null> {
