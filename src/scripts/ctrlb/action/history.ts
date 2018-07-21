@@ -1,22 +1,26 @@
-import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
+import { ActionArgs, ResultInfo, Action } from "./action";
+import { Validator } from "./validator";
+import { History } from "webextension-polyfill-ts";
 
-export class HistoryKind extends ActionKind {
-  protected getActions(): ActionGroup {
-    return {
-      search: {
-        f: (args: ActionArgs) => {
-          const a = this.has({ input: this.optionalString }, args);
-          return this.search(a.input);
-        }
-      }
-    };
-  }
+export class HistoryActionGroup {
+  constructor(protected readonly history: History.Static) {}
 
-  protected async search(text?: string): Promise<ResultInfo> {
-    if (text === undefined) {
+  public async search(text: string | null = null): Promise<ResultInfo> {
+    if (text === null) {
       return { body: [] };
     }
-    const histories = await this.browser.history.search({ text: text });
+    const histories = await this.history.search({ text: text });
     return { body: histories };
+  }
+}
+
+export class HistoryActionInvoker {
+  public readonly search: Action;
+
+  constructor(actionGroup: HistoryActionGroup, v: Validator) {
+    this.search = (args: ActionArgs) => {
+      const a = v.has({ input: v.optionalString() }, args);
+      return actionGroup.search(a.input);
+    };
   }
 }

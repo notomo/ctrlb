@@ -1,51 +1,84 @@
-import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
-import { Win } from "./facade";
+import { ResultInfo, Action } from "./action";
+import { Validator } from "./validator";
+import { Windows } from "webextension-polyfill-ts";
 
-export class WindowKind extends ActionKind {
-  protected getActions(): ActionGroup {
-    return {
-      maximize: () => this.updateState("maximized"),
-      minimize: () => this.updateState("minimized"),
-      toFullScreen: () => this.updateState("fullscreen"),
-      toNormal: () => this.updateState("normal"),
-      remove: {
-        f: (args: ActionArgs) => this.remove(this.hasId(args))
-      },
-      list: () => this.list(),
-      activate: {
-        f: (args: ActionArgs) => this.activate(this.hasId(args))
-      },
-      removeLastFocused: () => this.removeLastFocused()
-    };
+export class WindowActionGroup {
+  constructor(protected readonly windows: Windows.Static) {}
+
+  public maximize(): Promise<null> {
+    return this.updateState("maximized");
   }
 
-  protected async removeLastFocused(): Promise<null> {
+  public minimize(): Promise<null> {
+    return this.updateState("minimized");
+  }
+
+  public toFullScreen(): Promise<null> {
+    return this.updateState("fullscreen");
+  }
+
+  public toNormal(): Promise<null> {
+    return this.updateState("normal");
+  }
+
+  public async removeLastFocused(): Promise<null> {
     const win = await this.getLastFocused();
+    if (win.id === undefined) {
+      return null;
+    }
     return this.remove(win.id);
   }
 
-  protected async remove(windowId: number): Promise<null> {
-    this.browser.windows.remove(windowId);
+  public async remove(windowId: number): Promise<null> {
+    this.windows.remove(windowId);
     return null;
   }
 
-  protected activate(windowId: number): null {
-    this.browser.windows.update(windowId, { focused: true });
+  public activate(windowId: number): null {
+    this.windows.update(windowId, { focused: true });
     return null;
   }
 
-  protected async list(): Promise<ResultInfo> {
-    const windows = await this.browser.windows.getAll({ populate: true });
+  public async list(): Promise<ResultInfo> {
+    const windows = await this.windows.getAll({ populate: true });
     return { body: windows };
   }
 
-  private async updateState(state: string): Promise<null> {
+  protected async updateState(state: Windows.WindowState): Promise<null> {
     const win = await this.getLastFocused();
-    this.browser.windows.update(win.id, { state: state });
+    if (win.id === undefined) {
+      return null;
+    }
+    this.windows.update(win.id, { state: state });
     return null;
   }
 
-  private async getLastFocused(): Promise<Win> {
-    return await this.browser.windows.getLastFocused();
+  protected async getLastFocused(): Promise<Windows.Window> {
+    return await this.windows.getLastFocused();
+  }
+}
+
+export class WindowActionInvoker {
+  public readonly removeLastFocused: Action;
+  public readonly remove: Action;
+  public readonly activate: Action;
+  public readonly maximize: Action;
+  public readonly minimize: Action;
+  public readonly toFullScreen: Action;
+  public readonly toNormal: Action;
+  public readonly list: Action;
+
+  constructor(actionGroup: WindowActionGroup, v: Validator) {
+    this.removeLastFocused = v.noArgs(
+      actionGroup["removeLastFocused"],
+      actionGroup
+    );
+    this.remove = v.idArgs(actionGroup["remove"], actionGroup);
+    this.activate = v.idArgs(actionGroup["activate"], actionGroup);
+    this.maximize = v.noArgs(actionGroup["maximize"], actionGroup);
+    this.minimize = v.noArgs(actionGroup["minimize"], actionGroup);
+    this.toFullScreen = v.noArgs(actionGroup["toFullScreen"], actionGroup);
+    this.toNormal = v.noArgs(actionGroup["toNormal"], actionGroup);
+    this.list = v.noArgs(actionGroup["list"], actionGroup);
   }
 }

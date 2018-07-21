@@ -1,27 +1,27 @@
 import { Client, Connector } from "./ctrlb/client";
 import { Config } from "./ctrlb/config";
-import ChromePromise from "chrome-promise";
-import { ActionFacade } from "./ctrlb/action/facade";
+import { ActionFacade } from "./ctrlb/action/action";
+import { browser } from "webextension-polyfill-ts";
 
-const storage = new ChromePromise().storage.sync;
+const storage = browser.storage.sync;
 const config = new Config(storage);
 
 config.getHost().then((host: string) => {
   const connector = new Connector();
-  const view = chrome.browserAction;
-  const invoker = new ActionFacade(new ChromePromise());
+  const view = browser.browserAction;
+  const invoker = new ActionFacade(browser);
   const client = new Client(connector, view, invoker);
   client.open(host);
 
-  chrome.browserAction.onClicked.addListener(async () => {
+  browser.browserAction.onClicked.addListener(async () => {
     const host: string = await config.getHost();
     client.open(host);
   });
 
-  chrome.tabs.onActivated.addListener((activeInfo: any) => {
+  browser.tabs.onActivated.addListener((activeInfo: any) => {
     client.execute({
       actionName: "get",
-      kindName: "tab",
+      actionGroupName: "tab",
       args: {
         id: activeInfo.tabId
       }

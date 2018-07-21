@@ -1,40 +1,49 @@
-import { ActionKind, ActionGroup } from "./action";
+import { Action } from "./action";
+import { Validator } from "./validator";
+import { Tabs } from "webextension-polyfill-ts";
 
-export class ScrollKind extends ActionKind {
-  protected getActions(): ActionGroup {
-    return {
-      toTop: () => this.toTop(),
-      toBottom: () => this.toBottom(),
-      up: () => this.up(),
-      down: () => this.down()
-    };
-  }
+export class ScrollActionGroup {
+  constructor(protected readonly tabs: Tabs.Static) {}
 
-  protected toTop(): null {
-    this.browser.tabs.executeScript({
+  public toTop(): null {
+    this.tabs.executeScript({
       code: "window.scrollTo(window.scrollX, 0);"
     });
     return null;
   }
 
-  protected toBottom(): null {
-    this.browser.tabs.executeScript({
+  public toBottom(): null {
+    this.tabs.executeScript({
       code: "window.scrollTo(window.scrollX, document.body.scrollHeight);"
     });
     return null;
   }
 
-  protected up(): null {
-    this.browser.tabs.executeScript({
+  public up(): null {
+    this.tabs.executeScript({
       code: "window.scrollBy(0, -50);"
     });
     return null;
   }
 
-  protected down(): null {
-    this.browser.tabs.executeScript({
+  public down(): null {
+    this.tabs.executeScript({
       code: "window.scrollBy(0, 50);"
     });
     return null;
+  }
+}
+
+export class ScrollActionInvoker {
+  public readonly toTop: Action;
+  public readonly toBottom: Action;
+  public readonly up: Action;
+  public readonly down: Action;
+
+  constructor(actionGroup: ScrollActionGroup, v: Validator) {
+    this.toTop = v.noArgs(actionGroup["toTop"], actionGroup);
+    this.toBottom = v.noArgs(actionGroup["toBottom"], actionGroup);
+    this.up = v.noArgs(actionGroup["up"], actionGroup);
+    this.down = v.noArgs(actionGroup["down"], actionGroup);
   }
 }

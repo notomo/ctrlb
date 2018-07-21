@@ -1,53 +1,17 @@
-import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
-import { TabKind } from "./tab";
-import { BookmarkItem } from "./facade";
+import { ActionArgs, ResultInfo, Action } from "./action";
+import { TabActionGroup } from "./tab";
+import { Validator } from "./validator";
+import { Bookmarks } from "webextension-polyfill-ts";
 
-export class BookmarkKind extends ActionKind {
-  protected getActions(): ActionGroup {
-    return {
-      list: {
-        f: (args: ActionArgs) =>
-          this.list(this.has({ limit: this.optionalNumber }, args).limit)
-      },
-      open: { f: (args: ActionArgs) => this.open(this.hasId(args)) },
-      tabOpen: { f: (args: ActionArgs) => this.tabOpen(this.hasId(args)) },
-      search: {
-        f: (args: ActionArgs) =>
-          this.search(this.has({ input: this.optionalString }, args).input)
-      },
-      update: {
-        f: (args: ActionArgs) => {
-          const a = this.has(
-            {
-              id: this.requiredNumber,
-              url: this.requiredString,
-              title: this.requiredString
-            },
-            args
-          );
-          return this.update(a.id, a.url, a.title);
-        }
-      },
-      remove: { f: (args: ActionArgs) => this.remove(this.hasId(args)) },
-      create: {
-        f: (args: ActionArgs) => {
-          const a = this.has(
-            {
-              url: this.requiredString,
-              title: this.requiredString,
-              parentId: this.requiredString
-            },
-            args
-          );
-          return this.create(a.url, a.title, a.parentId);
-        }
-      }
-    };
-  }
+export class BookmarkActionGroup {
+  constructor(
+    protected readonly tabActionGroup: TabActionGroup,
+    protected readonly bookmarks: Bookmarks.Static
+  ) {}
 
-  private async get(bookmarkId: number): Promise<BookmarkItem> {
+  protected async get(bookmarkId: number): Promise<Bookmarks.BookmarkTreeNode> {
     const id = String(bookmarkId);
-    const bookmarks = await this.browser.bookmarks.get(id);
+    const bookmarks = await this.bookmarks.get(id);
     const bookmark = bookmarks.pop();
     if (bookmark === undefined) {
       throw new NotFoundBookmark(id);
@@ -55,53 +19,37 @@ export class BookmarkKind extends ActionKind {
     return bookmark;
   }
 
-  protected async open(id: number): Promise<ResultInfo> {
+  public async open(id: number): Promise<ResultInfo | null> {
     const bookmark = await this.get(id);
 
     if (bookmark.url === undefined) {
       return {};
     }
 
-    const result = (await new TabKind(this.browser).execute("open", {
-      url: bookmark.url
-    })) as ResultInfo; // TODO: remove as ResultInfo;
-
-    if (result === undefined) {
-      return {};
-    }
-
-    return result;
+    return this.tabActionGroup.open(bookmark.url);
   }
 
-  protected async tabOpen(id: number): Promise<ResultInfo> {
+  public async tabOpen(id: number): Promise<ResultInfo | null> {
     const bookmark = await this.get(id);
 
     if (bookmark.url === undefined) {
       return {};
     }
 
-    const result = (await new TabKind(this.browser).execute("tabOpen", {
-      url: bookmark.url
-    })) as ResultInfo; // TODO: remove as ResultInfo;
-
-    if (result === undefined) {
-      return {};
-    }
-
-    return result;
+    return this.tabActionGroup.tabOpen(bookmark.url);
   }
 
-  protected async remove(id: number): Promise<null> {
+  public async remove(id: number): Promise<null> {
     const bookmark = await this.get(id);
     if (bookmark.url === undefined) {
-      await this.browser.bookmarks.removeTree(bookmark.id);
+      await this.bookmarks.removeTree(bookmark.id);
       return null;
     }
-    this.browser.bookmarks.remove(bookmark.id);
+    this.bookmarks.remove(bookmark.id);
     return null;
   }
 
-  protected async create(
+  public async create(
     url: string,
     title: string,
     parentId: string
@@ -111,13 +59,13 @@ export class BookmarkKind extends ActionKind {
       title: title,
       parentId: parentId
     };
-    this.browser.bookmarks.create(info);
+    this.bookmarks.create(info);
     return null;
   }
 
-  protected async list(limit?: number): Promise<ResultInfo> {
+  public async list(limit: number | null = null): Promise<ResultInfo> {
     const numberOfItems = limit || 50;
-    const bookmarks = await this.browser.bookmarks.getRecent(numberOfItems);
+    const bookmarks = await this.bookmarks.getRecent(numberOfItems);
     const body = bookmarks.map(book => {
       return {
         id: book.id,
@@ -129,12 +77,12 @@ export class BookmarkKind extends ActionKind {
     return { body: body };
   }
 
-  protected async search(query?: string): Promise<ResultInfo> {
-    if (query === undefined) {
+  public async search(query: string | null = null): Promise<ResultInfo> {
+    if (query === null) {
       return { body: [] };
     }
 
-    const bookmarks = await this.browser.bookmarks.search(query);
+    const bookmarks = await this.bookmarks.search(query);
     const body = bookmarks.map(book => {
       return {
         id: book.id,
@@ -146,17 +94,13 @@ export class BookmarkKind extends ActionKind {
     return { body: body };
   }
 
-  protected async update(
-    id: number,
-    url: string,
-    title: string
-  ): Promise<null> {
+  public async update(id: number, url: string, title: string): Promise<null> {
     const info = {
       url: url,
       title: title
     };
     const bookmark = await this.get(id);
-    this.browser.bookmarks.update(bookmark.id, info);
+    this.bookmarks.update(bookmark.id, info);
     return null;
   }
 }
@@ -168,5 +112,57 @@ class NotFoundBookmark extends Error {
 
   toString() {
     return "Not found bookmark: " + this.id;
+  }
+}
+
+export class BookmarkActionInvoker {
+  public readonly list: Action;
+  public readonly search: Action;
+  public readonly update: Action;
+  public readonly create: Action;
+  public readonly open: Action;
+  public readonly tabOpen: Action;
+  public readonly remove: Action;
+
+  constructor(actionGroup: BookmarkActionGroup, v: Validator) {
+    this.list = (args: ActionArgs) => {
+      const a = v.has({ limit: v.optionalNumber() }, args);
+      return actionGroup.list(a.limit);
+    };
+
+    this.search = (args: ActionArgs) => {
+      const a = v.has({ input: v.optionalString() }, args);
+      return actionGroup.search(a.input);
+    };
+
+    this.update = (args: ActionArgs) => {
+      const a = v.has(
+        {
+          id: v.requiredNumber(),
+          url: v.requiredString(),
+          title: v.requiredString()
+        },
+        args
+      );
+      return actionGroup.update(a.id, a.url, a.title);
+    };
+
+    this.create = (args: ActionArgs) => {
+      const a = v.has(
+        {
+          url: v.requiredString(),
+          title: v.requiredString(),
+          parentId: v.requiredString()
+        },
+        args
+      );
+      return actionGroup.create(a.url, a.title, a.parentId);
+    };
+
+    this.open = v.idArgs(actionGroup["open"], actionGroup);
+
+    this.tabOpen = v.idArgs(actionGroup["tabOpen"], actionGroup);
+
+    this.remove = v.idArgs(actionGroup["remove"], actionGroup);
   }
 }

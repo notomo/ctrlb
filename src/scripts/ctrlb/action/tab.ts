@@ -1,51 +1,23 @@
-import { ActionArgs, ActionKind, ActionGroup, ResultInfo } from "./action";
-import { Tab } from "./facade";
+import { ActionArgs, ResultInfo, Action } from "./action";
+import { Validator } from "./validator";
+import { Tabs } from "webextension-polyfill-ts";
 
-export class TabKind extends ActionKind {
-  protected getActions(): ActionGroup {
-    return {
-      close: () => this.close(),
-      duplicate: () => this.duplicate(),
-      reload: () => this.reload(),
-      activate: { f: (args: ActionArgs) => this.activate(this.hasId(args)) },
-      list: () => this.list(),
-      tabOpen: {
-        f: (args: ActionArgs) =>
-          this.tabOpen(this.has({ url: this.requiredString }, args).url)
-      },
-      open: {
-        f: (args: ActionArgs) =>
-          this.open(this.has({ url: this.requiredString }, args).url)
-      },
-      next: () => this.next(),
-      previous: () => this.previous(),
-      first: () => this.first(),
-      last: () => this.last(),
-      create: () => this.create(),
-      closeOthers: () => this.closeOthers(),
-      closeRight: () => this.closeRight(),
-      closeLeft: () => this.closeLeft(),
-      moveLeft: () => this.moveLeft(),
-      moveRight: () => this.moveRight(),
-      moveFirst: () => this.moveFirst(),
-      moveLast: () => this.moveLast(),
-      get: { f: (args: ActionArgs) => this.get(this.hasId(args)) }
-    };
-  }
+export class TabActionGroup {
+  constructor(protected readonly tabs: Tabs.Static) {}
 
-  protected async activate(tabId: number): Promise<null> {
-    const tab = await this.browser.tabs.get(tabId);
+  public async activate(tabId: number): Promise<null> {
+    const tab = await this.tabs.get(tabId);
     this.update(tab, { active: true });
     return null;
   }
 
-  protected create(): null {
-    this.browser.tabs.create({});
+  public create(): null {
+    this.tabs.create({});
     return null;
   }
 
-  protected async first(): Promise<null> {
-    const tabs = await this.browser.tabs.query({
+  public async first(): Promise<null> {
+    const tabs = await this.tabs.query({
       currentWindow: true,
       index: 0
     });
@@ -56,7 +28,7 @@ export class TabKind extends ActionKind {
     return null;
   }
 
-  protected async next(): Promise<null> {
+  public async next(): Promise<null> {
     const tab = await this.getCurrentTab();
 
     const lastTabs = await this.getLastTab();
@@ -70,7 +42,7 @@ export class TabKind extends ActionKind {
     } else {
       index = (tab.index as number) + 1;
     }
-    const tabs = await this.browser.tabs.query({
+    const tabs = await this.tabs.query({
       currentWindow: true,
       index: index
     });
@@ -83,14 +55,14 @@ export class TabKind extends ActionKind {
     return null;
   }
 
-  protected async previous(): Promise<null> {
+  public async previous(): Promise<null> {
     const tab = await this.getCurrentTab();
     const index = tab.index as number;
-    let tabs: Tab[];
+    let tabs: Tabs.Tab[];
     if (index === 0) {
       tabs = await this.getLastTab();
     } else {
-      tabs = await this.browser.tabs.query({
+      tabs = await this.tabs.query({
         currentWindow: true,
         index: index - 1
       });
@@ -104,7 +76,7 @@ export class TabKind extends ActionKind {
     return null;
   }
 
-  protected async last(): Promise<null> {
+  public async last(): Promise<null> {
     const lastTab = await this.getLastTab();
     const tab = lastTab.pop();
     if (tab !== undefined) {
@@ -113,154 +85,154 @@ export class TabKind extends ActionKind {
     return null;
   }
 
-  protected async moveLeft(): Promise<null> {
+  public async moveLeft(): Promise<null> {
     const tab = await this.getCurrentTab();
     if (tab.index > 0) {
       const id = tab.id as number;
-      this.browser.tabs.move(id, { index: tab.index - 1 });
+      this.tabs.move(id, { index: tab.index - 1 });
     }
     return null;
   }
 
-  protected async moveRight(): Promise<null> {
+  public async moveRight(): Promise<null> {
     const tab = await this.getCurrentTab();
     const id = tab.id as number;
-    this.browser.tabs.move(id, { index: tab.index + 1 });
+    this.tabs.move(id, { index: tab.index + 1 });
     return null;
   }
 
-  protected async moveFirst(): Promise<null> {
+  public async moveFirst(): Promise<null> {
     const tab = await this.getCurrentTab();
     const id = tab.id as number;
-    this.browser.tabs.move(id, { index: 0 });
+    this.tabs.move(id, { index: 0 });
     return null;
   }
 
-  protected async moveLast(): Promise<null> {
+  public async moveLast(): Promise<null> {
     const tab = await this.getCurrentTab();
     const id = tab.id as number;
-    this.browser.tabs.move(id, { index: -1 });
+    this.tabs.move(id, { index: -1 });
     return null;
   }
 
-  protected async close(): Promise<null> {
+  public async close(): Promise<null> {
     const tab = await this.getCurrentTab();
     const tabId = tab.id as number;
-    this.browser.tabs.remove(tabId);
+    this.tabs.remove(tabId);
     return null;
   }
 
-  protected async closeOthers(): Promise<null> {
+  public async closeOthers(): Promise<null> {
     const tab = await this.getCurrentTab();
     const tabId = tab.id as number;
-    const tabs = await this.browser.tabs.query({
+    const tabs = await this.tabs.query({
       currentWindow: true,
       pinned: false
     });
 
     const tabIds = tabs
-      .filter((tab: Tab) => {
+      .filter((tab: Tabs.Tab) => {
         return tab.id !== tabId;
       })
-      .map((tab: Tab) => {
+      .map((tab: Tabs.Tab) => {
         return tab.id as number;
       });
-    this.browser.tabs.remove(tabIds);
+    this.tabs.remove(tabIds);
 
     return null;
   }
 
-  protected async closeRight(): Promise<null> {
+  public async closeRight(): Promise<null> {
     const tab = await this.getCurrentTab();
     const index = tab.index as number;
-    const tabs = await this.browser.tabs.query({
+    const tabs = await this.tabs.query({
       currentWindow: true,
       pinned: false
     });
 
     const tabIds = tabs
-      .filter((tab: Tab) => {
+      .filter((tab: Tabs.Tab) => {
         return tab.index > index;
       })
-      .map((tab: Tab) => {
+      .map((tab: Tabs.Tab) => {
         return tab.id as number;
       });
-    this.browser.tabs.remove(tabIds);
+    this.tabs.remove(tabIds);
 
     return null;
   }
 
-  protected async closeLeft(): Promise<null> {
+  public async closeLeft(): Promise<null> {
     const tab = await this.getCurrentTab();
     const index = tab.index as number;
-    const tabs = await this.browser.tabs.query({
+    const tabs = await this.tabs.query({
       currentWindow: true,
       pinned: false
     });
 
     const tabIds = tabs
-      .filter((tab: Tab) => {
+      .filter((tab: Tabs.Tab) => {
         return tab.index < index;
       })
-      .map((tab: Tab) => {
+      .map((tab: Tabs.Tab) => {
         return tab.id as number;
       });
-    this.browser.tabs.remove(tabIds);
+    this.tabs.remove(tabIds);
 
     return null;
   }
 
-  protected tabOpen(url: string): null {
-    this.browser.tabs.create({ url: url });
+  public tabOpen(url: string): null {
+    this.tabs.create({ url: url });
     return null;
   }
 
-  protected async open(url: string): Promise<null> {
+  public async open(url: string): Promise<null> {
     const tab = await this.getCurrentTab();
     this.update(tab, { url: url });
     return null;
   }
 
-  protected async duplicate(): Promise<null> {
+  public async duplicate(): Promise<null> {
     const tab = await this.getCurrentTab();
     const tabId = tab.id as number;
-    this.browser.tabs.duplicate(tabId);
+    this.tabs.duplicate(tabId);
     return null;
   }
 
-  protected async reload(): Promise<null> {
+  public async reload(): Promise<null> {
     const tab = await this.getCurrentTab();
     const tabId = tab.id as number;
-    this.browser.tabs.reload(tabId);
+    this.tabs.reload(tabId);
     return null;
   }
 
-  protected async list(): Promise<ResultInfo> {
-    const tabs = await this.browser.tabs.query({ currentWindow: true });
+  public async list(): Promise<ResultInfo> {
+    const tabs = await this.tabs.query({ currentWindow: true });
     return { body: tabs };
   }
 
-  protected async get(tabId: number): Promise<ResultInfo> {
-    const tab = await this.browser.tabs.get(tabId);
+  public async get(tabId: number): Promise<ResultInfo> {
+    const tab = await this.tabs.get(tabId);
     return { body: tab };
   }
 
-  private async update(tab: Tab, properties: any) {
+  private async update(tab: Tabs.Tab, properties: any) {
     const tabId = tab.id as number;
-    return this.browser.tabs.update(tabId, properties);
+    return this.tabs.update(tabId, properties);
   }
 
-  private async getCurrentTab(): Promise<Tab> {
-    const tabs = await this.browser.tabs.query({
+  private async getCurrentTab(): Promise<Tabs.Tab> {
+    const tabs = await this.tabs.query({
       currentWindow: true,
       active: true
     });
-    return tabs.pop() as Tab;
+    return tabs.pop() as Tabs.Tab;
   }
 
-  private async getLastTab(): Promise<Tab[]> {
-    const tabs = await this.browser.tabs.query({ currentWindow: true });
-    const indexes = tabs.map((tab: Tab) => {
+  private async getLastTab(): Promise<Tabs.Tab[]> {
+    const tabs = await this.tabs.query({ currentWindow: true });
+    const indexes = tabs.map((tab: Tabs.Tab) => {
       return tab.index;
     });
     indexes.push(-1);
@@ -268,6 +240,58 @@ export class TabKind extends ActionKind {
     if (index === -1) {
       return [];
     }
-    return this.browser.tabs.query({ index: index, currentWindow: true });
+    return this.tabs.query({ index: index, currentWindow: true });
+  }
+}
+
+export class TabActionInvoker {
+  public readonly get: Action;
+  public readonly activate: Action;
+  public readonly tabOpen: Action;
+  public readonly open: Action;
+  public readonly close: Action;
+  public readonly duplicate: Action;
+  public readonly reload: Action;
+  public readonly list: Action;
+  public readonly next: Action;
+  public readonly previous: Action;
+  public readonly first: Action;
+  public readonly last: Action;
+  public readonly create: Action;
+  public readonly closeOthers: Action;
+  public readonly closeRight: Action;
+  public readonly closeLeft: Action;
+  public readonly moveLeft: Action;
+  public readonly moveRight: Action;
+  public readonly moveFirst: Action;
+  public readonly moveLast: Action;
+
+  constructor(actionGroup: TabActionGroup, v: Validator) {
+    this.get = v.idArgs(actionGroup["get"], actionGroup);
+    this.activate = v.idArgs(actionGroup["activate"], actionGroup);
+    this.tabOpen = (args: ActionArgs) => {
+      const a = v.has({ url: v.requiredString() }, args);
+      return actionGroup.tabOpen(a.url);
+    };
+    this.open = (args: ActionArgs) => {
+      const a = v.has({ url: v.requiredString() }, args);
+      return actionGroup.open(a.url);
+    };
+    this.close = v.noArgs(actionGroup["close"], actionGroup);
+    this.duplicate = v.noArgs(actionGroup["duplicate"], actionGroup);
+    this.reload = v.noArgs(actionGroup["reload"], actionGroup);
+    this.list = v.noArgs(actionGroup["list"], actionGroup);
+    this.next = v.noArgs(actionGroup["next"], actionGroup);
+    this.previous = v.noArgs(actionGroup["previous"], actionGroup);
+    this.first = v.noArgs(actionGroup["first"], actionGroup);
+    this.last = v.noArgs(actionGroup["last"], actionGroup);
+    this.create = v.noArgs(actionGroup["create"], actionGroup);
+    this.closeOthers = v.noArgs(actionGroup["closeOthers"], actionGroup);
+    this.closeRight = v.noArgs(actionGroup["closeRight"], actionGroup);
+    this.closeLeft = v.noArgs(actionGroup["closeLeft"], actionGroup);
+    this.moveLeft = v.noArgs(actionGroup["moveLeft"], actionGroup);
+    this.moveRight = v.noArgs(actionGroup["moveRight"], actionGroup);
+    this.moveFirst = v.noArgs(actionGroup["moveFirst"], actionGroup);
+    this.moveLast = v.noArgs(actionGroup["moveLast"], actionGroup);
   }
 }

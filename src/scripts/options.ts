@@ -1,7 +1,7 @@
 import { Config } from "./ctrlb/config";
-import ChromePromise from "chrome-promise";
+import { browser } from "webextension-polyfill-ts";
 
-const storage = new ChromePromise().storage.sync;
+const storage = browser.storage.sync;
 const config = new Config(storage);
 
 function saveOptions() {
