@@ -6,7 +6,6 @@ import { NavigationActionInvoker, NavigationActionGroup } from "./navigation";
 import { ScrollActionInvoker, ScrollActionGroup } from "./scroll";
 import { ZoomActionInvoker, ZoomActionGroup } from "./zoom";
 import { Browser } from "webextension-polyfill-ts";
-import { Validator } from "./validator";
 import { ActionArgs, ResultInfo, Action } from "./action";
 
 export class ActionInvokers {
@@ -21,8 +20,7 @@ export class ActionInvokers {
   constructor(browser: Browser) {
     this.tab = ((): TabActionInvoker => {
       const actionGroup = new TabActionGroup(browser.tabs);
-      const validator = new Validator(actionGroup);
-      return new TabActionInvoker(actionGroup, validator);
+      return new TabActionInvoker(actionGroup);
     })();
 
     this.bookmark = ((): BookmarkActionInvoker => {
@@ -31,38 +29,32 @@ export class ActionInvokers {
         tabActionGroup,
         browser.bookmarks
       );
-      const validator = new Validator(actionGroup);
-      return new BookmarkActionInvoker(actionGroup, validator);
+      return new BookmarkActionInvoker(actionGroup);
     })();
 
     this.history = ((): HistoryActionInvoker => {
       const actionGroup = new HistoryActionGroup(browser.history);
-      const validator = new Validator(actionGroup);
-      return new HistoryActionInvoker(actionGroup, validator);
+      return new HistoryActionInvoker(actionGroup);
     })();
 
     this.window = ((): WindowActionInvoker => {
       const actionGroup = new WindowActionGroup(browser.windows);
-      const validator = new Validator(actionGroup);
-      return new WindowActionInvoker(actionGroup, validator);
+      return new WindowActionInvoker(actionGroup);
     })();
 
     this.navigation = ((): NavigationActionInvoker => {
       const actionGroup = new NavigationActionGroup(browser.tabs);
-      const validator = new Validator(actionGroup);
-      return new NavigationActionInvoker(actionGroup, validator);
+      return new NavigationActionInvoker(actionGroup);
     })();
 
     this.scroll = ((): ScrollActionInvoker => {
       const actionGroup = new ScrollActionGroup(browser.tabs);
-      const validator = new Validator(actionGroup);
-      return new ScrollActionInvoker(actionGroup, validator);
+      return new ScrollActionInvoker(actionGroup);
     })();
 
     this.zoom = ((): ZoomActionInvoker => {
       const actionGroup = new ZoomActionGroup(browser.tabs);
-      const validator = new Validator(actionGroup);
-      return new ZoomActionInvoker(actionGroup, validator);
+      return new ZoomActionInvoker(actionGroup);
     })();
   }
 }

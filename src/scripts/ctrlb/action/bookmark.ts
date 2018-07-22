@@ -1,6 +1,5 @@
 import { ActionArgs, ResultInfo, Action, ActionInvoker } from "./action";
 import { TabActionGroup } from "./tab";
-import { Validator } from "./validator";
 import { Bookmarks } from "webextension-polyfill-ts";
 
 export class BookmarkActionGroup {
@@ -124,28 +123,25 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
   public readonly tabOpen: Action;
   public readonly remove: Action;
 
-  constructor(
-    actionGroup: BookmarkActionGroup,
-    v: Validator<BookmarkActionGroup>
-  ) {
-    super(actionGroup, v);
+  constructor(actionGroup: BookmarkActionGroup) {
+    super(actionGroup);
 
     this.list = (args: ActionArgs) => {
-      const a = v.has({ limit: v.optionalNumber() }, args);
+      const a = this.v.has({ limit: this.v.optionalNumber() }, args);
       return actionGroup.list(a.limit);
     };
 
     this.search = (args: ActionArgs) => {
-      const a = v.has({ input: v.optionalString() }, args);
+      const a = this.v.has({ input: this.v.optionalString() }, args);
       return actionGroup.search(a.input);
     };
 
     this.update = (args: ActionArgs) => {
-      const a = v.has(
+      const a = this.v.has(
         {
-          id: v.requiredNumber(),
-          url: v.requiredString(),
-          title: v.requiredString()
+          id: this.v.requiredNumber(),
+          url: this.v.requiredString(),
+          title: this.v.requiredString()
         },
         args
       );
@@ -153,11 +149,11 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
     };
 
     this.create = (args: ActionArgs) => {
-      const a = v.has(
+      const a = this.v.has(
         {
-          url: v.requiredString(),
-          title: v.requiredString(),
-          parentId: v.requiredString()
+          url: this.v.requiredString(),
+          title: this.v.requiredString(),
+          parentId: this.v.requiredString()
         },
         args
       );

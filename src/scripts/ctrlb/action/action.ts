@@ -37,10 +37,11 @@ type IdArgsActions<T> = { [index: string]: IdArgsAction } & {
 };
 
 export class ActionInvoker<T> {
-  constructor(
-    protected readonly actionGroup: T,
-    protected readonly v: Validator<T>
-  ) {}
+  protected readonly v: Validator<T>;
+
+  constructor(protected readonly actionGroup: T) {
+    this.v = new Validator(actionGroup);
+  }
 
   protected noArgsAction<K extends NoArgsActions<T>>(
     noArgsActions: K,

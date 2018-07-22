@@ -1,4 +1,3 @@
-import { Validator } from "./validator";
 import { Tabs } from "webextension-polyfill-ts";
 import { Action, ActionInvoker } from "./action";
 
@@ -26,11 +25,8 @@ export class NavigationActionInvoker extends ActionInvoker<
   public readonly back: Action;
   public readonly forward: Action;
 
-  constructor(
-    actionGroup: NavigationActionGroup,
-    v: Validator<NavigationActionGroup>
-  ) {
-    super(actionGroup, v);
+  constructor(actionGroup: NavigationActionGroup) {
+    super(actionGroup);
 
     const noArgsActions = {
       back: actionGroup.back,

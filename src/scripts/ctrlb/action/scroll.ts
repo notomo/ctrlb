@@ -1,5 +1,4 @@
 import { Action, ActionInvoker } from "./action";
-import { Validator } from "./validator";
 import { Tabs } from "webextension-polyfill-ts";
 
 export class ScrollActionGroup {
@@ -40,8 +39,8 @@ export class ScrollActionInvoker extends ActionInvoker<ScrollActionGroup> {
   public readonly up: Action;
   public readonly down: Action;
 
-  constructor(actionGroup: ScrollActionGroup, v: Validator<ScrollActionGroup>) {
-    super(actionGroup, v);
+  constructor(actionGroup: ScrollActionGroup) {
+    super(actionGroup);
 
     const noArgsActions = {
       toTop: actionGroup.toTop,

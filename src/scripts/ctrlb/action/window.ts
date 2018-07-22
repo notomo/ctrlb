@@ -1,5 +1,5 @@
 import { ResultInfo, Action, ActionInvoker } from "./action";
-import { Validator } from "./validator";
+
 import { Windows } from "webextension-polyfill-ts";
 
 export class WindowActionGroup {
@@ -68,8 +68,8 @@ export class WindowActionInvoker extends ActionInvoker<WindowActionGroup> {
   public readonly toNormal: Action;
   public readonly list: Action;
 
-  constructor(actionGroup: WindowActionGroup, v: Validator<WindowActionGroup>) {
-    super(actionGroup, v);
+  constructor(actionGroup: WindowActionGroup) {
+    super(actionGroup);
 
     const idArgsActions = {
       remove: actionGroup.remove,

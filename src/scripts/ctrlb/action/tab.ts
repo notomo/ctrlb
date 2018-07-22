@@ -1,5 +1,4 @@
 import { ActionArgs, ResultInfo, Action, ActionInvoker } from "./action";
-import { Validator } from "./validator";
 import { Tabs } from "webextension-polyfill-ts";
 
 export class TabActionGroup {
@@ -266,8 +265,8 @@ export class TabActionInvoker extends ActionInvoker<TabActionGroup> {
   public readonly moveFirst: Action;
   public readonly moveLast: Action;
 
-  constructor(actionGroup: TabActionGroup, v: Validator<TabActionGroup>) {
-    super(actionGroup, v);
+  constructor(actionGroup: TabActionGroup) {
+    super(actionGroup);
 
     const idArgsActions = {
       get: actionGroup.get,
@@ -277,11 +276,11 @@ export class TabActionInvoker extends ActionInvoker<TabActionGroup> {
     this.get = this.idArgsAction(idArgsActions, "get");
     this.activate = this.idArgsAction(idArgsActions, "activate");
     this.tabOpen = (args: ActionArgs) => {
-      const a = v.has({ url: v.requiredString() }, args);
+      const a = this.v.has({ url: this.v.requiredString() }, args);
       return actionGroup.tabOpen(a.url);
     };
     this.open = (args: ActionArgs) => {
-      const a = v.has({ url: v.requiredString() }, args);
+      const a = this.v.has({ url: this.v.requiredString() }, args);
       return actionGroup.open(a.url);
     };
 
