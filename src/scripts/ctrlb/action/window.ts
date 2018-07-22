@@ -1,5 +1,4 @@
-import { ResultInfo, Action, ActionInvoker } from "./action";
-
+import { Action, ActionInvoker } from "./action";
 import { Windows } from "webextension-polyfill-ts";
 
 export class WindowActionGroup {
@@ -39,9 +38,8 @@ export class WindowActionGroup {
     return null;
   }
 
-  public async list(): Promise<ResultInfo> {
-    const windows = await this.windows.getAll({ populate: true });
-    return { body: windows };
+  public async list(): Promise<Windows.Window[]> {
+    return await this.windows.getAll({ populate: true });
   }
 
   protected async updateState(state: Windows.WindowState): Promise<null> {

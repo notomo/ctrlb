@@ -1,9 +1,7 @@
-import { Result } from "./action/action";
-import { ResultInfo } from "./action/action";
+import { ActionArgs } from "./action/action";
 
 export class Client {
   protected socket: WebSocket | null;
-  protected readonly NAME: string = "ctrlb";
   protected readonly connector: Connector;
   protected readonly view: View;
   protected readonly invoker: ActionInvoker;
@@ -37,11 +35,7 @@ export class Client {
   }
 
   protected sendMessage(data: any, requestId?: string) {
-    data.client = this.NAME;
-    if (requestId !== undefined) {
-      data.requestId = requestId;
-    }
-    const json = JSON.stringify(data);
+    const json = JSON.stringify(new Response(data, requestId));
     const socket = this.socket as WebSocket;
     socket.send(json);
   }
@@ -55,20 +49,44 @@ export class Client {
     this.view.setIcon({ path: this.DISABLE_ICON });
   }
 
-  protected onMessage(ev: MessageEvent) {
+  protected async onMessage(ev: MessageEvent) {
     const json = JSON.parse(ev.data);
-    this.execute(json);
+    const result = await this.invoker.execute(
+      json.actionGroupName || "",
+      json.actionName || "",
+      json.args || {}
+    );
+    this.sendMessage(result, json.requestId);
   }
 
-  public execute(jsonArray: any): boolean {
+  public async execute(
+    actionGroupName: string,
+    actionName: string,
+    args?: ActionArgs
+  ): Promise<boolean> {
     if (!this.isOpen()) {
       return false;
     }
-    const requestId = jsonArray.requestId;
-    this.invoker
-      .execute(jsonArray)
-      .then((result: Result) => this.sendMessage(result, requestId));
+    const result = await this.invoker.execute(
+      actionGroupName,
+      actionName,
+      args
+    );
+    this.sendMessage(result);
     return true;
+  }
+}
+
+class Response {
+  public readonly client = "ctrlb";
+  public readonly requestId?: string;
+  public readonly body: any;
+
+  constructor(body: any, requestId: string | undefined) {
+    this.body = body;
+    if (requestId !== undefined) {
+      this.requestId = requestId;
+    }
   }
 }
 
@@ -83,5 +101,9 @@ export class Connector {
 }
 
 export interface ActionInvoker {
-  execute(json: any): Promise<ResultInfo>;
+  execute(
+    actionGroupName: string,
+    actionName: string,
+    args?: ActionArgs
+  ): Promise<{}>;
 }

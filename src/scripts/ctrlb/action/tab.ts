@@ -1,4 +1,4 @@
-import { ActionArgs, ResultInfo, Action, ActionInvoker } from "./action";
+import { ActionArgs, Action, ActionInvoker } from "./action";
 import { Tabs } from "webextension-polyfill-ts";
 
 export class TabActionGroup {
@@ -206,14 +206,12 @@ export class TabActionGroup {
     return null;
   }
 
-  public async list(): Promise<ResultInfo> {
-    const tabs = await this.tabs.query({ currentWindow: true });
-    return { body: tabs };
+  public async list(): Promise<Tabs.Tab[]> {
+    return await this.tabs.query({ currentWindow: true });
   }
 
-  public async get(tabId: number): Promise<ResultInfo> {
-    const tab = await this.tabs.get(tabId);
-    return { body: tab };
+  public async get(tabId: number): Promise<Tabs.Tab> {
+    return await this.tabs.get(tabId);
   }
 
   private async update(tab: Tabs.Tab, properties: any) {

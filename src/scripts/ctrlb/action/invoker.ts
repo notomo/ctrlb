@@ -6,7 +6,7 @@ import { NavigationActionInvoker, NavigationActionGroup } from "./navigation";
 import { ScrollActionInvoker, ScrollActionGroup } from "./scroll";
 import { ZoomActionInvoker, ZoomActionGroup } from "./zoom";
 import { Browser } from "webextension-polyfill-ts";
-import { ActionArgs, ResultInfo, Action } from "./action";
+import { Action, ActionArgs } from "./action";
 
 export class ActionInvokers {
   public readonly tab: TabActionInvoker;
@@ -82,7 +82,7 @@ export class ActionFacade {
   protected isActionName<T extends ActionInvokers[keyof ActionInvokers]>(
     invoker: T,
     actionName: string | number | symbol
-  ): actionName is keyof T {
+  ): actionName is keyof ActionInvokers[keyof ActionInvokers] {
     return actionName in invoker;
   }
 
@@ -92,34 +92,22 @@ export class ActionFacade {
     return actionGroupName in this.invokers;
   }
 
-  public async execute(json: any): Promise<ResultInfo> {
-    const actionInfo = json as ActionInfo;
-
-    if (!this.isActionGroupName(actionInfo.actionGroupName)) {
-      throw new Error(actionInfo.actionGroupName + " is not actionGroup.");
+  public async execute(
+    actionGroupName: string,
+    actionName: string,
+    args?: ActionArgs
+  ): Promise<{}> {
+    if (!this.isActionGroupName(actionGroupName)) {
+      throw new Error(actionGroupName + " is not actionGroup.");
     }
-    const invoker = this.getActionInvoker(actionInfo.actionGroupName);
+    const invoker = this.getActionInvoker(actionGroupName);
 
-    if (!this.isActionName(invoker, actionInfo.actionName)) {
-      throw new Error(
-        actionInfo.actionName +
-          " is not " +
-          actionInfo.actionGroupName +
-          "'s action."
-      );
+    if (!this.isActionName(invoker, actionName)) {
+      throw new Error(actionName + " is not " + actionGroupName + "'s action.");
     }
-    const action: Action = this.getAction(invoker, actionInfo.actionName);
+    const action: Action = this.getAction(invoker, actionName);
 
-    const result = await action(actionInfo.args);
-    if (result === null) {
-      return {};
-    }
-    return result;
+    const result = await action(args || {});
+    return result || {};
   }
-}
-
-interface ActionInfo {
-  actionGroupName: string;
-  actionName: string;
-  args: ActionArgs;
 }

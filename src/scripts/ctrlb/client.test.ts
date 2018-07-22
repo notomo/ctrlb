@@ -1,7 +1,7 @@
 import { Client, View, Connector, ActionInvoker } from "./client";
 
 describe("Client", () => {
-  it("execute returns false if closed", () => {
+  it("execute returns false if closed", async () => {
     const ConnectorClass = jest.fn<Connector>(() => ({}));
     const connector = new ConnectorClass();
     const ViewClass = jest.fn<View>(() => ({}));
@@ -10,7 +10,7 @@ describe("Client", () => {
     const invoker = new InvokerClass();
     const client = new Client(connector, view, invoker);
 
-    expect(client.execute({})).toBe(false);
+    expect(await client.execute("", "", {})).toBe(false);
   });
 
   it("open sets event handlers", () => {
@@ -60,7 +60,7 @@ describe("Client", () => {
 
     const openEvent = new Event("open");
     socket.onopen(openEvent);
-    expect(send).toBeCalledWith('{"client":"ctrlb"}');
+    expect(send).toBeCalledWith('{"client":"ctrlb","body":{}}');
     expect(setIcon).toBeCalledWith({ path: client.ENABLE_ICON });
 
     // TODO: onmessage

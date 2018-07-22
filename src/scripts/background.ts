@@ -19,12 +19,6 @@ config.getHost().then((host: string) => {
   });
 
   browser.tabs.onActivated.addListener((activeInfo: any) => {
-    client.execute({
-      actionName: "get",
-      actionGroupName: "tab",
-      args: {
-        id: activeInfo.tabId
-      }
-    });
+    client.execute("tab", "get", { id: activeInfo.tabId });
   });
 });

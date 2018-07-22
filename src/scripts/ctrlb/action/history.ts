@@ -1,15 +1,16 @@
-import { ActionArgs, ResultInfo, Action, ActionInvoker } from "./action";
+import { ActionArgs, Action, ActionInvoker } from "./action";
 import { History } from "webextension-polyfill-ts";
 
 export class HistoryActionGroup {
   constructor(protected readonly history: History.Static) {}
 
-  public async search(text: string | null = null): Promise<ResultInfo> {
+  public async search(
+    text: string | null = null
+  ): Promise<History.HistoryItem[]> {
     if (text === null) {
-      return { body: [] };
+      return [];
     }
-    const histories = await this.history.search({ text: text });
-    return { body: histories };
+    return await this.history.search({ text: text });
   }
 }
 

@@ -1,6 +1,12 @@
-import { ActionArgs, ResultInfo, Action, ActionInvoker } from "./action";
+import { ActionArgs, Action, ActionInvoker } from "./action";
 import { TabActionGroup } from "./tab";
 import { Bookmarks } from "webextension-polyfill-ts";
+
+interface BookmarkResult {
+  id: string;
+  url?: string;
+  title: string;
+}
 
 export class BookmarkActionGroup {
   constructor(
@@ -18,21 +24,21 @@ export class BookmarkActionGroup {
     return bookmark;
   }
 
-  public async open(id: number): Promise<ResultInfo | null> {
+  public async open(id: number): Promise<null> {
     const bookmark = await this.get(id);
 
     if (bookmark.url === undefined) {
-      return {};
+      return null;
     }
 
     return this.tabActionGroup.open(bookmark.url);
   }
 
-  public async tabOpen(id: number): Promise<ResultInfo | null> {
+  public async tabOpen(id: number): Promise<null> {
     const bookmark = await this.get(id);
 
     if (bookmark.url === undefined) {
-      return {};
+      return null;
     }
 
     return this.tabActionGroup.tabOpen(bookmark.url);
@@ -62,35 +68,31 @@ export class BookmarkActionGroup {
     return null;
   }
 
-  public async list(limit: number | null = null): Promise<ResultInfo> {
+  public async list(limit: number | null = null): Promise<BookmarkResult[]> {
     const numberOfItems = limit || 50;
     const bookmarks = await this.bookmarks.getRecent(numberOfItems);
-    const body = bookmarks.map(book => {
+    return bookmarks.map(book => {
       return {
         id: book.id,
         url: book.url,
         title: book.title
       };
     });
-
-    return { body: body };
   }
 
-  public async search(query: string | null = null): Promise<ResultInfo> {
+  public async search(query: string | null = null): Promise<BookmarkResult[]> {
     if (query === null) {
-      return { body: [] };
+      return [];
     }
 
     const bookmarks = await this.bookmarks.search(query);
-    const body = bookmarks.map(book => {
+    return bookmarks.map(book => {
       return {
         id: book.id,
         url: book.url,
         title: book.title
       };
     });
-
-    return { body: body };
   }
 
   public async update(id: number, url: string, title: string): Promise<null> {

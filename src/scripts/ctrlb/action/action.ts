@@ -1,22 +1,13 @@
 import { Validator } from "./validator";
 
-export interface ResultInfo {
-  body?: any;
-}
-
-export type Result =
-  | ResultInfo
-  | Promise<ResultInfo>
-  | Promise<ResultInfo | null>
-  | null
-  | Promise<null>;
+export type ActionResult = any;
 
 export interface NoArgsAction {
-  (): Result;
+  (): ActionResult;
 }
 
 export interface IdArgsAction {
-  (id: number): Result;
+  (id: number): ActionResult;
 }
 
 // TODO
@@ -25,7 +16,7 @@ export interface ActionArgs {
 }
 
 export interface Action {
-  (args: ActionArgs): Result;
+  (args: ActionArgs): ActionResult;
 }
 
 type NoArgsActions<T> = { [index: string]: NoArgsAction } & {
