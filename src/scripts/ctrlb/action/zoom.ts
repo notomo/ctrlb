@@ -1,5 +1,4 @@
 import { ActionArgs, Action, ActionInvoker } from "./action";
-
 import { Tabs } from "webextension-polyfill-ts";
 
 export class ZoomActionGroup {
