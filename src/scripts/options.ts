@@ -4,31 +4,27 @@ import { browser } from "webextension-polyfill-ts";
 const storage = browser.storage.sync;
 const config = new Config(storage);
 
-function saveOptions() {
+const saveOptions = async () => {
   const hostForm = document.getElementById("host") as HTMLInputElement;
   const host = hostForm.value as string;
   const statusLabel = document.getElementById("status") as HTMLElement;
-  config
-    .saveHost(host)
-    .then(() => {
-      statusLabel.textContent = "Options saved.";
-      setTimeout(() => {
-        statusLabel.textContent = "";
-      }, 750);
-    })
-    .catch(() => {
-      statusLabel.textContent = "Failed saving options.";
-    });
-}
+  await config.saveHost(host).catch(() => {
+    statusLabel.textContent = "Failed saving options.";
+  });
+  statusLabel.textContent = "Options saved.";
+  setTimeout(() => {
+    statusLabel.textContent = "";
+  }, 750);
+};
 
 const saveButton = document.getElementById("save") as HTMLInputElement;
 saveButton.addEventListener("click", saveOptions);
 
-async function restoreOptions() {
+const restoreOptions = async () => {
   const defaultLabel = document.getElementById("default") as HTMLElement;
   const hostForm = document.getElementById("host") as HTMLInputElement;
   defaultLabel.textContent = config.DEFAULT_HOST;
   const host: string = await config.getHost();
   hostForm.value = host;
-}
+};
 document.addEventListener("DOMContentLoaded", restoreOptions);
