@@ -48,6 +48,7 @@ gulp.task("scripts", cb => {
             filename: "[name].js"
           },
           plugins: [],
+          devtool: "inline-source-map",
           module: {
             rules: [
               {
