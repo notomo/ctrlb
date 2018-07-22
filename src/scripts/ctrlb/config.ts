@@ -1,9 +1,11 @@
+import { Storage } from "webextension-polyfill-ts";
+
 export class Config {
   public readonly DEFAULT_HOST: string = "127.0.0.1:8888";
 
-  protected storage: ConfigStorage;
+  protected storage: Storage.SyncStorageArea;
 
-  constructor(storage: ConfigStorage) {
+  constructor(storage: Storage.SyncStorageArea) {
     this.storage = storage;
   }
 
@@ -57,9 +59,4 @@ export class ValidateError extends Error {
   toString() {
     return "allowed only private ip or localhost. actual: " + this.host;
   }
-}
-
-export interface ConfigStorage {
-  get(keys: { [key: string]: any }): { [key: string]: any };
-  set(keys: { [key: string]: any }): Promise<void>;
 }

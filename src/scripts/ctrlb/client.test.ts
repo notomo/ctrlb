@@ -1,4 +1,4 @@
-import { Client, View, Connector, IWebSocket, ActionInvoker } from "./client";
+import { Client, View, Connector, ActionInvoker } from "./client";
 
 describe("Client", () => {
   it("execute returns false if closed", () => {
@@ -14,9 +14,11 @@ describe("Client", () => {
   });
 
   it("open sets event handlers", () => {
-    const socket = new SocketMock();
     const send = jest.fn();
-    socket.send = send;
+    const WebSocketClass = jest.fn<WebSocket>(() => ({
+      send: send
+    }));
+    const socket = new WebSocketClass();
 
     const ConnectorClass = jest.fn<Connector>(() => ({
       connect: jest.fn().mockReturnValue(socket)
@@ -64,14 +66,3 @@ describe("Client", () => {
     // TODO: onmessage
   });
 });
-
-class SocketMock implements IWebSocket {
-  onclose: ((ev: CloseEvent) => any) | null = null;
-  onerror: ((ev: Event) => any) | null = null;
-  onmessage = null;
-  onopen: ((ev: Event) => any) | null = null;
-  readonly OPEN: number = WebSocket.OPEN;
-  readonly readyState: number = WebSocket.CONNECTING;
-  close = (code?: number, reason?: string): void => {};
-  send = (data: string | ArrayBufferLike | Blob | ArrayBufferView): void => {};
-}

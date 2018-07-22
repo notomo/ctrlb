@@ -2,7 +2,7 @@ import { Result } from "./action/action";
 import { ResultInfo } from "./action/action";
 
 export class Client {
-  protected socket: IWebSocket | null;
+  protected socket: WebSocket | null;
   protected readonly NAME: string = "ctrlb";
   protected readonly connector: Connector;
   protected readonly view: View;
@@ -42,7 +42,7 @@ export class Client {
       data.requestId = requestId;
     }
     const json = JSON.stringify(data);
-    const socket = this.socket as IWebSocket;
+    const socket = this.socket as WebSocket;
     socket.send(json);
   }
 
@@ -76,19 +76,8 @@ export interface View {
   setIcon(details: { path: string }): void;
 }
 
-export interface IWebSocket {
-  onclose: ((ev: CloseEvent) => any) | null;
-  onerror: ((ev: Event) => any) | null;
-  onmessage: ((ev: MessageEvent) => any) | null;
-  onopen: ((ev: Event) => any) | null;
-  readonly readyState: number;
-  close(code?: number, reason?: string): void;
-  send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void;
-  readonly OPEN: number;
-}
-
 export class Connector {
-  public connect(host: string): IWebSocket {
+  public connect(host: string): WebSocket {
     return new WebSocket("ws://" + host);
   }
 }
