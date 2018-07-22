@@ -1,4 +1,4 @@
-import { ActionArgs, ResultInfo, Action } from "./action";
+import { ActionArgs, ResultInfo, Action, ActionInvoker } from "./action";
 import { Validator } from "./validator";
 import { Tabs } from "webextension-polyfill-ts";
 
@@ -244,7 +244,7 @@ export class TabActionGroup {
   }
 }
 
-export class TabActionInvoker {
+export class TabActionInvoker extends ActionInvoker<TabActionGroup> {
   public readonly get: Action;
   public readonly activate: Action;
   public readonly tabOpen: Action;
@@ -266,9 +266,16 @@ export class TabActionInvoker {
   public readonly moveFirst: Action;
   public readonly moveLast: Action;
 
-  constructor(actionGroup: TabActionGroup, v: Validator) {
-    this.get = v.idArgs(actionGroup["get"], actionGroup);
-    this.activate = v.idArgs(actionGroup["activate"], actionGroup);
+  constructor(actionGroup: TabActionGroup, v: Validator<TabActionGroup>) {
+    super(actionGroup, v);
+
+    const idArgsActions = {
+      get: actionGroup.get,
+      activate: actionGroup.activate
+    };
+
+    this.get = this.idArgsAction(idArgsActions, "get");
+    this.activate = this.idArgsAction(idArgsActions, "activate");
     this.tabOpen = (args: ActionArgs) => {
       const a = v.has({ url: v.requiredString() }, args);
       return actionGroup.tabOpen(a.url);
@@ -277,21 +284,41 @@ export class TabActionInvoker {
       const a = v.has({ url: v.requiredString() }, args);
       return actionGroup.open(a.url);
     };
-    this.close = v.noArgs(actionGroup["close"], actionGroup);
-    this.duplicate = v.noArgs(actionGroup["duplicate"], actionGroup);
-    this.reload = v.noArgs(actionGroup["reload"], actionGroup);
-    this.list = v.noArgs(actionGroup["list"], actionGroup);
-    this.next = v.noArgs(actionGroup["next"], actionGroup);
-    this.previous = v.noArgs(actionGroup["previous"], actionGroup);
-    this.first = v.noArgs(actionGroup["first"], actionGroup);
-    this.last = v.noArgs(actionGroup["last"], actionGroup);
-    this.create = v.noArgs(actionGroup["create"], actionGroup);
-    this.closeOthers = v.noArgs(actionGroup["closeOthers"], actionGroup);
-    this.closeRight = v.noArgs(actionGroup["closeRight"], actionGroup);
-    this.closeLeft = v.noArgs(actionGroup["closeLeft"], actionGroup);
-    this.moveLeft = v.noArgs(actionGroup["moveLeft"], actionGroup);
-    this.moveRight = v.noArgs(actionGroup["moveRight"], actionGroup);
-    this.moveFirst = v.noArgs(actionGroup["moveFirst"], actionGroup);
-    this.moveLast = v.noArgs(actionGroup["moveLast"], actionGroup);
+
+    const noArgsActions = {
+      close: actionGroup.close,
+      duplicate: actionGroup.duplicate,
+      reload: actionGroup.reload,
+      list: actionGroup.list,
+      next: actionGroup.next,
+      previous: actionGroup.previous,
+      first: actionGroup.first,
+      last: actionGroup.last,
+      create: actionGroup.create,
+      closeOthers: actionGroup.closeOthers,
+      closeRight: actionGroup.closeRight,
+      closeLeft: actionGroup.closeLeft,
+      moveLeft: actionGroup.moveLeft,
+      moveRight: actionGroup.moveRight,
+      moveFirst: actionGroup.moveFirst,
+      moveLast: actionGroup.moveLast
+    };
+
+    this.close = this.noArgsAction(noArgsActions, "close");
+    this.duplicate = this.noArgsAction(noArgsActions, "duplicate");
+    this.reload = this.noArgsAction(noArgsActions, "reload");
+    this.list = this.noArgsAction(noArgsActions, "list");
+    this.next = this.noArgsAction(noArgsActions, "next");
+    this.previous = this.noArgsAction(noArgsActions, "previous");
+    this.first = this.noArgsAction(noArgsActions, "first");
+    this.last = this.noArgsAction(noArgsActions, "last");
+    this.create = this.noArgsAction(noArgsActions, "create");
+    this.closeOthers = this.noArgsAction(noArgsActions, "closeOthers");
+    this.closeRight = this.noArgsAction(noArgsActions, "closeRight");
+    this.closeLeft = this.noArgsAction(noArgsActions, "closeLeft");
+    this.moveLeft = this.noArgsAction(noArgsActions, "moveLeft");
+    this.moveRight = this.noArgsAction(noArgsActions, "moveRight");
+    this.moveFirst = this.noArgsAction(noArgsActions, "moveFirst");
+    this.moveLast = this.noArgsAction(noArgsActions, "moveLast");
   }
 }

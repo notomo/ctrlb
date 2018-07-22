@@ -1,4 +1,4 @@
-import { ResultInfo, Action } from "./action";
+import { ResultInfo, Action, ActionInvoker } from "./action";
 import { Validator } from "./validator";
 import { Windows } from "webextension-polyfill-ts";
 
@@ -58,7 +58,7 @@ export class WindowActionGroup {
   }
 }
 
-export class WindowActionInvoker {
+export class WindowActionInvoker extends ActionInvoker<WindowActionGroup> {
   public readonly removeLastFocused: Action;
   public readonly remove: Action;
   public readonly activate: Action;
@@ -68,17 +68,34 @@ export class WindowActionInvoker {
   public readonly toNormal: Action;
   public readonly list: Action;
 
-  constructor(actionGroup: WindowActionGroup, v: Validator) {
-    this.removeLastFocused = v.noArgs(
-      actionGroup["removeLastFocused"],
-      actionGroup
+  constructor(actionGroup: WindowActionGroup, v: Validator<WindowActionGroup>) {
+    super(actionGroup, v);
+
+    const idArgsActions = {
+      remove: actionGroup.remove,
+      activate: actionGroup.activate
+    };
+
+    this.remove = this.idArgsAction(idArgsActions, "remove");
+    this.activate = this.idArgsAction(idArgsActions, "activate");
+
+    const noArgsActions = {
+      removeLastFocused: actionGroup.removeLastFocused,
+      maximize: actionGroup.maximize,
+      minimize: actionGroup.minimize,
+      toFullScreen: actionGroup.toFullScreen,
+      toNormal: actionGroup.toNormal,
+      list: actionGroup.list
+    };
+
+    this.removeLastFocused = this.noArgsAction(
+      noArgsActions,
+      "removeLastFocused"
     );
-    this.remove = v.idArgs(actionGroup["remove"], actionGroup);
-    this.activate = v.idArgs(actionGroup["activate"], actionGroup);
-    this.maximize = v.noArgs(actionGroup["maximize"], actionGroup);
-    this.minimize = v.noArgs(actionGroup["minimize"], actionGroup);
-    this.toFullScreen = v.noArgs(actionGroup["toFullScreen"], actionGroup);
-    this.toNormal = v.noArgs(actionGroup["toNormal"], actionGroup);
-    this.list = v.noArgs(actionGroup["list"], actionGroup);
+    this.maximize = this.noArgsAction(noArgsActions, "maximize");
+    this.minimize = this.noArgsAction(noArgsActions, "minimize");
+    this.toFullScreen = this.noArgsAction(noArgsActions, "toFullScreen");
+    this.toNormal = this.noArgsAction(noArgsActions, "toNormal");
+    this.list = this.noArgsAction(noArgsActions, "list");
   }
 }

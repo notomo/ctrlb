@@ -1,4 +1,4 @@
-import { Action } from "./action";
+import { Action, ActionInvoker } from "./action";
 import { Validator } from "./validator";
 import { Tabs } from "webextension-polyfill-ts";
 
@@ -34,16 +34,25 @@ export class ScrollActionGroup {
   }
 }
 
-export class ScrollActionInvoker {
+export class ScrollActionInvoker extends ActionInvoker<ScrollActionGroup> {
   public readonly toTop: Action;
   public readonly toBottom: Action;
   public readonly up: Action;
   public readonly down: Action;
 
-  constructor(actionGroup: ScrollActionGroup, v: Validator) {
-    this.toTop = v.noArgs(actionGroup["toTop"], actionGroup);
-    this.toBottom = v.noArgs(actionGroup["toBottom"], actionGroup);
-    this.up = v.noArgs(actionGroup["up"], actionGroup);
-    this.down = v.noArgs(actionGroup["down"], actionGroup);
+  constructor(actionGroup: ScrollActionGroup, v: Validator<ScrollActionGroup>) {
+    super(actionGroup, v);
+
+    const noArgsActions = {
+      toTop: actionGroup.toTop,
+      toBottom: actionGroup.toBottom,
+      up: actionGroup.up,
+      down: actionGroup.down
+    };
+
+    this.toTop = this.noArgsAction(noArgsActions, "toTop");
+    this.toBottom = this.noArgsAction(noArgsActions, "toBottom");
+    this.up = this.noArgsAction(noArgsActions, "up");
+    this.down = this.noArgsAction(noArgsActions, "down");
   }
 }

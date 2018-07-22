@@ -1,4 +1,4 @@
-import { ActionArgs, ResultInfo, Action } from "./action";
+import { ActionArgs, ResultInfo, Action, ActionInvoker } from "./action";
 import { TabActionGroup } from "./tab";
 import { Validator } from "./validator";
 import { Bookmarks } from "webextension-polyfill-ts";
@@ -115,7 +115,7 @@ class NotFoundBookmark extends Error {
   }
 }
 
-export class BookmarkActionInvoker {
+export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
   public readonly list: Action;
   public readonly search: Action;
   public readonly update: Action;
@@ -124,7 +124,12 @@ export class BookmarkActionInvoker {
   public readonly tabOpen: Action;
   public readonly remove: Action;
 
-  constructor(actionGroup: BookmarkActionGroup, v: Validator) {
+  constructor(
+    actionGroup: BookmarkActionGroup,
+    v: Validator<BookmarkActionGroup>
+  ) {
+    super(actionGroup, v);
+
     this.list = (args: ActionArgs) => {
       const a = v.has({ limit: v.optionalNumber() }, args);
       return actionGroup.list(a.limit);
@@ -159,10 +164,14 @@ export class BookmarkActionInvoker {
       return actionGroup.create(a.url, a.title, a.parentId);
     };
 
-    this.open = v.idArgs(actionGroup["open"], actionGroup);
+    const idArgsActions = {
+      open: actionGroup.open,
+      tabOpen: actionGroup.tabOpen,
+      remove: actionGroup.remove
+    };
 
-    this.tabOpen = v.idArgs(actionGroup["tabOpen"], actionGroup);
-
-    this.remove = v.idArgs(actionGroup["remove"], actionGroup);
+    this.open = this.idArgsAction(idArgsActions, "open");
+    this.tabOpen = this.idArgsAction(idArgsActions, "tabOpen");
+    this.remove = this.idArgsAction(idArgsActions, "remove");
   }
 }

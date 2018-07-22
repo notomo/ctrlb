@@ -17,7 +17,10 @@ export class HistoryActionGroup {
 export class HistoryActionInvoker {
   public readonly search: Action;
 
-  constructor(actionGroup: HistoryActionGroup, v: Validator) {
+  constructor(
+    actionGroup: HistoryActionGroup,
+    v: Validator<HistoryActionGroup>
+  ) {
     this.search = (args: ActionArgs) => {
       const a = v.has({ input: v.optionalString() }, args);
       return actionGroup.search(a.input);

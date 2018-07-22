@@ -1,6 +1,6 @@
 import { Client, Connector } from "./ctrlb/client";
 import { Config } from "./ctrlb/config";
-import { ActionFacade } from "./ctrlb/action/action";
+import { ActionFacade } from "./ctrlb/action/invoker";
 import { browser } from "webextension-polyfill-ts";
 
 const storage = browser.storage.sync;

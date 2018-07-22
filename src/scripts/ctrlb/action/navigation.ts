@@ -1,6 +1,6 @@
 import { Validator } from "./validator";
 import { Tabs } from "webextension-polyfill-ts";
-import { Action } from "./action";
+import { Action, ActionInvoker } from "./action";
 
 export class NavigationActionGroup {
   constructor(protected readonly tabs: Tabs.Static) {}
@@ -20,12 +20,24 @@ export class NavigationActionGroup {
   }
 }
 
-export class NavigationActionInvoker {
+export class NavigationActionInvoker extends ActionInvoker<
+  NavigationActionGroup
+> {
   public readonly back: Action;
   public readonly forward: Action;
 
-  constructor(actionGroup: NavigationActionGroup, v: Validator) {
-    this.back = v.noArgs(actionGroup["back"], actionGroup);
-    this.forward = v.noArgs(actionGroup["forward"], actionGroup);
+  constructor(
+    actionGroup: NavigationActionGroup,
+    v: Validator<NavigationActionGroup>
+  ) {
+    super(actionGroup, v);
+
+    const noArgsActions = {
+      back: actionGroup.back,
+      forward: actionGroup.forward
+    };
+
+    this.back = this.noArgsAction(noArgsActions, "back");
+    this.forward = this.noArgsAction(noArgsActions, "forward");
   }
 }

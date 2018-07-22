@@ -1,4 +1,4 @@
-import { ActionArgs, Action } from "./action";
+import { ActionArgs, Action, ActionInvoker } from "./action";
 import { Validator } from "./validator";
 import { Tabs } from "webextension-polyfill-ts";
 
@@ -31,19 +31,28 @@ export class ZoomActionGroup {
   }
 }
 
-export class ZoomActionInvoker {
+export class ZoomActionInvoker extends ActionInvoker<ZoomActionGroup> {
   public readonly set: Action;
   public readonly reset: Action;
   public readonly up: Action;
   public readonly down: Action;
 
-  constructor(actionGroup: ZoomActionGroup, v: Validator) {
+  constructor(actionGroup: ZoomActionGroup, v: Validator<ZoomActionGroup>) {
+    super(actionGroup, v);
+
     this.set = (args: ActionArgs) => {
       const a = v.has({ zoomFactor: v.requiredNumber() }, args);
       return actionGroup.set(a.zoomFactor);
     };
-    this.reset = v.noArgs(actionGroup["reset"], actionGroup);
-    this.up = v.noArgs(actionGroup["up"], actionGroup);
-    this.down = v.noArgs(actionGroup["down"], actionGroup);
+
+    const noArgsActions = {
+      reset: actionGroup.reset,
+      up: actionGroup.up,
+      down: actionGroup.down
+    };
+
+    this.reset = this.noArgsAction(noArgsActions, "reset");
+    this.up = this.noArgsAction(noArgsActions, "up");
+    this.down = this.noArgsAction(noArgsActions, "down");
   }
 }

@@ -1,6 +1,6 @@
 import { ActionArgs, NoArgsAction, IdArgsAction } from "./action";
 
-export class Validator {
+export class Validator<K> {
   protected readonly REQUIRED_NUMBER = 1;
   protected readonly OPTIONAL_NUMBER = 2;
   protected readonly REQUIRED_STRING = "required";
@@ -19,6 +19,8 @@ export class Validator {
     this.REQUIRED_STRING,
     this.REQUIRED_BOOLEAN
   ];
+
+  constructor(protected readonly actionGroup: K) {}
 
   public requiredNumber(): number {
     return this.REQUIRED_NUMBER;
@@ -52,20 +54,28 @@ export class Validator {
     return this.OPTIONALS.includes(value);
   }
 
-  public noArgs(noArgsAction: NoArgsAction, group: any) {
+  public noArgs<T extends { [index: string]: NoArgsAction }>(
+    noArgsActions: T,
+    actionName: keyof T & string
+  ) {
     return (args: ActionArgs) => {
+      const noArgsAction = noArgsActions[actionName];
       if (Object.keys(args).length) {
-        throw new Error(noArgsAction.name + " 's args must be emtpy.");
+        throw new Error(actionName + " 's args must be emtpy.");
       }
-      const f = noArgsAction.bind(group);
+      const f = noArgsAction.bind(this.actionGroup);
       return f();
     };
   }
 
-  public idArgs(idArgsAction: IdArgsAction, group: any) {
+  public idArgs<T extends { [index: string]: IdArgsAction }>(
+    idArgsActions: T,
+    actionName: keyof T & string
+  ) {
     return (args: ActionArgs) => {
       const id = this.has({ id: this.requiredNumber() }, args).id;
-      const f = idArgsAction.bind(group);
+      const idArgsAction = idArgsActions[actionName];
+      const f = idArgsAction.bind(this.actionGroup);
       return f(id);
     };
   }
