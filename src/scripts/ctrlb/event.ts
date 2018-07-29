@@ -7,12 +7,16 @@ export class SubscribeEventHandler {
 
   constructor(
     client: Client,
-    protected readonly eventStorage: Storage.Static,
+    protected readonly onEventEmitted: { addListener(params: any): void },
     protected readonly storage: Storage.SyncStorageArea,
-    tabs: Tabs.Static
+    tabActivated: ListenerHolder,
+    tabUpdated: ListenerHolder
   ) {
     this.handleFunctions = new HandleFunctions(client);
-    this.events = new Events(tabs);
+    this.events = {
+      tabActivated: tabActivated,
+      tabUpdated: tabUpdated
+    };
   }
 
   public listen() {
@@ -23,7 +27,7 @@ export class SubscribeEventHandler {
       return eventNames;
     }, {});
     this.storage.set(initialValues);
-    this.eventStorage.onChanged.addListener((changes: Storage.StorageChange) =>
+    this.onEventEmitted.addListener((changes: Storage.StorageChange) =>
       this.onChanged(changes)
     );
   }
@@ -85,14 +89,4 @@ export enum EventType {
   tabUpdated = "tabUpdated"
 }
 
-type IEvents = { [P in keyof IHandleFunctions]: ListenerHolder };
-
-class Events implements IEvents {
-  public readonly tabActivated: ListenerHolder;
-  public readonly tabUpdated: ListenerHolder;
-
-  constructor(tabs: Tabs.Static) {
-    this.tabActivated = tabs.onActivated;
-    this.tabUpdated = tabs.onUpdated;
-  }
-}
+type Events = { [P in keyof IHandleFunctions]: ListenerHolder };

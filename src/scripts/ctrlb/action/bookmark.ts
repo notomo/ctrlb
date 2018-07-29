@@ -106,7 +106,7 @@ export class BookmarkActionGroup {
   }
 }
 
-class NotFoundBookmark extends Error {
+export class NotFoundBookmark extends Error {
   constructor(private id: string) {
     super();
   }

@@ -21,8 +21,9 @@ config.getHost().then((host: string) => {
 
   new SubscribeEventHandler(
     client,
-    browser.storage,
+    browser.storage.onChanged,
     browser.storage.sync,
-    browser.tabs
+    browser.tabs.onActivated,
+    browser.tabs.onUpdated
   ).listen();
 });
