@@ -1,5 +1,6 @@
 import { Client, Connector } from "./ctrlb/client";
 import { Config } from "./ctrlb/config";
+import { SubscribeEventHandler } from "./ctrlb/event";
 import { ActionFacade } from "./ctrlb/action/invoker";
 import { browser } from "webextension-polyfill-ts";
 
@@ -18,7 +19,10 @@ config.getHost().then((host: string) => {
     client.open(host);
   });
 
-  browser.tabs.onActivated.addListener((activeInfo: any) => {
-    client.execute("tab", "get", { id: activeInfo.tabId });
-  });
+  new SubscribeEventHandler(
+    client,
+    browser.storage,
+    browser.storage.sync,
+    browser.tabs
+  ).listen();
 });

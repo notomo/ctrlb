@@ -5,6 +5,7 @@ import { WindowActionInvoker, WindowActionGroup } from "./window";
 import { NavigationActionInvoker, NavigationActionGroup } from "./navigation";
 import { ScrollActionInvoker, ScrollActionGroup } from "./scroll";
 import { ZoomActionInvoker, ZoomActionGroup } from "./zoom";
+import { EventActionInvoker, EventActionGroup } from "./event";
 import { Browser } from "webextension-polyfill-ts";
 import { Action, ActionArgs } from "./action";
 
@@ -16,6 +17,7 @@ export class ActionInvokers {
   public readonly navigation: NavigationActionInvoker;
   public readonly scroll: ScrollActionInvoker;
   public readonly zoom: ZoomActionInvoker;
+  public readonly event: EventActionInvoker;
 
   constructor(browser: Browser) {
     this.tab = ((): TabActionInvoker => {
@@ -55,6 +57,11 @@ export class ActionInvokers {
     this.zoom = ((): ZoomActionInvoker => {
       const actionGroup = new ZoomActionGroup(browser.tabs);
       return new ZoomActionInvoker(actionGroup);
+    })();
+
+    this.event = ((): EventActionInvoker => {
+      const actionGroup = new EventActionGroup(browser.storage.sync);
+      return new EventActionInvoker(actionGroup);
     })();
   }
 }

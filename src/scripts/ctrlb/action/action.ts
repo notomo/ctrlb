@@ -1,4 +1,5 @@
 import { Validator } from "./validator";
+import { EventType } from "./../event";
 
 export type ActionResult = any;
 
@@ -11,9 +12,9 @@ export interface IdArgsAction {
 }
 
 // TODO
-export interface ActionArgs {
+export type ActionArgs = {
   [index: string]: string | number | boolean | null;
-}
+} & { eventName?: EventType };
 
 export interface Action {
   (args: ActionArgs): ActionResult;
