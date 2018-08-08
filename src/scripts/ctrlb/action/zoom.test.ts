@@ -19,6 +19,12 @@ describe("ZoomActionGroup", () => {
     actionGroup = new ZoomActionGroup(tabs);
   });
 
+  it("get", async () => {
+    await actionGroup.get();
+
+    expect(getZoom).toHaveBeenCalledTimes(1);
+  });
+
   it("set", () => {
     const zoomFactor = 0.5;
     actionGroup.set(zoomFactor);

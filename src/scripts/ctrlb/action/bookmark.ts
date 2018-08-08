@@ -14,7 +14,9 @@ export class BookmarkActionGroup {
     protected readonly bookmarks: Bookmarks.Static
   ) {}
 
-  protected async get(bookmarkId: number): Promise<Bookmarks.BookmarkTreeNode> {
+  protected async get(
+    bookmarkId: number | string
+  ): Promise<Bookmarks.BookmarkTreeNode> {
     const id = String(bookmarkId);
     const bookmarks = await this.bookmarks.get(id);
     const bookmark = bookmarks.pop();

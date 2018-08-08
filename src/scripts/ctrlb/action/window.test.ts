@@ -2,6 +2,7 @@ import { WindowActionGroup, WindowActionInvoker } from "./window";
 import { Windows } from "webextension-polyfill-ts";
 
 describe("WindowActionGroup", () => {
+  let get: jest.Mock;
   let update: jest.Mock;
   let remove: jest.Mock;
   let getAll: jest.Mock;
@@ -10,12 +11,14 @@ describe("WindowActionGroup", () => {
   const windowId = 1;
 
   beforeEach(() => {
+    get = jest.fn();
     update = jest.fn();
     remove = jest.fn();
     getAll = jest.fn();
     getLastFocused = jest.fn();
 
     const WindowsClass = jest.fn<Windows.Static>(() => ({
+      get: get,
       update: update,
       remove: remove,
       getAll: getAll,
@@ -24,6 +27,11 @@ describe("WindowActionGroup", () => {
     const windows = new WindowsClass();
 
     actionGroup = new WindowActionGroup(windows);
+  });
+
+  it("get", async () => {
+    await actionGroup.get(windowId);
+    expect(get).toHaveBeenCalledWith(windowId);
   });
 
   it("maximize", async () => {

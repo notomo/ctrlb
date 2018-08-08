@@ -24,6 +24,18 @@ config.getHost().then((host: string) => {
     browser.storage.onChanged,
     browser.storage.sync,
     browser.tabs.onActivated,
-    browser.tabs.onUpdated
+    browser.tabs.onUpdated,
+    browser.tabs.onCreated,
+    browser.tabs.onRemoved,
+    browser.tabs.onZoomChange,
+    browser.history.onVisited,
+    browser.history.onVisitRemoved,
+    browser.history.onTitleChanged,
+    browser.windows.onFocusChanged,
+    browser.windows.onCreated,
+    browser.windows.onRemoved,
+    browser.bookmarks.onCreated,
+    browser.bookmarks.onRemoved,
+    browser.bookmarks.onChanged
   ).listen();
 });

@@ -4,6 +4,10 @@ import { Windows } from "webextension-polyfill-ts";
 export class WindowActionGroup {
   constructor(protected readonly windows: Windows.Static) {}
 
+  public async get(windowId: number): Promise<Windows.Window> {
+    return this.windows.get(windowId);
+  }
+
   public maximize(): Promise<null> {
     return this.updateState("maximized");
   }
@@ -57,6 +61,7 @@ export class WindowActionGroup {
 }
 
 export class WindowActionInvoker extends ActionInvoker<WindowActionGroup> {
+  public readonly get: Action;
   public readonly removeLastFocused: Action;
   public readonly remove: Action;
   public readonly activate: Action;
@@ -70,10 +75,12 @@ export class WindowActionInvoker extends ActionInvoker<WindowActionGroup> {
     super(actionGroup);
 
     const idArgsActions = {
+      get: actionGroup.get,
       remove: actionGroup.remove,
       activate: actionGroup.activate
     };
 
+    this.get = this.idArgsAction(idArgsActions, "get");
     this.remove = this.idArgsAction(idArgsActions, "remove");
     this.activate = this.idArgsAction(idArgsActions, "activate");
 

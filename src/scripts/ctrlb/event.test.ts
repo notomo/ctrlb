@@ -30,6 +30,18 @@ describe("SubscribeEventHandler", () => {
       onEventEmitted,
       storage,
       onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
+      onActivated,
       onActivated
     ).listen();
   });
