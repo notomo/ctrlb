@@ -1,4 +1,5 @@
 import { ActionArgs, NoArgsAction, IdArgsAction } from "./action";
+import { EventType } from "./../event";
 
 export class Validator<K> {
   protected readonly REQUIRED_NUMBER = 1;
@@ -44,6 +45,10 @@ export class Validator<K> {
 
   public optionalBoolean(): boolean | null {
     return this.OPTIONAL_BOOLEAN;
+  }
+
+  public eventName(): EventType {
+    return EventType.tabActivated;
   }
 
   protected isRequired(value: string | number | boolean): boolean {

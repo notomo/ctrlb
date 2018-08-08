@@ -1,7 +1,8 @@
 import { Client, View, Connector, ActionInvoker } from "./client";
+import { EventType } from "./event";
 
 describe("Client", () => {
-  it("execute returns false if closed", async () => {
+  it("notify returns false if closed", async () => {
     const ConnectorClass = jest.fn<Connector>(() => ({}));
     const connector = new ConnectorClass();
     const ViewClass = jest.fn<View>(() => ({}));
@@ -10,7 +11,7 @@ describe("Client", () => {
     const invoker = new InvokerClass();
     const client = new Client(connector, view, invoker);
 
-    expect(await client.execute("", "", {})).toBe(false);
+    expect(await client.notify("", "", EventType.tabActivated)).toBe(false);
   });
 
   it("open sets event handlers", () => {
@@ -60,7 +61,7 @@ describe("Client", () => {
 
     const openEvent = new Event("open");
     socket.onopen(openEvent);
-    expect(send).toBeCalledWith('{"client":"ctrlb","body":{}}');
+    expect(send).toBeCalledWith('{"client":"ctrlb","body":{},"option":{}}');
     expect(setIcon).toBeCalledWith({ path: client.ENABLE_ICON });
 
     // TODO: onmessage

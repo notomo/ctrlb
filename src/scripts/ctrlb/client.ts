@@ -1,4 +1,5 @@
 import { ActionArgs } from "./action/action";
+import { EventType } from "./event";
 
 export class Client {
   protected socket: WebSocket | null;
@@ -34,15 +35,19 @@ export class Client {
     return this.socket.readyState === this.socket.OPEN;
   }
 
-  protected sendMessage(data: any, requestId?: string) {
-    const json = JSON.stringify(new Response(data, requestId));
+  protected sendMessage(
+    data: {},
+    option: ResponseOption,
+    requestId?: string | undefined
+  ) {
+    const json = JSON.stringify(new Response(data, option, requestId));
     const socket = this.socket as WebSocket;
     socket.send(json);
   }
 
   protected onOpen() {
     this.view.setIcon({ path: this.ENABLE_ICON });
-    this.sendMessage({});
+    this.sendMessage({}, {});
   }
 
   protected disableIcon() {
@@ -56,12 +61,13 @@ export class Client {
       json.actionName || "",
       json.args || {}
     );
-    this.sendMessage(result, json.requestId);
+    this.sendMessage(result, {}, json.requestId);
   }
 
-  public async execute(
+  public async notify(
     actionGroupName: string,
     actionName: string,
+    eventName: EventType,
     args?: ActionArgs
   ): Promise<boolean> {
     if (!this.isOpen()) {
@@ -72,20 +78,33 @@ export class Client {
       actionName,
       args
     );
-    this.sendMessage(result);
+    this.sendMessage(result, { eventName: eventName });
     return true;
   }
 }
 
+type ResponseOption = {
+  eventName?: EventType | undefined;
+};
+
 class Response {
   public readonly client = "ctrlb";
   public readonly requestId?: string;
-  public readonly body: any;
+  public readonly body: {};
+  public readonly option: ResponseOption;
 
-  constructor(body: any, requestId: string | undefined) {
+  constructor(
+    body: {},
+    option: ResponseOption,
+    requestId?: string | undefined
+  ) {
     this.body = body;
+    this.option = {};
     if (requestId !== undefined) {
       this.requestId = requestId;
+    }
+    if (option !== undefined && option.eventName !== undefined) {
+      this.option.eventName = option.eventName;
     }
   }
 }

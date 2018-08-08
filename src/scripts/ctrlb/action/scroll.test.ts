@@ -1,4 +1,4 @@
-import { ScrollActionGroup } from "./scroll";
+import { ScrollActionGroup, ScrollActionInvoker } from "./scroll";
 import { Tabs } from "webextension-polyfill-ts";
 
 describe("ScrollActionGroup", () => {
@@ -34,5 +34,14 @@ describe("ScrollActionGroup", () => {
   it("down", () => {
     actionGroup.down();
     expect(executeScript).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("ScrollActionInvoker", () => {
+  it("constructor", () => {
+    const ActionGroupClass = jest.fn<ScrollActionGroup>(() => ({}));
+    const actionGroup = new ActionGroupClass();
+
+    new ScrollActionInvoker(actionGroup);
   });
 });
