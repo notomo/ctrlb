@@ -3,7 +3,10 @@ language:
 node_js:
     - 'node'
 install:
-    - npm install
+    - npm ci
     - npm install -g codecov
 script:
     - npm run coverage && codecov
+cache:
+    directories:
+        - "$HOME/.npm"
