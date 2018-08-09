@@ -66,7 +66,7 @@ export class Validator<K> {
     return (args: ActionArgs) => {
       const noArgsAction = noArgsActions[actionName];
       if (Object.keys(args).length) {
-        throw new Error(actionName + " 's args must be emtpy.");
+        throw new Error(actionName + "'s args must be emtpy.");
       }
       const f = noArgsAction.bind(this.actionGroup);
       return f();
@@ -97,17 +97,16 @@ export class Validator<K> {
         throw new Error(key + " is a required argument.");
       }
 
-      if (!(key in args) && this.isOptional(validationValue)) {
+      if (
+        (!(key in args) || args[key] === null) &&
+        this.isOptional(validationValue)
+      ) {
         results[key] = null;
         continue;
       }
 
-      const value: string | number | boolean | null = args[key];
+      const value = args[key];
       if (value === null) {
-        if (this.isOptional(validationValue)) {
-          results[key] = null;
-          continue;
-        }
         throw new Error(key + " must not be void.");
       }
 
