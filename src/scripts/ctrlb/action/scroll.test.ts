@@ -9,7 +9,7 @@ describe("ScrollActionGroup", () => {
     executeScript = jest.fn();
 
     const TabsClass = jest.fn<Tabs.Static>(() => ({
-      executeScript: executeScript
+      executeScript: executeScript,
     }));
     const tabs = new TabsClass();
 

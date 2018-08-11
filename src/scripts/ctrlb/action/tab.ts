@@ -18,7 +18,7 @@ export class TabActionGroup {
   public async first(): Promise<null> {
     const tabs = await this.tabs.query({
       currentWindow: true,
-      index: 0
+      index: 0,
     });
     const tab = tabs.pop();
     if (tab !== undefined) {
@@ -35,7 +35,7 @@ export class TabActionGroup {
     if (lastTab === undefined) {
       return null;
     }
-    var index: number;
+    let index: number;
     if (lastTab.index === tab.index) {
       index = 0;
     } else {
@@ -43,7 +43,7 @@ export class TabActionGroup {
     }
     const tabs = await this.tabs.query({
       currentWindow: true,
-      index: index
+      index: index,
     });
 
     const nextTab = tabs.pop();
@@ -63,7 +63,7 @@ export class TabActionGroup {
     } else {
       tabs = await this.tabs.query({
         currentWindow: true,
-        index: index - 1
+        index: index - 1,
       });
     }
 
@@ -126,7 +126,7 @@ export class TabActionGroup {
     const tabId = tab.id as number;
     const tabs = await this.tabs.query({
       currentWindow: true,
-      pinned: false
+      pinned: false,
     });
 
     const tabIds = tabs
@@ -146,7 +146,7 @@ export class TabActionGroup {
     const index = tab.index as number;
     const tabs = await this.tabs.query({
       currentWindow: true,
-      pinned: false
+      pinned: false,
     });
 
     const tabIds = tabs
@@ -166,7 +166,7 @@ export class TabActionGroup {
     const index = tab.index as number;
     const tabs = await this.tabs.query({
       currentWindow: true,
-      pinned: false
+      pinned: false,
     });
 
     const tabIds = tabs
@@ -222,7 +222,7 @@ export class TabActionGroup {
   private async getCurrentTab(): Promise<Tabs.Tab> {
     const tabs = await this.tabs.query({
       currentWindow: true,
-      active: true
+      active: true,
     });
     return tabs.pop() as Tabs.Tab;
   }
@@ -268,7 +268,7 @@ export class TabActionInvoker extends ActionInvoker<TabActionGroup> {
 
     const idArgsActions = {
       get: actionGroup.get,
-      activate: actionGroup.activate
+      activate: actionGroup.activate,
     };
 
     this.get = this.idArgsAction(idArgsActions, "get");
@@ -298,7 +298,7 @@ export class TabActionInvoker extends ActionInvoker<TabActionGroup> {
       moveLeft: actionGroup.moveLeft,
       moveRight: actionGroup.moveRight,
       moveFirst: actionGroup.moveFirst,
-      moveLast: actionGroup.moveLast
+      moveLast: actionGroup.moveLast,
     };
 
     this.close = this.noArgsAction(noArgsActions, "close");

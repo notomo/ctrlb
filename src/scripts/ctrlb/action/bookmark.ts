@@ -64,7 +64,7 @@ export class BookmarkActionGroup {
     const info = {
       url: url,
       title: title,
-      parentId: parentId
+      parentId: parentId,
     };
     this.bookmarks.create(info);
     return null;
@@ -77,7 +77,7 @@ export class BookmarkActionGroup {
       return {
         id: book.id,
         url: book.url,
-        title: book.title
+        title: book.title,
       };
     });
   }
@@ -92,7 +92,7 @@ export class BookmarkActionGroup {
       return {
         id: book.id,
         url: book.url,
-        title: book.title
+        title: book.title,
       };
     });
   }
@@ -100,7 +100,7 @@ export class BookmarkActionGroup {
   public async update(id: number, url: string, title: string): Promise<null> {
     const info = {
       url: url,
-      title: title
+      title: title,
     };
     const bookmark = await this.get(id);
     this.bookmarks.update(bookmark.id, info);
@@ -145,7 +145,7 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
         {
           id: this.v.requiredNumber(),
           url: this.v.requiredString(),
-          title: this.v.requiredString()
+          title: this.v.requiredString(),
         },
         args
       );
@@ -157,7 +157,7 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
         {
           url: this.v.requiredString(),
           title: this.v.requiredString(),
-          parentId: this.v.requiredString()
+          parentId: this.v.requiredString(),
         },
         args
       );
@@ -167,7 +167,7 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
     const idArgsActions = {
       open: actionGroup.open,
       tabOpen: actionGroup.tabOpen,
-      remove: actionGroup.remove
+      remove: actionGroup.remove,
     };
 
     this.open = this.idArgsAction(idArgsActions, "open");

@@ -12,13 +12,13 @@ export class Validator<K> {
   protected readonly OPTIONALS = [
     this.OPTIONAL_NUMBER,
     this.OPTIONAL_STRING,
-    this.OPTIONAL_BOOLEAN
+    this.OPTIONAL_BOOLEAN,
   ];
 
   protected readonly REQUIREDS = [
     this.REQUIRED_NUMBER,
     this.REQUIRED_STRING,
-    this.REQUIRED_BOOLEAN
+    this.REQUIRED_BOOLEAN,
   ];
 
   constructor(protected readonly actionGroup: K) {}

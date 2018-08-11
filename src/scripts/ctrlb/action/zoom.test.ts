@@ -12,7 +12,7 @@ describe("ZoomActionGroup", () => {
 
     const TabsClass = jest.fn<Tabs.Static>(() => ({
       setZoom: setZoom,
-      getZoom: getZoom.mockReturnValue(1.0)
+      getZoom: getZoom.mockReturnValue(1.0),
     }));
     const tabs = new TabsClass();
 
@@ -69,7 +69,7 @@ describe("ZoomActionInvoker", () => {
     set = jest.fn();
 
     const ActionGroupClass = jest.fn<ZoomActionGroup>(() => ({
-      set: set
+      set: set,
     }));
     const actionGroup = new ActionGroupClass();
 

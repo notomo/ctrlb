@@ -9,7 +9,7 @@ describe("NavigationActionGroup", () => {
     executeScript = jest.fn();
 
     const TabsClass = jest.fn<Tabs.Static>(() => ({
-      executeScript: executeScript
+      executeScript: executeScript,
     }));
     const tabs = new TabsClass();
 
@@ -38,7 +38,7 @@ describe("NavigationActionInvoker", () => {
 
     const ActionGroupClass = jest.fn<NavigationActionGroup>(() => ({
       back: back,
-      forward: forward
+      forward: forward,
     }));
     const actionGroup = new ActionGroupClass();
 

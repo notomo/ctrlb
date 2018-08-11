@@ -4,7 +4,7 @@ import {
   Tabs,
   History,
   Windows,
-  Bookmarks
+  Bookmarks,
 } from "webextension-polyfill-ts";
 
 export class SubscribeEventHandler {
@@ -45,7 +45,7 @@ export class SubscribeEventHandler {
       windowRemoved: windowRemoved,
       bookmarkCreated: bookmarkCreated,
       bookmarkRemoved: bookmarkRemoved,
-      bookmarkUpdated: bookmarkUpdated
+      bookmarkUpdated: bookmarkUpdated,
     };
   }
 
@@ -191,7 +191,7 @@ class HandleFunctions implements IHandleFunctions {
 
     this.windowActivated = (windowId: number): void => {
       client.notify("window", "get", EventType.windowActivated, {
-        id: windowId
+        id: windowId,
       });
     };
 
@@ -200,13 +200,13 @@ class HandleFunctions implements IHandleFunctions {
         return;
       }
       client.notify("window", "get", EventType.windowRemoved, {
-        id: window.id
+        id: window.id,
       });
     };
 
     this.windowRemoved = (windowId: number): void => {
       client.notify("window", "get", EventType.windowRemoved, {
-        id: windowId
+        id: windowId,
       });
     };
 
@@ -215,7 +215,7 @@ class HandleFunctions implements IHandleFunctions {
       bookmark: Bookmarks.BookmarkTreeNode
     ): void => {
       client.notify("bookmark", "get", EventType.bookmarkCreated, {
-        id: bookmarkId
+        id: bookmarkId,
       });
     };
 
@@ -224,7 +224,7 @@ class HandleFunctions implements IHandleFunctions {
       removeInfo: Bookmarks.OnRemovedRemoveInfoType
     ): void => {
       client.notify("bookmark", "get", EventType.bookmarkRemoved, {
-        id: bookmarkId
+        id: bookmarkId,
       });
     };
 
@@ -233,7 +233,7 @@ class HandleFunctions implements IHandleFunctions {
       changeInfo: Bookmarks.OnChangedChangeInfoType
     ): void => {
       client.notify("bookmark", "get", EventType.bookmarkUpdated, {
-        id: bookmarkId
+        id: bookmarkId,
       });
     };
   }
@@ -258,7 +258,7 @@ export enum EventType {
   windowRemoved = "windowRemoved",
   bookmarkCreated = "bookmarkCreated",
   bookmarkRemoved = "bookmarkRemoved",
-  bookmarkUpdated = "bookmarkUpdated"
+  bookmarkUpdated = "bookmarkUpdated",
 }
 
 type Events = { [P in keyof IHandleFunctions]: ListenerHolder };

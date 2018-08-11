@@ -10,7 +10,7 @@ describe("EventActionGroup", () => {
     set = jest.fn();
 
     const StorageClass = jest.fn<Storage.SyncStorageArea>(() => ({
-      set: set
+      set: set,
     }));
     const eventStorage = new StorageClass();
 
@@ -39,7 +39,7 @@ describe("EventActionInvoker", () => {
 
     const ActionGroupClass = jest.fn<EventActionGroup>(() => ({
       subscribe: subscribe,
-      unsubscribe: unsubscribe
+      unsubscribe: unsubscribe,
     }));
     const actionGroup = new ActionGroupClass();
 

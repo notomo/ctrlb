@@ -77,7 +77,7 @@ export class WindowActionInvoker extends ActionInvoker<WindowActionGroup> {
     const idArgsActions = {
       get: actionGroup.get,
       remove: actionGroup.remove,
-      activate: actionGroup.activate
+      activate: actionGroup.activate,
     };
 
     this.get = this.idArgsAction(idArgsActions, "get");
@@ -90,7 +90,7 @@ export class WindowActionInvoker extends ActionInvoker<WindowActionGroup> {
       minimize: actionGroup.minimize,
       toFullScreen: actionGroup.toFullScreen,
       toNormal: actionGroup.toNormal,
-      list: actionGroup.list
+      list: actionGroup.list,
     };
 
     this.removeLastFocused = this.noArgsAction(

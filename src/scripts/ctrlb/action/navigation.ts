@@ -6,14 +6,14 @@ export class NavigationActionGroup {
 
   public back(): null {
     this.tabs.executeScript({
-      code: "history.back();"
+      code: "history.back();",
     });
     return null;
   }
 
   public forward(): null {
     this.tabs.executeScript({
-      code: "history.forward();"
+      code: "history.forward();",
     });
     return null;
   }
@@ -30,7 +30,7 @@ export class NavigationActionInvoker extends ActionInvoker<
 
     const noArgsActions = {
       back: actionGroup.back,
-      forward: actionGroup.forward
+      forward: actionGroup.forward,
     };
 
     this.back = this.noArgsAction(noArgsActions, "back");

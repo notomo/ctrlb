@@ -9,7 +9,7 @@ describe("HistoryActionGroup", () => {
     search = jest.fn();
 
     const HistoryClass = jest.fn<History.Static>(() => ({
-      search: search
+      search: search,
     }));
     const history = new HistoryClass();
 
@@ -37,7 +37,7 @@ describe("HistoryActionInvoker", () => {
     search = jest.fn();
 
     const ActionGroupClass = jest.fn<HistoryActionGroup>(() => ({
-      search: search
+      search: search,
     }));
     const actionGroup = new ActionGroupClass();
 

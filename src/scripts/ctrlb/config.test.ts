@@ -6,7 +6,7 @@ describe("Config", () => {
     const validHost = "127.0.0.1:8888";
 
     const StorageClass = jest.fn<Storage.SyncStorageArea>(() => ({
-      get: jest.fn().mockReturnValue({ host: validHost })
+      get: jest.fn().mockReturnValue({ host: validHost }),
     }));
     const storage = new StorageClass();
     const config = new Config(storage);
@@ -21,7 +21,7 @@ describe("Config", () => {
 
     const setConfig = jest.fn();
     const StorageClass = jest.fn<Storage.SyncStorageArea>(() => ({
-      set: setConfig
+      set: setConfig,
     }));
     const storage = new StorageClass();
     const config = new Config(storage);
@@ -34,7 +34,7 @@ describe("Config", () => {
   ["invalid:invalid:invalid", "invalid", "127.0.0.2"].forEach(invalidHost => {
     it(`getHost throws error if invalidHost: "${invalidHost}"`, async () => {
       const StorageClass = jest.fn<Storage.SyncStorageArea>(() => ({
-        get: jest.fn().mockReturnValue({ host: invalidHost })
+        get: jest.fn().mockReturnValue({ host: invalidHost }),
       }));
       const storage = new StorageClass();
       const config = new Config(storage);

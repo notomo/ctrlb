@@ -12,17 +12,17 @@ describe("SubscribeEventHandler", () => {
       cb({ tabActivated: { newValue: false, oldValue: true } });
     });
     const onEventEmitted = {
-      addListener: addListener
+      addListener: addListener,
     };
 
     const StorageClass = jest.fn<Storage.SyncStorageArea>(() => ({
-      set: jest.fn()
+      set: jest.fn(),
     }));
     const storage = new StorageClass();
 
     const onActivated = {
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     };
 
     new SubscribeEventHandler(
