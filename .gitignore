@@ -1,4 +1,6 @@
 dist/
 node_modules
-/archive.zip
+/ext/chrome/*
+/ext/firefox/*
 /coverage/*
+!.gitkeep
