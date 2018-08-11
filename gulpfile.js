@@ -4,6 +4,7 @@ const webpack = require("webpack");
 const gulpWebpack = require("webpack-stream");
 const plumber = require("gulp-plumber");
 const named = require("vinyl-named");
+const jeditor = require("gulp-json-editor");
 
 gulp.task("clean", () => {
   return del("dist/**/*");
@@ -11,6 +12,18 @@ gulp.task("clean", () => {
 
 gulp.task("manifest", () => {
   return gulp.src("src/manifest.json").pipe(gulp.dest("dist"));
+});
+
+gulp.task("manifest:chrome", () => {
+  return gulp
+    .src("src/manifest.json")
+    .pipe(
+      jeditor(json => {
+        delete json["applications"];
+        return json;
+      })
+    )
+    .pipe(gulp.dest("dist"));
 });
 
 gulp.task("images", () => {
@@ -74,6 +87,14 @@ gulp.task(
   gulp.series(
     gulp.task("clean"),
     gulp.parallel("manifest", "scripts", "images", "pages")
+  )
+);
+
+gulp.task(
+  "build:chrome",
+  gulp.series(
+    gulp.task("clean"),
+    gulp.parallel("manifest:chrome", "scripts", "images", "pages")
   )
 );
 

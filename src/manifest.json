@@ -3,6 +3,11 @@
     "description": "Control browser",
     "version": "0.0.1",
     "manifest_version": 2,
+    "applications": {
+        "gecko": {
+            "id": "{B52D31C7-AB79-431E-BA88-C325F238545D}"
+        }
+    },
     "icons": {
         "16": "images/icon-16.png",
         "128": "images/icon-128.png"
@@ -12,7 +17,9 @@
             "scripts/background.js"
         ]
     },
-    "options_page": "pages/options.html",
+    "options_ui": {
+        "page": "pages/options.html"
+    },
     "browser_action": {
         "default_icon": {
             "19": "images/icon-19.png",
@@ -24,7 +31,6 @@
         "storage",
         "bookmarks",
         "history",
-        "<all_urls>",
-        "tts"
+        "<all_urls>"
     ]
 }
