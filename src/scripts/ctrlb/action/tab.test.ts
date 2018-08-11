@@ -17,7 +17,7 @@ describe("TabActionGroup", () => {
   const tabIndex = 2;
   const TabClass = jest.fn<Tabs.Tab>((id, index) => ({
     id: id,
-    index: index
+    index: index,
   }));
 
   beforeEach(() => {
@@ -42,7 +42,7 @@ describe("TabActionGroup", () => {
       reload: reload,
       move: move,
       remove: remove,
-      duplicate: duplicate
+      duplicate: duplicate,
     }));
 
     actionGroup = new TabActionGroup(new TabsClass());
@@ -141,7 +141,7 @@ describe("TabActionGroup", () => {
     await actionGroup.previous();
     expect(query).toHaveBeenCalledWith({
       currentWindow: true,
-      index: tabIndex - 1
+      index: tabIndex - 1,
     });
     expect(update).toHaveBeenCalledWith(2, { active: true });
   });
@@ -165,7 +165,7 @@ describe("TabActionGroup", () => {
     await actionGroup.next();
     expect(query).toHaveBeenCalledWith({
       currentWindow: true,
-      index: tabIndex + 1
+      index: tabIndex + 1,
     });
     expect(update).toHaveBeenCalledWith(2, { active: true });
   });
@@ -181,7 +181,7 @@ describe("TabActionGroup", () => {
     await actionGroup.next();
     expect(query).toHaveBeenCalledWith({
       currentWindow: true,
-      index: 0
+      index: 0,
     });
     expect(update).toHaveBeenCalledWith(2, { active: true });
   });
@@ -221,7 +221,7 @@ describe("TabActionInvoker", () => {
 
     const ActionGroupClass = jest.fn<TabActionGroup>(() => ({
       tabOpen: tabOpen,
-      open: open
+      open: open,
     }));
     const actionGroup = new ActionGroupClass();
 

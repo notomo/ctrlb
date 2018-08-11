@@ -26,7 +26,7 @@ export class Config {
     }
 
     return this.storage.set({
-      host: trimmedHost
+      host: trimmedHost,
     });
   }
 

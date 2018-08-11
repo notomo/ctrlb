@@ -8,7 +8,7 @@ describe("Validator", () => {
   up = jest.fn(id => id);
   const actionGroup = {
     get: get,
-    up: up
+    up: up,
   };
 
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe("Validator", () => {
 
   it("noArgs throw error if args are not empty", async () => {
     const noArgsActions = {
-      up: actionGroup.up
+      up: actionGroup.up,
     };
 
     const action = validator.noArgs(noArgsActions, "up");
@@ -35,7 +35,7 @@ describe("Validator", () => {
 
   it("idArgs", async () => {
     const idArgsActions = {
-      get: actionGroup.get
+      get: actionGroup.get,
     };
 
     const action = validator.idArgs(idArgsActions, "get");

@@ -17,18 +17,18 @@ describe("Client", () => {
   it("open sets event handlers", () => {
     const send = jest.fn();
     const WebSocketClass = jest.fn<WebSocket>(() => ({
-      send: send
+      send: send,
     }));
     const socket = new WebSocketClass();
 
     const ConnectorClass = jest.fn<Connector>(() => ({
-      connect: jest.fn().mockReturnValue(socket)
+      connect: jest.fn().mockReturnValue(socket),
     }));
     const connector = new ConnectorClass();
 
     const setIcon = jest.fn();
     const ViewClass = jest.fn<View>(() => ({
-      setIcon: setIcon
+      setIcon: setIcon,
     }));
     const view = new ViewClass();
     const InvokerClass = jest.fn<ActionInvoker>(() => ({}));

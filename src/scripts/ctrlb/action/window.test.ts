@@ -22,7 +22,7 @@ describe("WindowActionGroup", () => {
       update: update,
       remove: remove,
       getAll: getAll,
-      getLastFocused: getLastFocused.mockReturnValue({ id: windowId })
+      getLastFocused: getLastFocused.mockReturnValue({ id: windowId }),
     }));
     const windows = new WindowsClass();
 

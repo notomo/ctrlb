@@ -53,7 +53,7 @@ export class ZoomActionInvoker extends ActionInvoker<ZoomActionGroup> {
       get: actionGroup.get,
       reset: actionGroup.reset,
       up: actionGroup.up,
-      down: actionGroup.down
+      down: actionGroup.down,
     };
 
     this.get = this.noArgsAction(noArgsActions, "get");

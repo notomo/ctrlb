@@ -31,7 +31,9 @@
     "ext:build:firefox": "gulp build && web-ext build --source-dir=dist --artifacts-dir=ext/firefox -o",
     "ext:build:chrome": "gulp build:chrome && web-ext build --source-dir=dist --artifacts-dir=ext/chrome -o",
     "ext": "npm run ext:build:chrome && npm run ext:build:firefox",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "format": "prettier --write 'src/scripts/**/*.ts'",
+    "lint:ts": "tslint 'src/scripts/**/*.ts'"
   },
   "jest": {
     "moduleFileExtensions": [

@@ -1,7 +1,7 @@
 import {
   BookmarkActionGroup,
   BookmarkActionInvoker,
-  NotFoundBookmark
+  NotFoundBookmark,
 } from "./bookmark";
 import { TabActionGroup } from "./tab";
 import { Bookmarks } from "webextension-polyfill-ts";
@@ -33,8 +33,8 @@ describe("BookmarkActionGroup", () => {
         {
           id: bookmarkId,
           url: bookmarkUrl,
-          title: "title"
-        }
+          title: "title",
+        },
       ];
     });
     search = jest.fn(() => {
@@ -42,8 +42,8 @@ describe("BookmarkActionGroup", () => {
         {
           id: bookmarkId,
           url: bookmarkUrl,
-          title: "title"
-        }
+          title: "title",
+        },
       ];
     });
     get = jest.fn();
@@ -57,13 +57,13 @@ describe("BookmarkActionGroup", () => {
       create: create,
       getRecent: getRecent,
       search: search,
-      update: update
+      update: update,
     }));
     const bookmarks = new BookmarksClass();
 
     const TabActionGroupClass = jest.fn<TabActionGroup>(() => ({
       open: tabGroupOpen,
-      tabOpen: tabGroupTabOpen
+      tabOpen: tabGroupTabOpen,
     }));
     const tabActionGroup = new TabActionGroupClass();
 
@@ -117,7 +117,7 @@ describe("BookmarkActionGroup", () => {
     expect(create).toHaveBeenCalledWith({
       url: bookmarkUrl,
       title: title,
-      parentId: parentId
+      parentId: parentId,
     });
   });
 
@@ -148,7 +148,7 @@ describe("BookmarkActionGroup", () => {
     await actionGroup.update(bookmarkId, bookmarkUrl, title);
     expect(update).toHaveBeenCalledWith(bookmarkId, {
       url: bookmarkUrl,
-      title: title
+      title: title,
     });
   });
 });
@@ -170,7 +170,7 @@ describe("BookmarkActionInvoker", () => {
       list: list,
       search: search,
       update: update,
-      create: create
+      create: create,
     }));
     const actionGroup = new ActionGroupClass();
 

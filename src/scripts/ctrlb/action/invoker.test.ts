@@ -11,13 +11,13 @@ describe("ActionFacade", () => {
 
     executeScript = jest.fn();
     const TabsClass = jest.fn<Tabs.Static>(() => ({
-      executeScript: executeScript
+      executeScript: executeScript,
     }));
     const tabs = new TabsClass();
 
     const BrowserClass = jest.fn<Browser>(() => ({
       storage: storage,
-      tabs: tabs
+      tabs: tabs,
     }));
     const browser = new BrowserClass();
 
