@@ -6,7 +6,7 @@ install:
     - npm ci
     - npm install -g codecov
 script:
-    - npm run build && npm run lint:manifest
+    - npm run build && npm run lint
     - npm run coverage && codecov
 cache:
     directories:
