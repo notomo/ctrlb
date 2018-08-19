@@ -33,7 +33,8 @@
     "ext": "npm run ext:build:chrome && npm run ext:build:firefox",
     "watch": "gulp watch",
     "format": "prettier --write 'src/scripts/**/*.ts'",
-    "lint:ts": "tslint 'src/scripts/**/*.ts'"
+    "lint:ts": "tslint 'src/scripts/**/*.ts'",
+    "lint": "npm run lint:ts && npm run lint:manifest"
   },
   "jest": {
     "moduleFileExtensions": [
