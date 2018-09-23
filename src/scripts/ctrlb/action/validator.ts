@@ -112,7 +112,11 @@ export class Validator<K> {
 
       if (typeof validationValue !== typeof value) {
         throw new Error(
-          key + "'s value must be " + typeof validationValue + " type."
+          key +
+            "'s value must be " +
+            typeof validationValue +
+            " type, but actual: " +
+            typeof value
         );
       }
 
