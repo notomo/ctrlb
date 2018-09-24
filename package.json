@@ -24,8 +24,7 @@
   },
   "dependencies": {},
   "scripts": {
-    "test": "jest",
-    "coverage": "jest --coverage",
+    "test": "jest --coverage",
     "build": "gulp build:chrome",
     "lint:manifest": "web-ext lint --source-dir=dist",
     "ext:build:firefox": "gulp build && web-ext build --source-dir=dist --artifacts-dir=ext/firefox -o",
