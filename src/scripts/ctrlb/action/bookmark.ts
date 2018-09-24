@@ -6,6 +6,7 @@ interface BookmarkResult {
   id: string;
   url?: string;
   title: string;
+  parentId?: string;
 }
 
 export class BookmarkActionGroup {
@@ -24,6 +25,36 @@ export class BookmarkActionGroup {
       throw new NotFoundBookmark(id);
     }
     return bookmark;
+  }
+
+  public async getTree(bookmarkId: string | null): Promise<BookmarkResult[]> {
+    let tree;
+    let parentNode = null;
+    if (bookmarkId === null) {
+      tree = await this.bookmarks.getTree();
+    } else {
+      tree = await this.bookmarks.getSubTree(bookmarkId);
+      const parentId = tree[0].parentId;
+      if (parentId !== undefined) {
+        parentNode = await this.get(parentId);
+      }
+    }
+    const nodes = tree[0].children;
+    if (nodes === undefined) {
+      return [];
+    }
+    if (parentNode !== null) {
+      nodes.unshift(parentNode);
+    }
+
+    return nodes.map((book: Bookmarks.BookmarkTreeNode) => {
+      return {
+        id: book.id,
+        url: book.url,
+        title: book.title,
+        parentId: book.parentId,
+      };
+    });
   }
 
   public async open(id: number): Promise<null> {
@@ -78,6 +109,7 @@ export class BookmarkActionGroup {
         id: book.id,
         url: book.url,
         title: book.title,
+        parentId: book.parentId,
       };
     });
   }
@@ -93,6 +125,7 @@ export class BookmarkActionGroup {
         id: book.id,
         url: book.url,
         title: book.title,
+        parentId: book.parentId,
       };
     });
   }
@@ -126,6 +159,7 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
   public readonly open: Action;
   public readonly tabOpen: Action;
   public readonly remove: Action;
+  public readonly getTree: Action;
 
   constructor(actionGroup: BookmarkActionGroup) {
     super(actionGroup);
@@ -162,6 +196,11 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
         args
       );
       return actionGroup.create(a.url, a.title, a.parentId);
+    };
+
+    this.getTree = (args: ActionArgs) => {
+      const a = this.v.has({ id: this.v.optionalString() }, args);
+      return actionGroup.getTree(a.id);
     };
 
     const idArgsActions = {
