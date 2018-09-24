@@ -27,14 +27,13 @@ export class BookmarkActionGroup {
     return bookmark;
   }
 
-  public async getTree(bookmarkId: number | null): Promise<BookmarkResult[]> {
+  public async getTree(bookmarkId: string | null): Promise<BookmarkResult[]> {
     let tree;
     let parentNode = null;
     if (bookmarkId === null) {
       tree = await this.bookmarks.getTree();
     } else {
-      const id = String(bookmarkId);
-      tree = await this.bookmarks.getSubTree(id);
+      tree = await this.bookmarks.getSubTree(bookmarkId);
       const parentId = tree[0].parentId;
       if (parentId !== undefined) {
         parentNode = await this.get(parentId);
@@ -200,7 +199,7 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
     };
 
     this.getTree = (args: ActionArgs) => {
-      const a = this.v.has({ id: this.v.optionalNumber() }, args);
+      const a = this.v.has({ id: this.v.optionalString() }, args);
       return actionGroup.getTree(a.id);
     };
 
@@ -208,7 +207,6 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
       open: actionGroup.open,
       tabOpen: actionGroup.tabOpen,
       remove: actionGroup.remove,
-      getTree: actionGroup.getTree,
     };
 
     this.open = this.idArgsAction(idArgsActions, "open");
