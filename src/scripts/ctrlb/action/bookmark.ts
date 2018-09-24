@@ -15,14 +15,11 @@ export class BookmarkActionGroup {
     protected readonly bookmarks: Bookmarks.Static
   ) {}
 
-  protected async get(
-    bookmarkId: number | string
-  ): Promise<Bookmarks.BookmarkTreeNode> {
-    const id = String(bookmarkId);
-    const bookmarks = await this.bookmarks.get(id);
+  protected async get(bookmarkId: string): Promise<Bookmarks.BookmarkTreeNode> {
+    const bookmarks = await this.bookmarks.get(bookmarkId);
     const bookmark = bookmarks.pop();
     if (bookmark === undefined) {
-      throw new NotFoundBookmark(id);
+      throw new NotFoundBookmark(bookmarkId);
     }
     return bookmark;
   }
@@ -57,7 +54,7 @@ export class BookmarkActionGroup {
     });
   }
 
-  public async open(id: number): Promise<null> {
+  public async open(id: string): Promise<null> {
     const bookmark = await this.get(id);
 
     if (bookmark.url === undefined) {
@@ -67,7 +64,7 @@ export class BookmarkActionGroup {
     return this.tabActionGroup.open(bookmark.url);
   }
 
-  public async tabOpen(id: number): Promise<null> {
+  public async tabOpen(id: string): Promise<null> {
     const bookmark = await this.get(id);
 
     if (bookmark.url === undefined) {
@@ -77,7 +74,7 @@ export class BookmarkActionGroup {
     return this.tabActionGroup.tabOpen(bookmark.url);
   }
 
-  public async remove(id: number): Promise<null> {
+  public async remove(id: string): Promise<null> {
     const bookmark = await this.get(id);
     if (bookmark.url === undefined) {
       await this.bookmarks.removeTree(bookmark.id);
@@ -130,7 +127,7 @@ export class BookmarkActionGroup {
     });
   }
 
-  public async update(id: number, url: string, title: string): Promise<null> {
+  public async update(id: string, url: string, title: string): Promise<null> {
     const info = {
       url: url,
       title: title,
@@ -177,7 +174,7 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
     this.update = (args: ActionArgs) => {
       const a = this.v.has(
         {
-          id: this.v.requiredNumber(),
+          id: this.v.requiredString(),
           url: this.v.requiredString(),
           title: this.v.requiredString(),
         },
@@ -203,14 +200,19 @@ export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
       return actionGroup.getTree(a.id);
     };
 
-    const idArgsActions = {
-      open: actionGroup.open,
-      tabOpen: actionGroup.tabOpen,
-      remove: actionGroup.remove,
+    this.open = (args: ActionArgs) => {
+      const a = this.v.has({ id: this.v.requiredString() }, args);
+      return actionGroup.open(a.id);
     };
 
-    this.open = this.idArgsAction(idArgsActions, "open");
-    this.tabOpen = this.idArgsAction(idArgsActions, "tabOpen");
-    this.remove = this.idArgsAction(idArgsActions, "remove");
+    this.tabOpen = (args: ActionArgs) => {
+      const a = this.v.has({ id: this.v.requiredString() }, args);
+      return actionGroup.tabOpen(a.id);
+    };
+
+    this.remove = (args: ActionArgs) => {
+      const a = this.v.has({ id: this.v.requiredString() }, args);
+      return actionGroup.remove(a.id);
+    };
   }
 }
