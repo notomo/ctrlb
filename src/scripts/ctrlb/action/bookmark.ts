@@ -7,6 +7,7 @@ interface BookmarkResult {
   url?: string;
   title: string;
   parentId?: string;
+  isParent?: boolean;
 }
 
 export class BookmarkActionGroup {
@@ -40,18 +41,27 @@ export class BookmarkActionGroup {
     if (nodes === undefined) {
       return [];
     }
-    if (parentNode !== null) {
-      nodes.unshift(parentNode);
-    }
 
-    return nodes.map((book: Bookmarks.BookmarkTreeNode) => {
+    const results = nodes.map((book: Bookmarks.BookmarkTreeNode) => {
       return {
         id: book.id,
         url: book.url,
         title: book.title,
         parentId: book.parentId,
+        isParent: false,
       };
     });
+
+    if (parentNode !== null) {
+      results.unshift({
+        id: parentNode.id,
+        url: parentNode.url,
+        title: parentNode.title,
+        parentId: parentNode.parentId,
+        isParent: true,
+      });
+    }
+    return results;
   }
 
   public async open(id: string): Promise<null> {
