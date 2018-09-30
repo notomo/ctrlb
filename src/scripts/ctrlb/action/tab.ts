@@ -214,11 +214,24 @@ export class TabActionGroup {
     return await this.tabs.get(tabId);
   }
 
+  public async getCurrent(): Promise<Tabs.Tab | null> {
+    const tabs = await this.tabs.query({
+      currentWindow: true,
+      active: true,
+    });
+    const tab = tabs.pop();
+    if (tab === undefined) {
+      return null;
+    }
+    return tab;
+  }
+
   private async update(tab: Tabs.Tab, properties: any) {
     const tabId = tab.id as number;
     return this.tabs.update(tabId, properties);
   }
 
+  // TODO: return Tab or null
   private async getCurrentTab(): Promise<Tabs.Tab> {
     const tabs = await this.tabs.query({
       currentWindow: true,
@@ -243,6 +256,7 @@ export class TabActionGroup {
 
 export class TabActionInvoker extends ActionInvoker<TabActionGroup> {
   public readonly get: Action;
+  public readonly getCurrent: Action;
   public readonly activate: Action;
   public readonly tabOpen: Action;
   public readonly open: Action;
@@ -299,6 +313,7 @@ export class TabActionInvoker extends ActionInvoker<TabActionGroup> {
       moveRight: actionGroup.moveRight,
       moveFirst: actionGroup.moveFirst,
       moveLast: actionGroup.moveLast,
+      getCurrent: actionGroup.getCurrent,
     };
 
     this.close = this.noArgsAction(noArgsActions, "close");
@@ -317,5 +332,6 @@ export class TabActionInvoker extends ActionInvoker<TabActionGroup> {
     this.moveRight = this.noArgsAction(noArgsActions, "moveRight");
     this.moveFirst = this.noArgsAction(noArgsActions, "moveFirst");
     this.moveLast = this.noArgsAction(noArgsActions, "moveLast");
+    this.getCurrent = this.noArgsAction(noArgsActions, "getCurrent");
   }
 }
