@@ -7,10 +7,7 @@ export class HistoryActionGroup {
   public async search(
     text: string | null = null
   ): Promise<History.HistoryItem[]> {
-    if (text === null) {
-      return [];
-    }
-    return await this.history.search({ text: text });
+    return await this.history.search({ text: text || "" });
   }
 }
 

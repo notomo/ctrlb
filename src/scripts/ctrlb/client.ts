@@ -64,6 +64,17 @@ export class Client {
     this.sendMessage(result, {}, json.requestId);
   }
 
+  public async notifyWithData(
+    data: {},
+    eventName: EventType
+  ): Promise<boolean> {
+    if (!this.isOpen()) {
+      return false;
+    }
+    this.sendMessage(data, { eventName: eventName });
+    return true;
+  }
+
   public async notify(
     actionGroupName: string,
     actionName: string,

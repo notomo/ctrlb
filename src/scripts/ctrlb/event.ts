@@ -176,18 +176,21 @@ class HandleFunctions implements IHandleFunctions {
       client.notify("zoom", "get", EventType.zoomChanged);
     };
 
-    // TODO
-    this.historyCreated = (history: History.HistoryItem): void => {};
+    this.historyCreated = (history: History.HistoryItem): void => {
+      client.notifyWithData(history, EventType.historyCreated);
+    };
 
-    // TODO
     this.historyRemoved = (
       removeInfo: History.OnVisitRemovedRemovedType
-    ): void => {};
+    ): void => {
+      client.notifyWithData(removeInfo, EventType.historyRemoved);
+    };
 
-    // TODO
     this.historyUpdated = (
       changeInfo: History.OnTitleChangedChangedType
-    ): void => {};
+    ): void => {
+      client.notifyWithData(changeInfo, EventType.historyUpdated);
+    };
 
     this.windowActivated = (windowId: number): void => {
       client.notify("window", "get", EventType.windowActivated, {
@@ -199,7 +202,7 @@ class HandleFunctions implements IHandleFunctions {
       if (window.id === undefined) {
         return;
       }
-      client.notify("window", "get", EventType.windowRemoved, {
+      client.notify("window", "get", EventType.windowCreated, {
         id: window.id,
       });
     };

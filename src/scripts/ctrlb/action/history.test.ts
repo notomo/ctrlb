@@ -23,9 +23,8 @@ describe("HistoryActionGroup", () => {
   });
 
   it("search return empty if input is null.", async () => {
-    const result = await actionGroup.search();
-    expect(search).toHaveBeenCalledTimes(0);
-    expect(result).toEqual([]);
+    await actionGroup.search();
+    expect(search).toHaveBeenCalledWith({ text: "" });
   });
 });
 
