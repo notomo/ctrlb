@@ -202,7 +202,7 @@ class HandleFunctions implements IHandleFunctions {
       if (window.id === undefined) {
         return;
       }
-      client.notify("window", "get", EventType.windowRemoved, {
+      client.notify("window", "get", EventType.windowCreated, {
         id: window.id,
       });
     };
