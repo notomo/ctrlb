@@ -1,7 +1,7 @@
 import { Storage } from "webextension-polyfill-ts";
 
 export class Config {
-  public readonly DEFAULT_HOST: string = "127.0.0.1:8888";
+  public readonly DEFAULT_HOST: string = "127.0.0.1:8001";
 
   protected storage: Storage.SyncStorageArea;
 
