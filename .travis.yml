@@ -14,11 +14,14 @@ jobs:
               - npm ci
               - npm install -g codecov
           script:
-              - npm run ext:build:chrome && npm run lint
+              - npm run build:prod && npm run lint
               - npm run test
           after_success:
               - codecov
         - stage: deploy
           # if: branch = master
+          install:
+              - npm ci
           script:
+              - npm run ext:build:chrome
               - EXTENSION_ID=${EXTENSION_ID} CLIENT_SECRET=${CLIENT_SECRET} CLIENT_ID=${CLIENT_ID} REFRESH_TOKEN=${REFRESH_TOKEN} node ./deploy.js
