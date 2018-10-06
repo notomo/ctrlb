@@ -24,4 +24,5 @@ exec(
   })
   .catch(e => {
     console.log(e);
+    process.exit(1);
   });
