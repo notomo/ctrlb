@@ -9,7 +9,7 @@ describe("EventActionGroup", () => {
   beforeEach(() => {
     set = jest.fn();
 
-    const StorageClass = jest.fn<Storage.SyncStorageArea>(() => ({
+    const StorageClass = jest.fn<Storage.LocalStorageArea>(() => ({
       set: set,
     }));
     const eventStorage = new StorageClass();

@@ -4,7 +4,7 @@ import { SubscribeEventHandler } from "./ctrlb/event";
 import { ActionFacade } from "./ctrlb/action/invoker";
 import { browser } from "webextension-polyfill-ts";
 
-const storage = browser.storage.sync;
+const storage = browser.storage.local;
 const config = new Config(storage);
 
 config.getHost().then((host: string) => {
@@ -22,7 +22,7 @@ config.getHost().then((host: string) => {
   new SubscribeEventHandler(
     client,
     browser.storage.onChanged,
-    browser.storage.sync,
+    browser.storage.local,
     browser.tabs.onActivated,
     browser.tabs.onUpdated,
     browser.tabs.onCreated,
