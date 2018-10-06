@@ -60,7 +60,7 @@ export class ActionInvokers {
     })();
 
     this.event = ((): EventActionInvoker => {
-      const actionGroup = new EventActionGroup(browser.storage.sync);
+      const actionGroup = new EventActionGroup(browser.storage.local);
       return new EventActionInvoker(actionGroup);
     })();
   }

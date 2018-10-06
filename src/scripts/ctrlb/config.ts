@@ -3,9 +3,9 @@ import { Storage } from "webextension-polyfill-ts";
 export class Config {
   public readonly DEFAULT_HOST: string = "127.0.0.1:8001";
 
-  protected storage: Storage.SyncStorageArea;
+  protected storage: Storage.LocalStorageArea;
 
-  constructor(storage: Storage.SyncStorageArea) {
+  constructor(storage: Storage.LocalStorageArea) {
     this.storage = storage;
   }
 

@@ -15,7 +15,7 @@ describe("SubscribeEventHandler", () => {
       addListener: addListener,
     };
 
-    const StorageClass = jest.fn<Storage.SyncStorageArea>(() => ({
+    const StorageClass = jest.fn<Storage.LocalStorageArea>(() => ({
       set: jest.fn(),
     }));
     const storage = new StorageClass();

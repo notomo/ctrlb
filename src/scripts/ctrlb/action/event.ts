@@ -3,7 +3,7 @@ import { Storage } from "webextension-polyfill-ts";
 import { EventType } from "./../event";
 
 export class EventActionGroup {
-  constructor(protected readonly eventStorage: Storage.SyncStorageArea) {}
+  constructor(protected readonly eventStorage: Storage.LocalStorageArea) {}
 
   public subscribe(eventName: EventType): null {
     this.eventStorage.set({ [eventName]: true });

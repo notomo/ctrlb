@@ -1,7 +1,7 @@
 import { Config } from "./ctrlb/config";
 import { browser } from "webextension-polyfill-ts";
 
-const storage = browser.storage.sync;
+const storage = browser.storage.local;
 const config = new Config(storage);
 
 const saveOptions = async () => {

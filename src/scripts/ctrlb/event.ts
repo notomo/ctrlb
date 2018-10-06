@@ -14,7 +14,7 @@ export class SubscribeEventHandler {
   constructor(
     client: Client,
     protected readonly onEventEmitted: { addListener(params: any): void },
-    protected readonly storage: Storage.SyncStorageArea,
+    protected readonly storage: Storage.LocalStorageArea,
     tabActivated: ListenerHolder,
     tabUpdated: ListenerHolder,
     tabCreated: ListenerHolder,
