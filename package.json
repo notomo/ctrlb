@@ -2,6 +2,7 @@
   "private": true,
   "devDependencies": {
     "@types/jest": "^22.2.3",
+    "chrome-webstore-upload-cli": "^1.2.0",
     "copy-webpack-plugin": "^4.5.2",
     "eslint": "^4.19.1",
     "eslint-config-google": "^0.9.1",
