@@ -19,7 +19,7 @@ jobs:
           after_success:
               - codecov
         - stage: deploy
-          # if: branch = master
+          if: type != pull_request AND branch = master
           install:
               - npm ci
           script:
