@@ -22,13 +22,13 @@
   "dependencies": {},
   "scripts": {
     "test": "jest --coverage",
-    "build": "webpack --mode development",
+    "build": "webpack --mode development --env.CHROME",
     "build:prod": "webpack --mode production",
     "lint:manifest": "web-ext lint --source-dir=dist",
-    "ext:build:firefox": "npm run build:prod --env.FIREFOX && web-ext build --source-dir=dist --artifacts-dir=ext/firefox -o",
-    "ext:build:chrome": "npm run build:prod && web-ext build --source-dir=dist --artifacts-dir=ext/chrome -o",
+    "ext:build:firefox": "npm run build:prod && web-ext build --source-dir=dist --artifacts-dir=ext/firefox -o",
+    "ext:build:chrome": "npm run build:prod --env.CHROME && web-ext build --source-dir=dist --artifacts-dir=ext/chrome -o",
     "ext": "npm run ext:build:chrome && npm run ext:build:firefox",
-    "watch": "webpack -w --mode development",
+    "watch": "webpack -w --mode development --env.CHROME",
     "format": "prettier --write 'src/scripts/**/*.ts'",
     "lint:ts": "tslint 'src/scripts/**/*.ts'",
     "lint": "npm run lint:ts && npm run lint:manifest"

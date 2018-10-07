@@ -2,6 +2,40 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HardSourceWebpackPlugin = require("hard-source-webpack-plugin");
 
 module.exports = (env, options) => {
+  const isChrome = env !== undefined && "CHROME" in env;
+
+  const copyPluginConfig = [
+    {
+      from: "**/*",
+      context: "src",
+      ignore: ["scripts/**/*", "manifest.json", "reload.js"],
+    },
+    {
+      from: "manifest.json",
+      context: "src",
+      transform: (content, path) => {
+        const json = JSON.parse(content.toString());
+
+        if (isChrome) {
+          delete json["applications"];
+
+          if (options.mode === "development") {
+            json["background"]["scripts"].push("reload.js");
+          }
+        }
+
+        return JSON.stringify(json, null, 4);
+      },
+    },
+  ];
+
+  if (options.mode === "development" && isChrome) {
+    copyPluginConfig.push({
+      from: "reload.js",
+      context: "src",
+    });
+  }
+
   const config = {
     entry: {
       background: "./src/scripts/background.ts",
@@ -13,25 +47,7 @@ module.exports = (env, options) => {
     cache: true,
     plugins: [
       new HardSourceWebpackPlugin(),
-      new CopyWebpackPlugin([
-        {
-          from: "**/*",
-          context: "src",
-          ignore: ["scripts/**/*", "manifest.json"],
-        },
-        {
-          from: "manifest.json",
-          context: "src",
-          transform: (content, path) => {
-            if (env === undefined || !("FIREFOX" in env)) {
-              return content;
-            }
-            const json = JSON.parse(content.toString());
-            delete json["applications"];
-            return JSON.stringify(json, null, 4);
-          },
-        },
-      ]),
+      new CopyWebpackPlugin(copyPluginConfig),
     ],
     module: {
       rules: [
