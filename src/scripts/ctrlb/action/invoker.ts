@@ -6,6 +6,7 @@ import { NavigationActionInvoker, NavigationActionGroup } from "./navigation";
 import { ScrollActionInvoker, ScrollActionGroup } from "./scroll";
 import { ZoomActionInvoker, ZoomActionGroup } from "./zoom";
 import { EventActionInvoker, EventActionGroup } from "./event";
+import { ApiInfoActionInvoker, ApiInfoActionGroup } from "./apiInfo";
 import { Browser } from "webextension-polyfill-ts";
 import { Action, ActionArgs } from "./action";
 
@@ -18,6 +19,7 @@ export class ActionInvokers {
   public readonly scroll: ScrollActionInvoker;
   public readonly zoom: ZoomActionInvoker;
   public readonly event: EventActionInvoker;
+  public readonly apiInfo: ApiInfoActionInvoker;
 
   constructor(browser: Browser) {
     this.tab = ((): TabActionInvoker => {
@@ -62,6 +64,20 @@ export class ActionInvokers {
     this.event = ((): EventActionInvoker => {
       const actionGroup = new EventActionGroup(browser.storage.local);
       return new EventActionInvoker(actionGroup);
+    })();
+
+    this.apiInfo = ((): ApiInfoActionInvoker => {
+      const actionGroup = new ApiInfoActionGroup({
+        tab: this.tab,
+        bookmark: this.bookmark,
+        history: this.history,
+        window: this.window,
+        navigation: this.navigation,
+        scroll: this.scroll,
+        zoom: this.zoom,
+        event: this.event,
+      });
+      return new ApiInfoActionInvoker(actionGroup);
     })();
   }
 }
@@ -115,6 +131,7 @@ export class ActionFacade {
     const action: Action = this.getAction(invoker, actionName);
 
     const result = await action(args || {});
+    console.log(result);
     return result || {};
   }
 }
