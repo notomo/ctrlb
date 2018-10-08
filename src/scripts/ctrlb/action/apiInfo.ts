@@ -18,7 +18,7 @@ export class ApiInfoActionGroup {
 
   public async get(): Promise<ApiInfo> {
     const invokers = this.invokers;
-    invokers["apiInfo"] = [{ get: {} }];
+    invokers["apiInfo"] = { get: {} };
 
     const baseActionInvoker = new ActionInvoker<{}>({});
 

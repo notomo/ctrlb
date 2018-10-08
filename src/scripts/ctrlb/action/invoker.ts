@@ -131,7 +131,6 @@ export class ActionFacade {
     const action: Action = this.getAction(invoker, actionName);
 
     const result = await action(args || {});
-    console.log(result);
     return result || {};
   }
 }
