@@ -36,6 +36,7 @@ config.getHost().then((host: string) => {
     browser.windows.onRemoved,
     browser.bookmarks.onCreated,
     browser.bookmarks.onRemoved,
-    browser.bookmarks.onChanged
+    browser.bookmarks.onChanged,
+    browser.downloads.onCreated
   ).listen();
 });

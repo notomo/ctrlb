@@ -7,6 +7,7 @@ import { ScrollActionInvoker, ScrollActionGroup } from "./scroll";
 import { ZoomActionInvoker, ZoomActionGroup } from "./zoom";
 import { EventActionInvoker, EventActionGroup } from "./event";
 import { ApiInfoActionInvoker, ApiInfoActionGroup } from "./apiInfo";
+import { DownloadActionInvoker, DownloadActionGroup } from "./download";
 import { Browser } from "webextension-polyfill-ts";
 import { Action, ActionArgs } from "./action";
 
@@ -20,6 +21,7 @@ export class ActionInvokers {
   public readonly zoom: ZoomActionInvoker;
   public readonly event: EventActionInvoker;
   public readonly apiInfo: ApiInfoActionInvoker;
+  public readonly download: DownloadActionInvoker;
 
   constructor(browser: Browser) {
     this.tab = ((): TabActionInvoker => {
@@ -66,6 +68,11 @@ export class ActionInvokers {
       return new EventActionInvoker(actionGroup);
     })();
 
+    this.download = ((): DownloadActionInvoker => {
+      const actionGroup = new DownloadActionGroup(browser.downloads);
+      return new DownloadActionInvoker(actionGroup);
+    })();
+
     this.apiInfo = ((): ApiInfoActionInvoker => {
       const actionGroup = new ApiInfoActionGroup({
         tab: this.tab,
@@ -76,6 +83,7 @@ export class ActionInvokers {
         scroll: this.scroll,
         zoom: this.zoom,
         event: this.event,
+        download: this.download,
       });
       return new ApiInfoActionInvoker(actionGroup);
     })();

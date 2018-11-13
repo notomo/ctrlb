@@ -42,6 +42,7 @@ describe("SubscribeEventHandler", () => {
       onActivated,
       onActivated,
       onActivated,
+      onActivated,
       onActivated
     ).listen();
   });
