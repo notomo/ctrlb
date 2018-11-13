@@ -5,6 +5,7 @@ import {
   History,
   Windows,
   Bookmarks,
+  Downloads,
 } from "webextension-polyfill-ts";
 
 export class SubscribeEventHandler {
@@ -28,7 +29,8 @@ export class SubscribeEventHandler {
     windowRemoved: ListenerHolder,
     bookmarkCreated: ListenerHolder,
     bookmarkRemoved: ListenerHolder,
-    bookmarkUpdated: ListenerHolder
+    bookmarkUpdated: ListenerHolder,
+    downloadCreated: ListenerHolder
   ) {
     this.handleFunctions = new HandleFunctions(client);
     this.events = {
@@ -46,6 +48,7 @@ export class SubscribeEventHandler {
       bookmarkCreated: bookmarkCreated,
       bookmarkRemoved: bookmarkRemoved,
       bookmarkUpdated: bookmarkUpdated,
+      downloadCreated: downloadCreated,
     };
   }
 
@@ -144,6 +147,10 @@ class HandleFunctions implements IHandleFunctions {
     (bookmarkId: string, changeInfo: Bookmarks.OnChangedChangeInfoType): void;
   };
 
+  public readonly downloadCreated: {
+    (download: Downloads.DownloadItem): void;
+  };
+
   constructor(client: Client) {
     this.tabActivated = (info: Tabs.OnActivatedActiveInfoType): void => {
       client.notify("tab", "get", EventType.tabActivated, { id: info.tabId });
@@ -239,6 +246,10 @@ class HandleFunctions implements IHandleFunctions {
         id: bookmarkId,
       });
     };
+
+    this.downloadCreated = (download: Downloads.DownloadItem): void => {
+      client.notifyWithData(download, EventType.downloadCreated);
+    };
   }
 }
 
@@ -262,6 +273,7 @@ export enum EventType {
   bookmarkCreated = "bookmarkCreated",
   bookmarkRemoved = "bookmarkRemoved",
   bookmarkUpdated = "bookmarkUpdated",
+  downloadCreated = "downloadCreated",
 }
 
 type Events = { [P in keyof IHandleFunctions]: ListenerHolder };
