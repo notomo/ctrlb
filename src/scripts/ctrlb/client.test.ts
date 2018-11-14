@@ -1,15 +1,16 @@
-import { Client, View, Connector, ActionInvoker } from "./client";
+import { Client, Connector, ActionInvoker } from "./client";
+import { Button } from "./browserAction";
 import { EventType } from "./event";
 
 describe("Client", () => {
   it("notify returns false if closed", async () => {
     const ConnectorClass = jest.fn<Connector>(() => ({}));
     const connector = new ConnectorClass();
-    const ViewClass = jest.fn<View>(() => ({}));
-    const view = new ViewClass();
+    const ButtonClass = jest.fn<Button>(() => ({}));
+    const button = new ButtonClass();
     const InvokerClass = jest.fn<ActionInvoker>(() => ({}));
     const invoker = new InvokerClass();
-    const client = new Client(connector, view, invoker);
+    const client = new Client(connector, button, invoker);
 
     expect(await client.notify("", "", EventType.tabActivated)).toBe(false);
   });
@@ -26,14 +27,16 @@ describe("Client", () => {
     }));
     const connector = new ConnectorClass();
 
-    const setIcon = jest.fn();
-    const ViewClass = jest.fn<View>(() => ({
-      setIcon: setIcon,
+    const enable = jest.fn();
+    const disable = jest.fn();
+    const ButtonClass = jest.fn<Button>(() => ({
+      enable: enable,
+      disable: disable,
     }));
-    const view = new ViewClass();
+    const button = new ButtonClass();
     const InvokerClass = jest.fn<ActionInvoker>(() => ({}));
     const invoker = new InvokerClass();
-    const client = new Client(connector, view, invoker);
+    const client = new Client(connector, button, invoker);
 
     client.open("dummyhost");
     expect(socket.onclose).not.toBeNull();
@@ -52,17 +55,17 @@ describe("Client", () => {
 
     const closeEvent = new CloseEvent("close");
     socket.onclose(closeEvent);
-    expect(setIcon).toBeCalledWith({ path: client.DISABLE_ICON });
-    expect(setIcon).toHaveBeenCalledTimes(1);
+    expect(disable).toBeCalledWith();
+    expect(disable).toHaveBeenCalledTimes(1);
 
     const errorEvent = new Event("error");
     socket.onerror(errorEvent);
-    expect(setIcon).toHaveBeenCalledTimes(2);
+    expect(disable).toHaveBeenCalledTimes(2);
 
     const openEvent = new Event("open");
     socket.onopen(openEvent);
     expect(send).toBeCalledWith('{"client":"ctrlb","body":{},"option":{}}');
-    expect(setIcon).toBeCalledWith({ path: client.ENABLE_ICON });
+    expect(enable).toBeCalledWith();
 
     // TODO: onmessage
   });

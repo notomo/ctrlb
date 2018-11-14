@@ -1,18 +1,19 @@
 import { ActionArgs } from "./action/action";
 import { EventType } from "./event";
+import { Button } from "./browserAction";
 
 export class Client {
   protected socket: WebSocket | null;
   protected readonly connector: Connector;
-  protected readonly view: View;
   protected readonly invoker: ActionInvoker;
-  public readonly ENABLE_ICON = "images/icon-19.png";
-  public readonly DISABLE_ICON = "images/icon-19-gray.png";
 
-  constructor(connector: Connector, view: View, invoker: ActionInvoker) {
+  constructor(
+    connector: Connector,
+    protected readonly button: Button,
+    invoker: ActionInvoker
+  ) {
     this.socket = null;
     this.connector = connector;
-    this.view = view;
     this.invoker = invoker;
   }
 
@@ -23,8 +24,8 @@ export class Client {
     const socket = this.connector.connect(host);
     socket.onopen = (ev: Event) => this.onOpen();
     socket.onmessage = (ev: MessageEvent) => this.onMessage(ev);
-    socket.onerror = (ev: Event) => this.disableIcon();
-    socket.onclose = (ev: CloseEvent) => this.disableIcon();
+    socket.onerror = (ev: Event) => this.button.disable();
+    socket.onclose = (ev: CloseEvent) => this.button.disable();
     this.socket = socket;
   }
 
@@ -46,12 +47,8 @@ export class Client {
   }
 
   protected onOpen() {
-    this.view.setIcon({ path: this.ENABLE_ICON });
+    this.button.enable();
     this.sendMessage({}, {});
-  }
-
-  protected disableIcon() {
-    this.view.setIcon({ path: this.DISABLE_ICON });
   }
 
   protected async onMessage(ev: MessageEvent) {
@@ -118,10 +115,6 @@ class Response {
       this.option.eventName = option.eventName;
     }
   }
-}
-
-export interface View {
-  setIcon(details: { path: string }): void;
 }
 
 export class Connector {
