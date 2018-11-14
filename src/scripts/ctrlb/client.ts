@@ -1,6 +1,7 @@
 import { ActionArgs } from "./action/action";
 import { EventType } from "./event";
 import { Button } from "./browserAction";
+import { ResponseFactory } from "./response";
 
 export class Client {
   protected socket: WebSocket | null;
@@ -8,7 +9,8 @@ export class Client {
   constructor(
     protected readonly connector: Connector,
     protected readonly button: Button,
-    protected readonly invoker: ActionInvoker
+    protected readonly invoker: ActionInvoker,
+    protected readonly responseFactory: ResponseFactory
   ) {
     this.socket = null;
   }
@@ -32,19 +34,14 @@ export class Client {
     return this.socket.readyState === this.socket.OPEN;
   }
 
-  protected sendMessage(
-    data: {},
-    option: ResponseOption,
-    requestId?: string | undefined
-  ) {
-    const json = JSON.stringify(new Response(data, option, requestId));
+  protected sendMessage(json: string) {
     const socket = this.socket as WebSocket;
     socket.send(json);
   }
 
   protected onOpen() {
     this.button.enable();
-    this.sendMessage({}, {});
+    this.sendMessage(this.responseFactory.create({}).toJson());
   }
 
   protected async onMessage(ev: MessageEvent) {
@@ -54,7 +51,10 @@ export class Client {
       json.actionName || "",
       json.args || {}
     );
-    this.sendMessage(result, {}, json.requestId);
+
+    this.sendMessage(
+      this.responseFactory.create(result, json.requestId).toJson()
+    );
   }
 
   public async notifyWithData(
@@ -64,7 +64,10 @@ export class Client {
     if (!this.isOpen()) {
       return false;
     }
-    this.sendMessage(data, { eventName: eventName });
+
+    this.sendMessage(
+      this.responseFactory.create(data).toJsonWithEventType(eventName)
+    );
     return true;
   }
 
@@ -77,39 +80,17 @@ export class Client {
     if (!this.isOpen()) {
       return false;
     }
+
     const result = await this.invoker.execute(
       actionGroupName,
       actionName,
       args
     );
-    this.sendMessage(result, { eventName: eventName });
+
+    this.sendMessage(
+      this.responseFactory.create(result).toJsonWithEventType(eventName)
+    );
     return true;
-  }
-}
-
-type ResponseOption = {
-  eventName?: EventType | undefined;
-};
-
-class Response {
-  public readonly client = "ctrlb";
-  public readonly requestId?: string;
-  public readonly body: {};
-  public readonly option: ResponseOption;
-
-  constructor(
-    body: {},
-    option: ResponseOption,
-    requestId?: string | undefined
-  ) {
-    this.body = body;
-    this.option = {};
-    if (requestId !== undefined) {
-      this.requestId = requestId;
-    }
-    if (option !== undefined && option.eventName !== undefined) {
-      this.option.eventName = option.eventName;
-    }
   }
 }
 
