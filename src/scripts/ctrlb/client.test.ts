@@ -2,6 +2,7 @@ import { Client, Connector, ActionInvoker } from "./client";
 import { Button } from "./browserAction";
 import { EventType } from "./event";
 import { ResponseFactory, Response } from "./response";
+import { RequestFactory } from "./request";
 
 describe("Client", () => {
   it("notify returns false if closed", async () => {
@@ -12,10 +13,19 @@ describe("Client", () => {
     const InvokerClass = jest.fn<ActionInvoker>(() => ({}));
     const invoker = new InvokerClass();
 
+    const RequestFactoryClass = jest.fn<RequestFactory>(() => ({}));
+    const requestFactory = new RequestFactoryClass();
+
     const ResponseFactoryClass = jest.fn<ResponseFactory>(() => ({}));
     const responseFactory = new ResponseFactoryClass();
 
-    const client = new Client(connector, button, invoker, responseFactory);
+    const client = new Client(
+      connector,
+      button,
+      invoker,
+      requestFactory,
+      responseFactory
+    );
 
     expect(await client.notify("", "", EventType.tabActivated)).toBe(false);
   });
@@ -42,6 +52,9 @@ describe("Client", () => {
     const InvokerClass = jest.fn<ActionInvoker>(() => ({}));
     const invoker = new InvokerClass();
 
+    const RequestFactoryClass = jest.fn<RequestFactory>(() => ({}));
+    const requestFactory = new RequestFactoryClass();
+
     const responseJson = "{}";
     const toJson = jest.fn().mockReturnValue(responseJson);
     const ResponseClass = jest.fn<Response>(() => ({
@@ -55,7 +68,13 @@ describe("Client", () => {
     }));
     const responseFactory = new ResponseFactoryClass();
 
-    const client = new Client(connector, button, invoker, responseFactory);
+    const client = new Client(
+      connector,
+      button,
+      invoker,
+      requestFactory,
+      responseFactory
+    );
 
     client.open("dummyhost");
     expect(socket.onclose).not.toBeNull();

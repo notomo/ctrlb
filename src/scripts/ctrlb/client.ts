@@ -1,6 +1,7 @@
 import { ActionArgs } from "./action/action";
 import { EventType } from "./event";
 import { Button } from "./browserAction";
+import { RequestFactory } from "./request";
 import { ResponseFactory } from "./response";
 
 export class Client {
@@ -10,6 +11,7 @@ export class Client {
     protected readonly connector: Connector,
     protected readonly button: Button,
     protected readonly invoker: ActionInvoker,
+    protected readonly requestFactory: RequestFactory,
     protected readonly responseFactory: ResponseFactory
   ) {
     this.socket = null;
@@ -45,16 +47,14 @@ export class Client {
   }
 
   protected async onMessage(ev: MessageEvent) {
-    const json = JSON.parse(ev.data);
+    const request = this.requestFactory.createFromJson(ev.data);
     const result = await this.invoker.execute(
-      json.actionGroupName || "",
-      json.actionName || "",
-      json.args || {}
+      request.actionGroupName,
+      request.actionName,
+      request.params
     );
 
-    this.sendMessage(
-      this.responseFactory.create(result, json.requestId).toJson()
-    );
+    this.sendMessage(this.responseFactory.create(result, request.id).toJson());
   }
 
   public async notifyWithData(
