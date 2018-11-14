@@ -4,17 +4,13 @@ import { Button } from "./browserAction";
 
 export class Client {
   protected socket: WebSocket | null;
-  protected readonly connector: Connector;
-  protected readonly invoker: ActionInvoker;
 
   constructor(
-    connector: Connector,
+    protected readonly connector: Connector,
     protected readonly button: Button,
-    invoker: ActionInvoker
+    protected readonly invoker: ActionInvoker
   ) {
     this.socket = null;
-    this.connector = connector;
-    this.invoker = invoker;
   }
 
   public open(host: string) {
