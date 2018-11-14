@@ -24,7 +24,7 @@ export class Response {
 }
 
 export class ResponseFactory {
-  public create(body: {}, requestId?: string) {
+  public create(body: {}, requestId?: string): Response {
     return new Response(body, requestId);
   }
 }
