@@ -2,6 +2,9 @@ import { Client, Connector } from "./ctrlb/client";
 import { Config } from "./ctrlb/config";
 import { SubscribeEventHandler } from "./ctrlb/event";
 import { ActionFacade } from "./ctrlb/action/invoker";
+import { Button } from "./ctrlb/browserAction";
+import { RequestFactory } from "./ctrlb/request";
+import { ResponseFactory } from "./ctrlb/response";
 import { browser } from "webextension-polyfill-ts";
 
 const storage = browser.storage.local;
@@ -9,9 +12,17 @@ const config = new Config(storage);
 
 config.getHost().then((host: string) => {
   const connector = new Connector();
-  const view = browser.browserAction;
+  const button = new Button(browser.browserAction);
   const invoker = new ActionFacade(browser);
-  const client = new Client(connector, view, invoker);
+  const requestFactory = new RequestFactory();
+  const responseFactory = new ResponseFactory();
+  const client = new Client(
+    connector,
+    button,
+    invoker,
+    requestFactory,
+    responseFactory
+  );
   client.open(host);
 
   browser.browserAction.onClicked.addListener(async () => {
