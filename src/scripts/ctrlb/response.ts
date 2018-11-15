@@ -9,7 +9,7 @@ export class Response {
   public toJson(): string {
     return JSON.stringify({
       body: { data: this.data },
-      requestId: this.requestId,
+      id: this.requestId,
     });
   }
 
@@ -19,7 +19,7 @@ export class Response {
       requestId: this.requestId,
       eventName: eventName,
     };
-    return JSON.stringify({ body: body, requestId: this.requestId });
+    return JSON.stringify({ body: body, id: this.requestId });
   }
 }
 

@@ -15,7 +15,7 @@ export class RequestFactory {
 
     const decodedJson = JSON.parse(jsonString);
 
-    const id = decodedJson.requestId;
+    const id = decodedJson.id;
     if (typeof id !== "string") {
       throw new Error("Invalid id");
     }
