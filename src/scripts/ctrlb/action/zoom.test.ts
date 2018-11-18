@@ -1,4 +1,4 @@
-import { ZoomActionGroup, ZoomActionInvoker } from "./zoom";
+import { ZoomActionGroup } from "./zoom";
 import { Tabs } from "webextension-polyfill-ts";
 
 describe("ZoomActionGroup", () => {
@@ -58,27 +58,5 @@ describe("ZoomActionGroup", () => {
 
     expect(getZoom).toHaveBeenCalledTimes(1);
     expect(setZoom).not.toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("ZoomActionInvoker", () => {
-  let set: jest.Mock;
-  let invoker: ZoomActionInvoker;
-
-  beforeEach(() => {
-    set = jest.fn();
-
-    const ActionGroupClass = jest.fn<ZoomActionGroup>(() => ({
-      set: set,
-    }));
-    const actionGroup = new ActionGroupClass();
-
-    invoker = new ZoomActionInvoker(actionGroup);
-  });
-
-  it("set", () => {
-    const zoomFactor = 1.1;
-    invoker.set({ zoomFactor: zoomFactor });
-    expect(set).toHaveBeenCalledWith(zoomFactor);
   });
 });

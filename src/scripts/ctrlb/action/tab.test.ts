@@ -1,4 +1,4 @@
-import { TabActionGroup, TabActionInvoker } from "./tab";
+import { TabActionGroup } from "./tab";
 import { Tabs } from "webextension-polyfill-ts";
 
 describe("TabActionGroup", () => {
@@ -206,35 +206,5 @@ describe("TabActionGroup", () => {
   it("reload current", async () => {
     await actionGroup.reload();
     expect(reload).toHaveBeenCalledWith(tabId);
-  });
-});
-
-describe("TabActionInvoker", () => {
-  let tabOpen: jest.Mock;
-  let open: jest.Mock;
-  let invoker: TabActionInvoker;
-  const url = "url";
-
-  beforeEach(() => {
-    tabOpen = jest.fn();
-    open = jest.fn();
-
-    const ActionGroupClass = jest.fn<TabActionGroup>(() => ({
-      tabOpen: tabOpen,
-      open: open,
-    }));
-    const actionGroup = new ActionGroupClass();
-
-    invoker = new TabActionInvoker(actionGroup);
-  });
-
-  it("tabOpen", () => {
-    invoker.tabOpen({ url: url });
-    expect(tabOpen).toHaveBeenCalledWith(url);
-  });
-
-  it("open", () => {
-    invoker.open({ url: url });
-    expect(open).toHaveBeenCalledWith(url);
   });
 });

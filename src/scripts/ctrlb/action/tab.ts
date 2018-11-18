@@ -1,4 +1,3 @@
-import { ActionArgs, Action, ActionInvoker } from "./action";
 import { Tabs } from "webextension-polyfill-ts";
 
 export class TabActionGroup {
@@ -251,87 +250,5 @@ export class TabActionGroup {
       return [];
     }
     return this.tabs.query({ index: index, currentWindow: true });
-  }
-}
-
-export class TabActionInvoker extends ActionInvoker<TabActionGroup> {
-  public readonly get: Action;
-  public readonly getCurrent: Action;
-  public readonly activate: Action;
-  public readonly tabOpen: Action;
-  public readonly open: Action;
-  public readonly close: Action;
-  public readonly duplicate: Action;
-  public readonly reload: Action;
-  public readonly list: Action;
-  public readonly next: Action;
-  public readonly previous: Action;
-  public readonly first: Action;
-  public readonly last: Action;
-  public readonly create: Action;
-  public readonly closeOthers: Action;
-  public readonly closeRight: Action;
-  public readonly closeLeft: Action;
-  public readonly moveLeft: Action;
-  public readonly moveRight: Action;
-  public readonly moveFirst: Action;
-  public readonly moveLast: Action;
-
-  constructor(actionGroup: TabActionGroup) {
-    super(actionGroup);
-
-    const idArgsActions = {
-      get: actionGroup.get,
-      activate: actionGroup.activate,
-    };
-
-    this.get = this.idArgsAction(idArgsActions, "get");
-    this.activate = this.idArgsAction(idArgsActions, "activate");
-    this.tabOpen = (args: ActionArgs) => {
-      const a = this.v.has({ url: this.v.requiredString() }, args);
-      return actionGroup.tabOpen(a.url);
-    };
-    this.open = (args: ActionArgs) => {
-      const a = this.v.has({ url: this.v.requiredString() }, args);
-      return actionGroup.open(a.url);
-    };
-
-    const noArgsActions = {
-      close: actionGroup.close,
-      duplicate: actionGroup.duplicate,
-      reload: actionGroup.reload,
-      list: actionGroup.list,
-      next: actionGroup.next,
-      previous: actionGroup.previous,
-      first: actionGroup.first,
-      last: actionGroup.last,
-      create: actionGroup.create,
-      closeOthers: actionGroup.closeOthers,
-      closeRight: actionGroup.closeRight,
-      closeLeft: actionGroup.closeLeft,
-      moveLeft: actionGroup.moveLeft,
-      moveRight: actionGroup.moveRight,
-      moveFirst: actionGroup.moveFirst,
-      moveLast: actionGroup.moveLast,
-      getCurrent: actionGroup.getCurrent,
-    };
-
-    this.close = this.noArgsAction(noArgsActions, "close");
-    this.duplicate = this.noArgsAction(noArgsActions, "duplicate");
-    this.reload = this.noArgsAction(noArgsActions, "reload");
-    this.list = this.noArgsAction(noArgsActions, "list");
-    this.next = this.noArgsAction(noArgsActions, "next");
-    this.previous = this.noArgsAction(noArgsActions, "previous");
-    this.first = this.noArgsAction(noArgsActions, "first");
-    this.last = this.noArgsAction(noArgsActions, "last");
-    this.create = this.noArgsAction(noArgsActions, "create");
-    this.closeOthers = this.noArgsAction(noArgsActions, "closeOthers");
-    this.closeRight = this.noArgsAction(noArgsActions, "closeRight");
-    this.closeLeft = this.noArgsAction(noArgsActions, "closeLeft");
-    this.moveLeft = this.noArgsAction(noArgsActions, "moveLeft");
-    this.moveRight = this.noArgsAction(noArgsActions, "moveRight");
-    this.moveFirst = this.noArgsAction(noArgsActions, "moveFirst");
-    this.moveLast = this.noArgsAction(noArgsActions, "moveLast");
-    this.getCurrent = this.noArgsAction(noArgsActions, "getCurrent");
   }
 }
