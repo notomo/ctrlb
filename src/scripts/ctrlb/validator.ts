@@ -1,5 +1,6 @@
 import { Tuple } from "./tuple";
 import { EventType } from "./event";
+import { InvalidParams } from "./error";
 
 export class Validator {
   protected readonly REQUIRED_NUMBER = 1;
@@ -68,12 +69,12 @@ export class Validator {
     let i = 0;
     for (const key of Object.values(names)) {
       if (typeof types[i] === "undefined") {
-        throw new Error("validationValue must not be null.");
+        throw new InvalidParams("validationValue must not be null.");
       }
       const validationValue = types[i];
 
       if (!(key in values) && this.isRequired(validationValue)) {
-        throw new Error(key + " is a required argument.");
+        throw new InvalidParams(key + " is a required argument.");
       }
 
       if (
@@ -86,11 +87,11 @@ export class Validator {
 
       const value = values[key];
       if (value === null) {
-        throw new Error(key + " must not be void.");
+        throw new InvalidParams(key + " must not be void.");
       }
 
       if (typeof validationValue !== typeof value) {
-        throw new Error(
+        throw new InvalidParams(
           key +
             "'s value must be " +
             typeof validationValue +
