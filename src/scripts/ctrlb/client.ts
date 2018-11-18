@@ -72,13 +72,13 @@ export class Client {
   public async notify(
     method: string,
     eventName: EventType,
-    args?: { [index: string]: any }
+    params?: { [index: string]: any }
   ): Promise<boolean> {
     if (!this.isOpen()) {
       return false;
     }
 
-    const notification = this.notificationFactory.create(method, args);
+    const notification = this.notificationFactory.create(method, params);
     const result = await this.router.match(notification);
 
     this.sendMessage(
