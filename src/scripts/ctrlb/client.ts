@@ -2,7 +2,9 @@ import { ActionArgs } from "./action/action";
 import { EventType } from "./event";
 import { Button } from "./browserAction";
 import { RequestFactory } from "./request";
+import { NotificationFactory } from "./notification";
 import { ResponseFactory } from "./response";
+import { Router } from "./router";
 
 export class Client {
   protected socket: WebSocket | null;
@@ -10,8 +12,9 @@ export class Client {
   constructor(
     protected readonly connector: Connector,
     protected readonly button: Button,
-    protected readonly invoker: ActionInvoker,
+    protected readonly router: Router,
     protected readonly requestFactory: RequestFactory,
+    protected readonly notificationFactory: NotificationFactory,
     protected readonly responseFactory: ResponseFactory
   ) {
     this.socket = null;
@@ -48,11 +51,7 @@ export class Client {
 
   protected async onMessage(ev: MessageEvent) {
     const request = this.requestFactory.createFromJson(ev.data);
-    const result = await this.invoker.execute(
-      request.actionGroupName,
-      request.actionName,
-      request.params
-    );
+    const result = await this.router.match(request);
 
     this.sendMessage(this.responseFactory.create(result, request.id).toJson());
   }
@@ -72,8 +71,7 @@ export class Client {
   }
 
   public async notify(
-    actionGroupName: string,
-    actionName: string,
+    method: string,
     eventName: EventType,
     args?: ActionArgs
   ): Promise<boolean> {
@@ -81,11 +79,8 @@ export class Client {
       return false;
     }
 
-    const result = await this.invoker.execute(
-      actionGroupName,
-      actionName,
-      args
-    );
+    const notification = this.notificationFactory.create(method, args);
+    const result = await this.router.match(notification);
 
     this.sendMessage(
       this.responseFactory.create(result).toJsonWithEventType(eventName)
@@ -98,12 +93,4 @@ export class Connector {
   public connect(host: string): WebSocket {
     return new WebSocket("ws://" + host);
   }
-}
-
-export interface ActionInvoker {
-  execute(
-    actionGroupName: string,
-    actionName: string,
-    args?: ActionArgs
-  ): Promise<{}>;
 }

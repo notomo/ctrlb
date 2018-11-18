@@ -1,9 +1,13 @@
+export interface IRequest {
+  method: string;
+  params: { [index: string]: any };
+}
+
 export class Request {
   constructor(
     public readonly id: string,
-    public readonly actionGroupName: string,
-    public readonly actionName: string,
-    public readonly params: {}
+    public readonly method: string,
+    public readonly params: { [index: string]: any }
   ) {}
 }
 
@@ -20,23 +24,16 @@ export class RequestFactory {
       throw new Error("Invalid id");
     }
 
-    const method = decodedJson.method || "";
+    const method = decodedJson.method;
     if (typeof method !== "string") {
       throw new Error("Invalid method");
     }
 
-    const paths = method.split("/");
-    if (paths.length <= 1) {
-      throw new Error("Invalid actionGroup/actionName");
-    }
-    const actionGroupName = paths[0];
-    const actionName = paths.slice(1).join("/");
-
-    const params = decodedJson.params || {};
+    const params = decodedJson.params;
     if (typeof params !== "object") {
       throw new Error("Invalid params");
     }
 
-    return new Request(id, actionGroupName, actionName, params);
+    return new Request(id, method, params);
   }
 }

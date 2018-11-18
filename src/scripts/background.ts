@@ -1,11 +1,12 @@
 import { Client, Connector } from "./ctrlb/client";
 import { Config } from "./ctrlb/config";
 import { SubscribeEventHandler } from "./ctrlb/event";
-import { ActionFacade } from "./ctrlb/action/invoker";
 import { Button } from "./ctrlb/browserAction";
 import { RequestFactory } from "./ctrlb/request";
+import { NotificationFactory } from "./ctrlb/notification";
 import { ResponseFactory } from "./ctrlb/response";
 import { browser } from "webextension-polyfill-ts";
+import { router } from "./ctrlb/route";
 
 const storage = browser.storage.local;
 const config = new Config(storage);
@@ -13,14 +14,15 @@ const config = new Config(storage);
 config.getHost().then((host: string) => {
   const connector = new Connector();
   const button = new Button(browser.browserAction);
-  const invoker = new ActionFacade(browser);
   const requestFactory = new RequestFactory();
+  const notificationFactory = new NotificationFactory();
   const responseFactory = new ResponseFactory();
   const client = new Client(
     connector,
     button,
-    invoker,
+    router,
     requestFactory,
+    notificationFactory,
     responseFactory
   );
   client.open(host);
