@@ -30,6 +30,24 @@ export class InvalidRequest extends ApplicationError {
   }
 }
 
+export class InvalidParams extends ApplicationError {
+  constructor(protected readonly _message: string) {
+    super();
+  }
+
+  get code(): number {
+    return -32602;
+  }
+
+  get name(): string {
+    return "InvalidParams";
+  }
+
+  toString(): string {
+    return this._message;
+  }
+}
+
 export class ParseError extends ApplicationError {
   constructor(protected readonly _message: string) {
     super();

@@ -4,6 +4,7 @@ import {
   MethodNotFound,
   ServerError,
   InvalidRequest,
+  InvalidParams,
   ParseError,
 } from "./error";
 
@@ -57,6 +58,7 @@ export class ResponseFactory {
     if (
       e instanceof MethodNotFound ||
       e instanceof InvalidRequest ||
+      e instanceof InvalidParams ||
       e instanceof ParseError
     ) {
       return new ErrorResponse(e, requestId);
