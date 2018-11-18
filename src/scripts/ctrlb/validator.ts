@@ -1,4 +1,5 @@
 import { Tuple } from "./tuple";
+import { EventType } from "./event";
 
 export class Validator {
   protected readonly REQUIRED_NUMBER = 1;
@@ -44,6 +45,10 @@ export class Validator {
 
   public optionalBoolean(): boolean | null {
     return this.OPTIONAL_BOOLEAN;
+  }
+
+  public eventName(): EventType {
+    return EventType.tabActivated;
   }
 
   protected isRequired(value: string | number | boolean): boolean {
