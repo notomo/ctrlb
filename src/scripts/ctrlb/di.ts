@@ -4,7 +4,6 @@ import { HistoryActionGroup } from "./action/history";
 import { WindowActionGroup } from "./action/window";
 import { NavigationActionGroup } from "./action/navigation";
 import { EventActionGroup } from "./action/event";
-import { ApiInfoActionGroup } from "./action/apiInfo";
 import { DownloadActionGroup } from "./action/download";
 import { TabActionGroup } from "./action/tab";
 import { ScrollActionGroup } from "./action/scroll";
@@ -36,20 +35,6 @@ export class Di {
     },
     EventActionGroup: () => {
       return new EventActionGroup(browser.storage.local);
-    },
-    ApiInfoActionGroup: () => {
-      const actionGroups = {
-        tab: Di.get("TabActionGroup"),
-        bookmark: Di.get("BookmarkActionGroup"),
-        history: Di.get("HistoryActionGroup"),
-        window: Di.get("WindowActionGroup"),
-        navigation: Di.get("NavigationActionGroup"),
-        scroll: Di.get("ScrollActionGroup"),
-        zoom: Di.get("ZoomActionGroup"),
-        event: Di.get("EventActionGroup"),
-        download: Di.get("DownloadActionGroup"),
-      };
-      return new ApiInfoActionGroup(actionGroups);
     },
     DownloadActionGroup: () => {
       return new DownloadActionGroup(browser.downloads);
@@ -118,7 +103,6 @@ export class Di {
     WindowActionGroup: null,
     NavigationActionGroup: null,
     EventActionGroup: null,
-    ApiInfoActionGroup: null,
     DownloadActionGroup: null,
     TabActionGroup: null,
     ScrollActionGroup: null,
@@ -135,7 +119,6 @@ export class Di {
   public static get(cls: "WindowActionGroup"): WindowActionGroup;
   public static get(cls: "NavigationActionGroup"): NavigationActionGroup;
   public static get(cls: "EventActionGroup"): EventActionGroup;
-  public static get(cls: "ApiInfoActionGroup"): ApiInfoActionGroup;
   public static get(cls: "DownloadActionGroup"): DownloadActionGroup;
   public static get(cls: "TabActionGroup"): TabActionGroup;
   public static get(cls: "ScrollActionGroup"): ScrollActionGroup;
@@ -185,7 +168,6 @@ interface Deps {
   WindowActionGroup: { (...args: any[]): WindowActionGroup };
   NavigationActionGroup: { (...args: any[]): NavigationActionGroup };
   EventActionGroup: { (...args: any[]): EventActionGroup };
-  ApiInfoActionGroup: { (...args: any[]): ApiInfoActionGroup };
   DownloadActionGroup: { (...args: any[]): DownloadActionGroup };
   TabActionGroup: { (...args: any[]): TabActionGroup };
   ScrollActionGroup: { (...args: any[]): ScrollActionGroup };

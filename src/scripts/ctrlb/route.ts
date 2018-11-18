@@ -35,9 +35,6 @@ router.add(
   ["input"]
 );
 
-const apiInfo = Di.get("ApiInfoActionGroup");
-router.add("apiInfo/get", apiInfo, apiInfo.get, [], []);
-
 const download = Di.get("DownloadActionGroup");
 router.add(
   "download/search",
@@ -171,3 +168,5 @@ router.add("tab/reload", tab, tab.reload, [], []);
 router.add("tab/list", tab, tab.list, [], []);
 router.add("tab/get", tab, tab.get, [v.requiredNumber()], ["id"]);
 router.add("tab/getCurrent", tab, tab.getCurrent, [], []);
+
+router.add("apiInfo/get", router, router.getAll, [], []);

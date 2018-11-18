@@ -34,4 +34,14 @@ export class Router {
 
     return matched(request);
   }
+
+  public getAll(): ({ name: string })[] {
+    const results = [];
+    const names = this.routes.keys();
+    for (const name of names) {
+      results.push({ name: name });
+    }
+
+    return results;
+  }
 }
