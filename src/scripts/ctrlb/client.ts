@@ -64,7 +64,12 @@ export class Client {
         .createError(e, request.id)
         .toJson();
       this.sendMessage(errorJson);
+      console.error(errorJson);
     });
+
+    if (result === undefined) {
+      return;
+    }
 
     this.sendMessage(this.responseFactory.create(result, request.id).toJson());
   }
