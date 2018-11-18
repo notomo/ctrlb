@@ -4,6 +4,7 @@ import {
   MethodNotFound,
   ServerError,
   InvalidRequest,
+  ParseError,
 } from "./error";
 
 export class Response {
@@ -53,7 +54,11 @@ export class ResponseFactory {
   }
 
   public createError(e: any, requestId?: string): ErrorResponse {
-    if (e instanceof MethodNotFound || e instanceof InvalidRequest) {
+    if (
+      e instanceof MethodNotFound ||
+      e instanceof InvalidRequest ||
+      e instanceof ParseError
+    ) {
       return new ErrorResponse(e, requestId);
     }
 

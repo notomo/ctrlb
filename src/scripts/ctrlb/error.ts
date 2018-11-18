@@ -30,6 +30,24 @@ export class InvalidRequest extends ApplicationError {
   }
 }
 
+export class ParseError extends ApplicationError {
+  constructor(protected readonly _message: string) {
+    super();
+  }
+
+  get code(): number {
+    return -32700;
+  }
+
+  get name(): string {
+    return "ParseError";
+  }
+
+  toString(): string {
+    return this._message;
+  }
+}
+
 export class MethodNotFound extends ApplicationError {
   constructor(protected readonly method: string) {
     super();

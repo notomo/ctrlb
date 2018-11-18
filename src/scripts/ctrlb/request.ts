@@ -1,4 +1,4 @@
-import { InvalidRequest } from "./error";
+import { InvalidRequest, ParseError } from "./error";
 
 export interface IRequest {
   method: string;
@@ -19,7 +19,12 @@ export class RequestFactory {
       throw new InvalidRequest("Invalid Request");
     }
 
-    const decodedJson = JSON.parse(jsonString);
+    let decodedJson;
+    try {
+      decodedJson = JSON.parse(jsonString);
+    } catch (e) {
+      throw new ParseError(e.message);
+    }
 
     const id = decodedJson.id;
     if (typeof id !== "string") {
