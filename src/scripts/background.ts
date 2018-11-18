@@ -1,28 +1,11 @@
-import { Client, Connector } from "./ctrlb/client";
-import { Config } from "./ctrlb/config";
-import { SubscribeEventHandler } from "./ctrlb/event";
-import { ActionFacade } from "./ctrlb/action/invoker";
-import { Button } from "./ctrlb/browserAction";
-import { RequestFactory } from "./ctrlb/request";
-import { ResponseFactory } from "./ctrlb/response";
 import { browser } from "webextension-polyfill-ts";
+import { router } from "./ctrlb/route";
+import { Di } from "./ctrlb/di";
 
-const storage = browser.storage.local;
-const config = new Config(storage);
+const config = Di.get("Config");
 
 config.getHost().then((host: string) => {
-  const connector = new Connector();
-  const button = new Button(browser.browserAction);
-  const invoker = new ActionFacade(browser);
-  const requestFactory = new RequestFactory();
-  const responseFactory = new ResponseFactory();
-  const client = new Client(
-    connector,
-    button,
-    invoker,
-    requestFactory,
-    responseFactory
-  );
+  const client = Di.get("Client", true, router);
   client.open(host);
 
   browser.browserAction.onClicked.addListener(async () => {
@@ -30,24 +13,5 @@ config.getHost().then((host: string) => {
     client.open(host);
   });
 
-  new SubscribeEventHandler(
-    client,
-    browser.storage.onChanged,
-    browser.storage.local,
-    browser.tabs.onActivated,
-    browser.tabs.onUpdated,
-    browser.tabs.onCreated,
-    browser.tabs.onRemoved,
-    browser.tabs.onZoomChange,
-    browser.history.onVisited,
-    browser.history.onVisitRemoved,
-    browser.history.onTitleChanged,
-    browser.windows.onFocusChanged,
-    browser.windows.onCreated,
-    browser.windows.onRemoved,
-    browser.bookmarks.onCreated,
-    browser.bookmarks.onRemoved,
-    browser.bookmarks.onChanged,
-    browser.downloads.onCreated
-  ).listen();
+  Di.get("SubscribeEventHandler", true, client).listen();
 });

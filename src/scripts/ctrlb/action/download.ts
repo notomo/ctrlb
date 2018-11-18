@@ -1,4 +1,3 @@
-import { Action, ActionInvoker, ActionArgs } from "./action";
 import { Downloads } from "webextension-polyfill-ts";
 
 export class DownloadActionGroup {
@@ -11,18 +10,5 @@ export class DownloadActionGroup {
     }
 
     return this.downloads.search({ query: [input], limit: limit });
-  }
-}
-
-export class DownloadActionInvoker extends ActionInvoker<DownloadActionGroup> {
-  public readonly search: Action;
-
-  constructor(actionGroup: DownloadActionGroup) {
-    super(actionGroup);
-
-    this.search = (args: ActionArgs) => {
-      const a = this.v.has({ input: this.v.optionalString() }, args);
-      return actionGroup.search(a.input);
-    };
   }
 }

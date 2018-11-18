@@ -1,4 +1,4 @@
-import { WindowActionGroup, WindowActionInvoker } from "./window";
+import { WindowActionGroup } from "./window";
 import { Windows } from "webextension-polyfill-ts";
 
 describe("WindowActionGroup", () => {
@@ -84,14 +84,5 @@ describe("WindowActionGroup", () => {
   it("list", async () => {
     await actionGroup.list();
     expect(getAll).toHaveBeenCalledWith({ populate: true });
-  });
-});
-
-describe("WindowActionInvoker", () => {
-  it("constructor", () => {
-    const ActionGroupClass = jest.fn<WindowActionGroup>(() => ({}));
-    const actionGroup = new ActionGroupClass();
-
-    new WindowActionInvoker(actionGroup);
   });
 });

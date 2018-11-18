@@ -153,34 +153,34 @@ class HandleFunctions implements IHandleFunctions {
 
   constructor(client: Client) {
     this.tabActivated = (info: Tabs.OnActivatedActiveInfoType): void => {
-      client.notify("tab", "get", EventType.tabActivated, { id: info.tabId });
+      client.notify("tab/get", EventType.tabActivated, { id: info.tabId });
     };
 
     this.tabUpdated = (
       tabId: number,
       info: Tabs.OnUpdatedChangeInfoType
     ): void => {
-      client.notify("tab", "get", EventType.tabUpdated, { id: tabId });
+      client.notify("tab/get", EventType.tabUpdated, { id: tabId });
     };
 
     this.tabCreated = (tab: Tabs.Tab): void => {
       if (tab.id === undefined) {
         return;
       }
-      client.notify("tab", "get", EventType.tabCreated, { id: tab.id });
+      client.notify("tab/get", EventType.tabCreated, { id: tab.id });
     };
 
     this.tabRemoved = (
       tabId: number,
       removeInfo: Tabs.OnRemovedRemoveInfoType
     ): void => {
-      client.notify("tab", "get", EventType.tabRemoved, { id: tabId });
+      client.notify("tab/get", EventType.tabRemoved, { id: tabId });
     };
 
     this.zoomChanged = (
       zoomChangeInfo: Tabs.OnZoomChangeZoomChangeInfoType
     ): void => {
-      client.notify("zoom", "get", EventType.zoomChanged);
+      client.notify("zoom/get", EventType.zoomChanged);
     };
 
     this.historyCreated = (history: History.HistoryItem): void => {
@@ -200,7 +200,7 @@ class HandleFunctions implements IHandleFunctions {
     };
 
     this.windowActivated = (windowId: number): void => {
-      client.notify("window", "get", EventType.windowActivated, {
+      client.notify("window/get", EventType.windowActivated, {
         id: windowId,
       });
     };
@@ -209,13 +209,13 @@ class HandleFunctions implements IHandleFunctions {
       if (window.id === undefined) {
         return;
       }
-      client.notify("window", "get", EventType.windowCreated, {
+      client.notify("window/get", EventType.windowCreated, {
         id: window.id,
       });
     };
 
     this.windowRemoved = (windowId: number): void => {
-      client.notify("window", "get", EventType.windowRemoved, {
+      client.notify("window/get", EventType.windowRemoved, {
         id: windowId,
       });
     };
@@ -224,7 +224,7 @@ class HandleFunctions implements IHandleFunctions {
       bookmarkId: string,
       bookmark: Bookmarks.BookmarkTreeNode
     ): void => {
-      client.notify("bookmark", "get", EventType.bookmarkCreated, {
+      client.notify("bookmark/get", EventType.bookmarkCreated, {
         id: bookmarkId,
       });
     };
@@ -233,7 +233,7 @@ class HandleFunctions implements IHandleFunctions {
       bookmarkId: string,
       removeInfo: Bookmarks.OnRemovedRemoveInfoType
     ): void => {
-      client.notify("bookmark", "get", EventType.bookmarkRemoved, {
+      client.notify("bookmark/get", EventType.bookmarkRemoved, {
         id: bookmarkId,
       });
     };
@@ -242,7 +242,7 @@ class HandleFunctions implements IHandleFunctions {
       bookmarkId: string,
       changeInfo: Bookmarks.OnChangedChangeInfoType
     ): void => {
-      client.notify("bookmark", "get", EventType.bookmarkUpdated, {
+      client.notify("bookmark/get", EventType.bookmarkUpdated, {
         id: bookmarkId,
       });
     };

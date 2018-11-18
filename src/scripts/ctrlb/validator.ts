@@ -1,7 +1,7 @@
-import { ActionArgs, NoArgsAction, IdArgsAction } from "./action";
-import { EventType } from "./../event";
+import { Tuple } from "./tuple";
+import { EventType } from "./event";
 
-export class Validator<K> {
+export class Validator {
   protected readonly REQUIRED_NUMBER = 1;
   protected readonly OPTIONAL_NUMBER = 2;
   protected readonly REQUIRED_STRING = "required";
@@ -21,7 +21,7 @@ export class Validator<K> {
     this.REQUIRED_BOOLEAN,
   ];
 
-  constructor(protected readonly actionGroup: K) {}
+  constructor() {}
 
   public requiredNumber(): number {
     return this.REQUIRED_NUMBER;
@@ -59,53 +59,32 @@ export class Validator<K> {
     return this.OPTIONALS.includes(value);
   }
 
-  public noArgs<T extends { [index: string]: NoArgsAction }>(
-    noArgsActions: T,
-    actionName: keyof T & string
-  ) {
-    return (args: ActionArgs) => {
-      const noArgsAction = noArgsActions[actionName];
-      if (Object.keys(args).length) {
-        throw new Error(actionName + "'s args must be emtpy.");
-      }
-      const f = noArgsAction.bind(this.actionGroup);
-      return f();
-    };
-  }
-
-  public idArgs<T extends { [index: string]: IdArgsAction }>(
-    idArgsActions: T,
-    actionName: keyof T & string
-  ) {
-    return (args: ActionArgs) => {
-      const id = this.has({ id: this.requiredNumber() }, args).id;
-      const idArgsAction = idArgsActions[actionName];
-      const f = idArgsAction.bind(this.actionGroup);
-      return f(id);
-    };
-  }
-
-  public has<T extends ActionArgs>(valid: T, args: ActionArgs): T {
-    let results = {} as T;
-    for (const key of Object.keys(valid)) {
-      const validationValue = valid[key];
-      if (validationValue === null) {
+  public to<T extends Tuple>(
+    values: { [index: string]: any },
+    types: T,
+    names: { [P in keyof T]: string }
+  ): T {
+    let results: { [index: string]: any } = {};
+    let i = 0;
+    for (const key of Object.values(names)) {
+      if (typeof types[i] === "undefined") {
         throw new Error("validationValue must not be null.");
       }
+      const validationValue = types[i];
 
-      if (!(key in args) && this.isRequired(validationValue)) {
+      if (!(key in values) && this.isRequired(validationValue)) {
         throw new Error(key + " is a required argument.");
       }
 
       if (
-        (!(key in args) || args[key] === null) &&
+        (!(key in values) || values[key] === null) &&
         this.isOptional(validationValue)
       ) {
         results[key] = null;
         continue;
       }
 
-      const value = args[key];
+      const value = values[key];
       if (value === null) {
         throw new Error(key + " must not be void.");
       }
@@ -121,7 +100,9 @@ export class Validator<K> {
       }
 
       results[key] = value;
+      ++i;
     }
-    return results;
+
+    return [...Object.values(results)] as T;
   }
 }

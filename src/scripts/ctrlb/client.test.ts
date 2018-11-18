@@ -1,7 +1,9 @@
-import { Client, Connector, ActionInvoker } from "./client";
+import { Client, Connector } from "./client";
 import { Button } from "./browserAction";
 import { EventType } from "./event";
+import { Router } from "./router";
 import { ResponseFactory, Response } from "./response";
+import { NotificationFactory } from "./notification";
 import { RequestFactory } from "./request";
 
 describe("Client", () => {
@@ -10,11 +12,15 @@ describe("Client", () => {
     const connector = new ConnectorClass();
     const ButtonClass = jest.fn<Button>(() => ({}));
     const button = new ButtonClass();
-    const InvokerClass = jest.fn<ActionInvoker>(() => ({}));
-    const invoker = new InvokerClass();
+
+    const RouterClass = jest.fn<Router>(() => ({}));
+    const router = new RouterClass();
 
     const RequestFactoryClass = jest.fn<RequestFactory>(() => ({}));
     const requestFactory = new RequestFactoryClass();
+
+    const NotificationFactoryClass = jest.fn<NotificationFactory>(() => ({}));
+    const notificationFactory = new NotificationFactoryClass();
 
     const ResponseFactoryClass = jest.fn<ResponseFactory>(() => ({}));
     const responseFactory = new ResponseFactoryClass();
@@ -22,12 +28,13 @@ describe("Client", () => {
     const client = new Client(
       connector,
       button,
-      invoker,
+      router,
       requestFactory,
+      notificationFactory,
       responseFactory
     );
 
-    expect(await client.notify("", "", EventType.tabActivated)).toBe(false);
+    expect(await client.notify("", EventType.tabActivated)).toBe(false);
   });
 
   it("open sets event handlers", () => {
@@ -49,11 +56,15 @@ describe("Client", () => {
       disable: disable,
     }));
     const button = new ButtonClass();
-    const InvokerClass = jest.fn<ActionInvoker>(() => ({}));
-    const invoker = new InvokerClass();
+
+    const RouterClass = jest.fn<Router>(() => ({}));
+    const router = new RouterClass();
 
     const RequestFactoryClass = jest.fn<RequestFactory>(() => ({}));
     const requestFactory = new RequestFactoryClass();
+
+    const NotificationFactoryClass = jest.fn<NotificationFactory>(() => ({}));
+    const notificationFactory = new NotificationFactoryClass();
 
     const responseJson = "{}";
     const toJson = jest.fn().mockReturnValue(responseJson);
@@ -71,8 +82,9 @@ describe("Client", () => {
     const client = new Client(
       connector,
       button,
-      invoker,
+      router,
       requestFactory,
+      notificationFactory,
       responseFactory
     );
 

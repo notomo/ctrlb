@@ -1,8 +1,6 @@
-import { Config } from "./ctrlb/config";
-import { browser } from "webextension-polyfill-ts";
+import { Di } from "./ctrlb/di";
 
-const storage = browser.storage.local;
-const config = new Config(storage);
+const config = Di.get("Config");
 
 const saveOptions = async () => {
   const hostForm = document.getElementById("host") as HTMLInputElement;

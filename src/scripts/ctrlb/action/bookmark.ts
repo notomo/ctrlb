@@ -1,4 +1,3 @@
-import { ActionArgs, Action, ActionInvoker } from "./action";
 import { TabActionGroup } from "./tab";
 import { Bookmarks } from "webextension-polyfill-ts";
 
@@ -155,74 +154,5 @@ export class NotFoundBookmark extends Error {
 
   toString() {
     return "Not found bookmark: " + this.id;
-  }
-}
-
-export class BookmarkActionInvoker extends ActionInvoker<BookmarkActionGroup> {
-  public readonly list: Action;
-  public readonly search: Action;
-  public readonly update: Action;
-  public readonly create: Action;
-  public readonly open: Action;
-  public readonly tabOpen: Action;
-  public readonly remove: Action;
-  public readonly getTree: Action;
-
-  constructor(actionGroup: BookmarkActionGroup) {
-    super(actionGroup);
-
-    this.list = (args: ActionArgs) => {
-      const a = this.v.has({ limit: this.v.optionalNumber() }, args);
-      return actionGroup.list(a.limit);
-    };
-
-    this.search = (args: ActionArgs) => {
-      const a = this.v.has({ input: this.v.optionalString() }, args);
-      return actionGroup.search(a.input);
-    };
-
-    this.update = (args: ActionArgs) => {
-      const a = this.v.has(
-        {
-          id: this.v.requiredString(),
-          url: this.v.requiredString(),
-          title: this.v.requiredString(),
-        },
-        args
-      );
-      return actionGroup.update(a.id, a.url, a.title);
-    };
-
-    this.create = (args: ActionArgs) => {
-      const a = this.v.has(
-        {
-          url: this.v.requiredString(),
-          title: this.v.requiredString(),
-          parentId: this.v.requiredString(),
-        },
-        args
-      );
-      return actionGroup.create(a.url, a.title, a.parentId);
-    };
-
-    this.getTree = (args: ActionArgs) => {
-      const a = this.v.has({ id: this.v.optionalString() }, args);
-      return actionGroup.getTree(a.id);
-    };
-
-    this.open = (args: ActionArgs) => {
-      const a = this.v.has({ id: this.v.requiredString() }, args);
-      return actionGroup.open(a.id);
-    };
-
-    this.tabOpen = (args: ActionArgs) => {
-      const a = this.v.has({ id: this.v.requiredString() }, args);
-      return actionGroup.tabOpen(a.id);
-    };
-
-    this.remove = (args: ActionArgs) => {
-      const a = this.v.has({ id: this.v.requiredString() }, args);
-      return actionGroup.remove(a.id);
-    };
   }
 }

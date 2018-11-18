@@ -1,4 +1,4 @@
-import { HistoryActionGroup, HistoryActionInvoker } from "./history";
+import { HistoryActionGroup } from "./history";
 import { History } from "webextension-polyfill-ts";
 
 describe("HistoryActionGroup", () => {
@@ -25,27 +25,5 @@ describe("HistoryActionGroup", () => {
   it("search return empty if input is null.", async () => {
     await actionGroup.search();
     expect(search).toHaveBeenCalledWith({ text: "" });
-  });
-});
-
-describe("HistoryActionInvoker", () => {
-  let search: jest.Mock;
-  let invoker: HistoryActionInvoker;
-
-  beforeEach(() => {
-    search = jest.fn();
-
-    const ActionGroupClass = jest.fn<HistoryActionGroup>(() => ({
-      search: search,
-    }));
-    const actionGroup = new ActionGroupClass();
-
-    invoker = new HistoryActionInvoker(actionGroup);
-  });
-
-  it("search", () => {
-    const input = "input";
-    invoker.search({ input: input });
-    expect(search).toHaveBeenCalledWith(input);
   });
 });
