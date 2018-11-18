@@ -21,17 +21,17 @@ export class RequestFactory {
 
     const id = decodedJson.id;
     if (typeof id !== "string") {
-      throw new Error("Invalid id");
+      throw new Error("id is required");
     }
 
     const method = decodedJson.method;
     if (typeof method !== "string") {
-      throw new Error("Invalid method");
+      throw new Error("Invalid method: " + method);
     }
 
-    const params = decodedJson.params;
+    const params = decodedJson.params || {};
     if (typeof params !== "object") {
-      throw new Error("Invalid params");
+      throw new Error("Invalid params: " + JSON.stringify(params));
     }
 
     return new Request(id, method, params);
