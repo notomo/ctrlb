@@ -1,4 +1,3 @@
-import { ActionArgs } from "./action/action";
 import { EventType } from "./event";
 import { Button } from "./browserAction";
 import { RequestFactory } from "./request";
@@ -73,7 +72,7 @@ export class Client {
   public async notify(
     method: string,
     eventName: EventType,
-    args?: ActionArgs
+    args?: { [index: string]: any }
   ): Promise<boolean> {
     if (!this.isOpen()) {
       return false;
