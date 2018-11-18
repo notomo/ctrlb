@@ -1,6 +1,6 @@
 import { EventType } from "./event";
 import { Button } from "./browserAction";
-import { RequestFactory } from "./request";
+import { RequestFactory, Request } from "./request";
 import { NotificationFactory } from "./notification";
 import { ResponseFactory } from "./response";
 import { Router } from "./router";
@@ -49,8 +49,22 @@ export class Client {
   }
 
   protected async onMessage(ev: MessageEvent) {
-    const request = this.requestFactory.createFromJson(ev.data);
-    const result = await this.router.match(request);
+    let request: Request;
+    try {
+      request = this.requestFactory.createFromJson(ev.data);
+    } catch (e) {
+      const errorJson = this.responseFactory.createError(e).toJson();
+      this.sendMessage(errorJson);
+      console.error(errorJson);
+      return;
+    }
+
+    const result = await this.router.match(request).catch(e => {
+      const errorJson = this.responseFactory
+        .createError(e, request.id)
+        .toJson();
+      this.sendMessage(errorJson);
+    });
 
     this.sendMessage(this.responseFactory.create(result, request.id).toJson());
   }

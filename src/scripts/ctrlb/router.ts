@@ -1,6 +1,7 @@
 import { IRequest } from "./request";
 import { Validator } from "./validator";
 import { Tuple } from "./tuple";
+import { MethodNotFound } from "./error";
 
 export class Router {
   protected readonly routes: Map<string, { (request: IRequest): any }>;
@@ -25,10 +26,10 @@ export class Router {
     return routeAction;
   }
 
-  public match(request: IRequest) {
+  public async match(request: IRequest) {
     const matched = this.routes.get(request.method);
     if (matched === undefined) {
-      // TODO: throw no method error
+      throw new MethodNotFound(request.method);
       return;
     }
 
