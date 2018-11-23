@@ -8,4 +8,9 @@ export class HistoryActionGroup {
   ): Promise<History.HistoryItem[]> {
     return await this.history.search({ text: text || "" });
   }
+
+  public async remove(url: string): Promise<null> {
+    this.history.deleteUrl({ url: url });
+    return null;
+  }
 }
