@@ -34,6 +34,13 @@ router.add(
   [v.optionalString()],
   ["input"]
 );
+router.add(
+  "history/remove",
+  history,
+  history.remove,
+  [v.requiredString()],
+  ["url"]
+);
 
 const download = Di.get("DownloadActionGroup");
 router.add(
