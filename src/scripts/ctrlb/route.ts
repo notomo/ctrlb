@@ -10,17 +10,17 @@ router.add("tab/scroll/toTop", scroll, scroll.toTop, [], []);
 router.add("tab/scroll/toBottom", scroll, scroll.toBottom, [], []);
 
 const zoom = Di.get("ZoomActionGroup");
-router.add("tab/zoom/get", zoom, zoom.get, [], []);
+router.add("tab/zoom/get", zoom, zoom.get, [v.optionalNumber()], ["id"]);
 router.add(
   "tab/zoom/set",
   zoom,
   zoom.set,
-  [v.requiredNumber()],
-  ["zoomFactor"]
+  [v.requiredNumber(), v.optionalNumber()],
+  ["zoomFactor", "id"]
 );
-router.add("tab/zoom/up", zoom, zoom.up, [], []);
-router.add("tab/zoom/down", zoom, zoom.down, [], []);
-router.add("tab/zoom/reset", zoom, zoom.reset, [], []);
+router.add("tab/zoom/up", zoom, zoom.up, [v.optionalNumber()], ["id"]);
+router.add("tab/zoom/down", zoom, zoom.down, [v.optionalNumber()], ["id"]);
+router.add("tab/zoom/reset", zoom, zoom.reset, [v.optionalNumber()], ["id"]);
 
 const navigation = Di.get("NavigationActionGroup");
 router.add("tab/navigation/back", navigation, navigation.back, [], []);
