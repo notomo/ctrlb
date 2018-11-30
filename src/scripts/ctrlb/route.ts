@@ -173,7 +173,9 @@ router.add("tab/open", tab, tab.open, [v.requiredString()], ["url"]);
 router.add("tab/duplicate", tab, tab.duplicate, [], []);
 router.add("tab/reload", tab, tab.reload, [], []);
 router.add("tab/list", tab, tab.list, [], []);
+router.add("tab/listAll", tab, tab.listAll, [], []);
 router.add("tab/get", tab, tab.get, [v.requiredNumber()], ["id"]);
 router.add("tab/getCurrent", tab, tab.getCurrent, [], []);
+router.add("tab/activate", tab, tab.activate, [v.requiredNumber()], ["id"]);
 
 router.add("apiInfo/get", router, router.getAll, [], []);

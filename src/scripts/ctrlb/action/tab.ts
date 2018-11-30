@@ -205,6 +205,10 @@ export class TabActionGroup {
     return null;
   }
 
+  public async listAll(): Promise<Tabs.Tab[]> {
+    return await this.tabs.query({});
+  }
+
   public async list(): Promise<Tabs.Tab[]> {
     return await this.tabs.query({ currentWindow: true });
   }
