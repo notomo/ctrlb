@@ -81,27 +81,27 @@ describe("TabActionGroup", () => {
   });
 
   it("moveRight on current window", async () => {
-    await actionGroup.moveRight();
+    await actionGroup.moveRight(null);
     expect(move).toHaveBeenCalledWith(tabId, { index: tabIndex + 1 });
   });
 
   it("moveLeft on current window", async () => {
-    await actionGroup.moveLeft();
+    await actionGroup.moveLeft(null);
     expect(move).toHaveBeenCalledWith(tabId, { index: tabIndex - 1 });
   });
 
   it("moveFirst on current window", async () => {
-    await actionGroup.moveFirst();
+    await actionGroup.moveFirst(null);
     expect(move).toHaveBeenCalledWith(tabId, { index: 0 });
   });
 
   it("moveLast on current window", async () => {
-    await actionGroup.moveLast();
+    await actionGroup.moveLast(null);
     expect(move).toHaveBeenCalledWith(tabId, { index: -1 });
   });
 
   it("close on current window", async () => {
-    await actionGroup.close();
+    await actionGroup.close(null);
     expect(remove).toHaveBeenCalledWith(tabId);
   });
 
@@ -199,12 +199,12 @@ describe("TabActionGroup", () => {
   });
 
   it("duplicate on current window", async () => {
-    await actionGroup.duplicate();
+    await actionGroup.duplicate(null);
     expect(duplicate).toHaveBeenCalledWith(tabId);
   });
 
   it("reload current", async () => {
-    await actionGroup.reload();
+    await actionGroup.reload(null);
     expect(reload).toHaveBeenCalledWith(tabId);
   });
 });
