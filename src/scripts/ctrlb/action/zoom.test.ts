@@ -20,41 +20,41 @@ describe("ZoomActionGroup", () => {
   });
 
   it("get", async () => {
-    await actionGroup.get();
+    await actionGroup.get(null);
 
     expect(getZoom).toHaveBeenCalledTimes(1);
   });
 
   it("set", () => {
     const zoomFactor = 0.5;
-    actionGroup.set(zoomFactor);
+    actionGroup.set(zoomFactor, null);
 
-    expect(setZoom).toHaveBeenCalledWith(zoomFactor);
+    expect(setZoom).toHaveBeenCalledWith(undefined, zoomFactor);
   });
 
   it("reset", () => {
-    actionGroup.reset();
+    actionGroup.reset(null);
 
-    expect(setZoom).toHaveBeenCalledWith(0);
+    expect(setZoom).toHaveBeenCalledWith(undefined, 0);
   });
 
   it("up", async () => {
-    await actionGroup.up();
+    await actionGroup.up(null);
 
     expect(getZoom).toHaveBeenCalledTimes(1);
-    expect(setZoom).toHaveBeenCalledWith(1.1);
+    expect(setZoom).toHaveBeenCalledWith(undefined, 1.1);
   });
 
   it("down", async () => {
-    await actionGroup.down();
+    await actionGroup.down(null);
 
     expect(getZoom).toHaveBeenCalledTimes(1);
-    expect(setZoom).toHaveBeenCalledWith(0.9);
+    expect(setZoom).toHaveBeenCalledWith(undefined, 0.9);
   });
 
   it("not down", async () => {
     getZoom.mockReturnValue(0.1);
-    await actionGroup.down();
+    await actionGroup.down(null);
 
     expect(getZoom).toHaveBeenCalledTimes(1);
     expect(setZoom).not.toHaveBeenCalledTimes(1);

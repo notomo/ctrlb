@@ -3,32 +3,34 @@ import { Tabs } from "webextension-polyfill-ts";
 export class ZoomActionGroup {
   constructor(protected readonly tabs: Tabs.Static) {}
 
-  public get(): Promise<number> {
-    return this.tabs.getZoom();
+  public get(tabId: number | null): Promise<number> {
+    return this.tabs.getZoom(tabId || undefined);
   }
 
-  public set(zoomFactor: number): null {
-    this.tabs.setZoom(zoomFactor);
+  public set(zoomFactor: number, tabId: number | null): null {
+    this.tabs.setZoom(tabId || undefined, zoomFactor);
     return null;
   }
 
-  public reset(): null {
-    this.tabs.setZoom(0);
+  public reset(tabId: number | null): null {
+    this.tabs.setZoom(tabId || undefined, 0);
     return null;
   }
 
-  public async up(): Promise<null> {
-    const currentZoomFactor = await this.tabs.getZoom();
-    this.tabs.setZoom(currentZoomFactor + 0.1);
+  public async up(tabId: number | null): Promise<null> {
+    const id = tabId || undefined;
+    const currentZoomFactor = await this.tabs.getZoom(id);
+    this.tabs.setZoom(id, currentZoomFactor + 0.1);
     return null;
   }
 
-  public async down(): Promise<null> {
-    const zoomFactor = (await this.tabs.getZoom()) - 0.1;
+  public async down(tabId: number | null): Promise<null> {
+    const id = tabId || undefined;
+    const zoomFactor = (await this.tabs.getZoom(id)) - 0.1;
     if (zoomFactor < 0.1) {
       return null;
     }
-    this.tabs.setZoom(zoomFactor);
+    this.tabs.setZoom(id, zoomFactor);
     return null;
   }
 }
