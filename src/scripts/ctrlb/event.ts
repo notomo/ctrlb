@@ -20,6 +20,7 @@ export class SubscribeEventHandler {
     tabUpdated: ListenerHolder,
     tabCreated: ListenerHolder,
     tabRemoved: ListenerHolder,
+    tabMoved: ListenerHolder,
     zoomChanged: ListenerHolder,
     historyCreated: ListenerHolder,
     historyRemoved: ListenerHolder,
@@ -38,6 +39,7 @@ export class SubscribeEventHandler {
       tabUpdated: tabUpdated,
       tabCreated: tabCreated,
       tabRemoved: tabRemoved,
+      tabMoved: tabMoved,
       zoomChanged: zoomChanged,
       historyCreated: historyCreated,
       historyRemoved: historyRemoved,
@@ -107,6 +109,10 @@ class HandleFunctions implements IHandleFunctions {
     (tabId: number, removeInfo: Tabs.OnRemovedRemoveInfoType): void;
   };
 
+  public readonly tabMoved: {
+    (tabId: number, moveInfo: Tabs.OnMovedMoveInfoType): void;
+  };
+
   public readonly zoomChanged: {
     (zoomChangeInfo: Tabs.OnZoomChangeZoomChangeInfoType): void;
   };
@@ -153,34 +159,38 @@ class HandleFunctions implements IHandleFunctions {
 
   constructor(client: Client) {
     this.tabActivated = (info: Tabs.OnActivatedActiveInfoType): void => {
-      client.notify("tab/get", EventType.tabActivated, { id: info.tabId });
+      client.notifyWithData(info, EventType.tabActivated);
     };
 
     this.tabUpdated = (
       tabId: number,
       info: Tabs.OnUpdatedChangeInfoType
     ): void => {
-      client.notify("tab/get", EventType.tabUpdated, { id: tabId });
+      client.notifyWithData({ id: tabId, info: info }, EventType.tabUpdated);
     };
 
     this.tabCreated = (tab: Tabs.Tab): void => {
-      if (tab.id === undefined) {
-        return;
-      }
-      client.notify("tab/get", EventType.tabCreated, { id: tab.id });
+      client.notifyWithData(tab, EventType.tabCreated);
     };
 
     this.tabRemoved = (
       tabId: number,
       removeInfo: Tabs.OnRemovedRemoveInfoType
     ): void => {
-      client.notify("tab/get", EventType.tabRemoved, { id: tabId });
+      client.notifyWithData(removeInfo, EventType.tabRemoved);
+    };
+
+    this.tabMoved = (
+      tabId: number,
+      moveInfo: Tabs.OnMovedMoveInfoType
+    ): void => {
+      client.notifyWithData(moveInfo, EventType.tabMoved);
     };
 
     this.zoomChanged = (
       zoomChangeInfo: Tabs.OnZoomChangeZoomChangeInfoType
     ): void => {
-      client.notify("zoom/get", EventType.zoomChanged);
+      client.notifyWithData(zoomChangeInfo, EventType.zoomChanged);
     };
 
     this.historyCreated = (history: History.HistoryItem): void => {
@@ -200,51 +210,42 @@ class HandleFunctions implements IHandleFunctions {
     };
 
     this.windowActivated = (windowId: number): void => {
-      client.notify("window/get", EventType.windowActivated, {
-        id: windowId,
-      });
+      client.notifyWithData(windowId, EventType.windowActivated);
     };
 
     this.windowCreated = (window: Windows.Window): void => {
-      if (window.id === undefined) {
-        return;
-      }
-      client.notify("window/get", EventType.windowCreated, {
-        id: window.id,
-      });
+      client.notifyWithData(window, EventType.windowCreated);
     };
 
     this.windowRemoved = (windowId: number): void => {
-      client.notify("window/get", EventType.windowRemoved, {
-        id: windowId,
-      });
+      client.notifyWithData(windowId, EventType.windowRemoved);
     };
 
     this.bookmarkCreated = (
       bookmarkId: string,
       bookmark: Bookmarks.BookmarkTreeNode
     ): void => {
-      client.notify("bookmark/get", EventType.bookmarkCreated, {
-        id: bookmarkId,
-      });
+      client.notifyWithData(bookmark, EventType.bookmarkCreated);
     };
 
     this.bookmarkRemoved = (
       bookmarkId: string,
       removeInfo: Bookmarks.OnRemovedRemoveInfoType
     ): void => {
-      client.notify("bookmark/get", EventType.bookmarkRemoved, {
-        id: bookmarkId,
-      });
+      client.notifyWithData(
+        { id: bookmarkId, info: removeInfo },
+        EventType.bookmarkRemoved
+      );
     };
 
     this.bookmarkUpdated = (
       bookmarkId: string,
       changeInfo: Bookmarks.OnChangedChangeInfoType
     ): void => {
-      client.notify("bookmark/get", EventType.bookmarkUpdated, {
-        id: bookmarkId,
-      });
+      client.notifyWithData(
+        { id: bookmarkId, info: changeInfo },
+        EventType.bookmarkUpdated
+      );
     };
 
     this.downloadCreated = (download: Downloads.DownloadItem): void => {
@@ -263,6 +264,7 @@ export enum EventType {
   tabUpdated = "tabUpdated",
   tabCreated = "tabCreated",
   tabRemoved = "tabRemoved",
+  tabMoved = "tabMoved",
   zoomChanged = "zoomChanged",
   historyCreated = "historyCreated",
   historyRemoved = "historyRemoved",

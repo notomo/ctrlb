@@ -83,41 +83,56 @@ export class TabActionGroup {
     return null;
   }
 
-  public async moveLeft(): Promise<null> {
-    const tab = await this.getCurrentTab();
-    if (tab.index > 0) {
-      const id = tab.id as number;
-      this.tabs.move(id, { index: tab.index - 1 });
+  public async moveLeft(tabId: number | null): Promise<null> {
+    let tab;
+    if (tabId !== null) {
+      tab = await this.get(tabId);
+    } else {
+      tab = await this.getCurrentTab();
     }
+
+    const id = tab.id;
+    if (id === undefined || tab.index === 0) {
+      return null;
+    }
+
+    await this.tabs.move(id, { index: tab.index - 1 });
     return null;
   }
 
-  public async moveRight(): Promise<null> {
-    const tab = await this.getCurrentTab();
-    const id = tab.id as number;
-    this.tabs.move(id, { index: tab.index + 1 });
+  public async moveRight(tabId: number | null): Promise<null> {
+    let tab;
+    if (tabId !== null) {
+      tab = await this.get(tabId);
+    } else {
+      tab = await this.getCurrentTab();
+    }
+
+    const id = tab.id;
+    if (id === undefined) {
+      return null;
+    }
+
+    await this.tabs.move(id, { index: tab.index + 1 });
     return null;
   }
 
-  public async moveFirst(): Promise<null> {
-    const tab = await this.getCurrentTab();
-    const id = tab.id as number;
-    this.tabs.move(id, { index: 0 });
-    return null;
+  public async moveFirst(tabId: number | null): Promise<null> {
+    return this.executeWithIdOrCurrent(tabId, (tabId: number) => {
+      this.tabs.move(tabId, { index: 0 });
+    });
   }
 
-  public async moveLast(): Promise<null> {
-    const tab = await this.getCurrentTab();
-    const id = tab.id as number;
-    this.tabs.move(id, { index: -1 });
-    return null;
+  public async moveLast(tabId: number | null): Promise<null> {
+    return this.executeWithIdOrCurrent(tabId, (tabId: number) => {
+      this.tabs.move(tabId, { index: -1 });
+    });
   }
 
-  public async close(): Promise<null> {
-    const tab = await this.getCurrentTab();
-    const tabId = tab.id as number;
-    this.tabs.remove(tabId);
-    return null;
+  public async close(tabId: number | null): Promise<null> {
+    return this.executeWithIdOrCurrent(tabId, (tabId: number) => {
+      this.tabs.remove(tabId);
+    });
   }
 
   public async closeOthers(): Promise<null> {
@@ -191,18 +206,39 @@ export class TabActionGroup {
     return null;
   }
 
-  public async duplicate(): Promise<null> {
+  public async duplicate(tabId: number | null): Promise<null> {
+    return this.executeWithIdOrCurrent(tabId, (tabId: number) => {
+      this.tabs.duplicate(tabId);
+    });
+  }
+
+  public async reload(tabId: number | null): Promise<null> {
+    return this.executeWithIdOrCurrent(tabId, (tabId: number) => {
+      this.tabs.reload(tabId);
+    });
+  }
+
+  protected async executeWithIdOrCurrent(
+    tabId: number | null,
+    fun: { (tabId: number): void }
+  ): Promise<null> {
+    if (tabId !== null) {
+      fun(tabId);
+      return null;
+    }
+
     const tab = await this.getCurrentTab();
-    const tabId = tab.id as number;
-    this.tabs.duplicate(tabId);
+    const id = tab.id;
+    if (id === undefined) {
+      return null;
+    }
+
+    fun(id);
     return null;
   }
 
-  public async reload(): Promise<null> {
-    const tab = await this.getCurrentTab();
-    const tabId = tab.id as number;
-    this.tabs.reload(tabId);
-    return null;
+  public async listAll(): Promise<Tabs.Tab[]> {
+    return await this.tabs.query({});
   }
 
   public async list(): Promise<Tabs.Tab[]> {

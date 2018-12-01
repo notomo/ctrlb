@@ -67,6 +67,7 @@ export class Di {
         browser.tabs.onUpdated,
         browser.tabs.onCreated,
         browser.tabs.onRemoved,
+        browser.tabs.onMoved,
         browser.tabs.onZoomChange,
         browser.history.onVisited,
         browser.history.onVisitRemoved,
