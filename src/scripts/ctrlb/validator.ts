@@ -1,5 +1,4 @@
 import { Tuple } from "./tuple";
-import { EventType } from "./event";
 import { InvalidParams } from "./error";
 
 export class Validator {
@@ -46,10 +45,6 @@ export class Validator {
 
   public optionalBoolean(): boolean | null {
     return this.OPTIONAL_BOOLEAN;
-  }
-
-  public eventName(): EventType {
-    return EventType.tabActivated;
   }
 
   protected isRequired(value: string | number | boolean): boolean {

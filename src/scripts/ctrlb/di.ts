@@ -3,7 +3,6 @@ import { BookmarkActionGroup } from "./action/bookmark";
 import { HistoryActionGroup } from "./action/history";
 import { WindowActionGroup } from "./action/window";
 import { NavigationActionGroup } from "./action/navigation";
-import { EventActionGroup } from "./action/event";
 import { DownloadActionGroup } from "./action/download";
 import { TabActionGroup } from "./action/tab";
 import { ScrollActionGroup } from "./action/scroll";
@@ -33,9 +32,6 @@ export class Di {
     NavigationActionGroup: () => {
       return new NavigationActionGroup(browser.tabs);
     },
-    EventActionGroup: () => {
-      return new EventActionGroup(browser.storage.local);
-    },
     DownloadActionGroup: () => {
       return new DownloadActionGroup(browser.downloads);
     },
@@ -61,8 +57,6 @@ export class Di {
     SubscribeEventHandler: (client: Client) => {
       return new SubscribeEventHandler(
         client,
-        browser.storage.onChanged,
-        browser.storage.local,
         browser.tabs.onActivated,
         browser.tabs.onUpdated,
         browser.tabs.onCreated,
@@ -71,7 +65,6 @@ export class Di {
         browser.tabs.onZoomChange,
         browser.history.onVisited,
         browser.history.onVisitRemoved,
-        browser.history.onTitleChanged,
         browser.windows.onFocusChanged,
         browser.windows.onCreated,
         browser.windows.onRemoved,
@@ -103,7 +96,6 @@ export class Di {
     HistoryActionGroup: null,
     WindowActionGroup: null,
     NavigationActionGroup: null,
-    EventActionGroup: null,
     DownloadActionGroup: null,
     TabActionGroup: null,
     ScrollActionGroup: null,
@@ -119,7 +111,6 @@ export class Di {
   public static get(cls: "HistoryActionGroup"): HistoryActionGroup;
   public static get(cls: "WindowActionGroup"): WindowActionGroup;
   public static get(cls: "NavigationActionGroup"): NavigationActionGroup;
-  public static get(cls: "EventActionGroup"): EventActionGroup;
   public static get(cls: "DownloadActionGroup"): DownloadActionGroup;
   public static get(cls: "TabActionGroup"): TabActionGroup;
   public static get(cls: "ScrollActionGroup"): ScrollActionGroup;
@@ -168,7 +159,6 @@ interface Deps {
   HistoryActionGroup: { (...args: any[]): HistoryActionGroup };
   WindowActionGroup: { (...args: any[]): WindowActionGroup };
   NavigationActionGroup: { (...args: any[]): NavigationActionGroup };
-  EventActionGroup: { (...args: any[]): EventActionGroup };
   DownloadActionGroup: { (...args: any[]): DownloadActionGroup };
   TabActionGroup: { (...args: any[]): TabActionGroup };
   ScrollActionGroup: { (...args: any[]): ScrollActionGroup };
