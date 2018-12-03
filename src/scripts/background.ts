@@ -9,7 +9,7 @@ config.getHost().then((host: string) => {
   client.open(host);
 
   browser.browserAction.onClicked.addListener(async () => {
-    const host: string = await config.getHost();
+    const host = await config.getHost();
     client.open(host);
   });
 

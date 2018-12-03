@@ -51,22 +51,6 @@ router.add(
   ["input"]
 );
 
-const event = Di.get("EventActionGroup");
-router.add(
-  "event/subscribe",
-  event,
-  event.subscribe,
-  [v.eventName()],
-  ["eventName"]
-);
-router.add(
-  "event/unsubscribe",
-  event,
-  event.unsubscribe,
-  [v.eventName()],
-  ["eventName"]
-);
-
 const window = Di.get("WindowActionGroup");
 router.add("window/get", window, window.get, [v.requiredNumber()], ["id"]);
 router.add("window/maximize", window, window.maximize, [], []);

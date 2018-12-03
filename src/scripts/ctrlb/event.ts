@@ -1,6 +1,5 @@
 import { Client } from "./client";
 import {
-  Storage,
   Tabs,
   History,
   Windows,
@@ -14,8 +13,6 @@ export class SubscribeEventHandler {
 
   constructor(
     client: Client,
-    protected readonly onEventEmitted: { addListener(params: any): void },
-    protected readonly storage: Storage.LocalStorageArea,
     tabActivated: ListenerHolder,
     tabUpdated: ListenerHolder,
     tabCreated: ListenerHolder,
@@ -24,7 +21,6 @@ export class SubscribeEventHandler {
     zoomChanged: ListenerHolder,
     historyCreated: ListenerHolder,
     historyRemoved: ListenerHolder,
-    historyUpdated: ListenerHolder,
     windowActivated: ListenerHolder,
     windowCreated: ListenerHolder,
     windowRemoved: ListenerHolder,
@@ -43,7 +39,6 @@ export class SubscribeEventHandler {
       zoomChanged: zoomChanged,
       historyCreated: historyCreated,
       historyRemoved: historyRemoved,
-      historyUpdated: historyUpdated,
       windowActivated: windowActivated,
       windowCreated: windowCreated,
       windowRemoved: windowRemoved,
@@ -55,39 +50,13 @@ export class SubscribeEventHandler {
   }
 
   public listen() {
-    const initialValues: { [index: string]: boolean } = Object.keys(
-      EventType
-    ).reduce((eventNames: { [index: string]: boolean }, eventName: string) => {
-      eventNames[eventName] = false;
-      return eventNames;
-    }, {});
-    this.storage.set(initialValues);
-    this.onEventEmitted.addListener((changes: Storage.StorageChange) =>
-      this.onChanged(changes)
-    );
-  }
-
-  protected isEventName(name: string): name is EventType {
-    return name in EventType;
-  }
-
-  protected updateListener(eventName: string, isSubscription: boolean) {
-    if (!this.isEventName(eventName)) {
-      throw new Error(eventName + " is not valid EventType.");
-    }
-    const handleFunction = this.handleFunctions[eventName];
-    const event = this.events[eventName];
-    if (isSubscription) {
+    for (const eventName in this.events) {
+      const handleFunction = this.handleFunctions[
+        eventName as keyof IHandleFunctions
+      ];
+      const event = this.events[eventName as keyof IHandleFunctions];
       event.addListener(handleFunction);
-    } else {
-      event.removeListener(handleFunction);
     }
-  }
-
-  protected onChanged(changes: Storage.StorageChange) {
-    Object.entries(changes).forEach(([key, values]) => {
-      this.updateListener(key, values.newValue);
-    });
   }
 }
 
@@ -123,10 +92,6 @@ class HandleFunctions implements IHandleFunctions {
 
   public readonly historyRemoved: {
     (removeInfo: History.OnVisitRemovedRemovedType): void;
-  };
-
-  public readonly historyUpdated: {
-    (changeInfo: History.OnTitleChangedChangedType): void;
   };
 
   public readonly windowActivated: {
@@ -203,12 +168,6 @@ class HandleFunctions implements IHandleFunctions {
       client.notifyWithData(removeInfo, EventType.historyRemoved);
     };
 
-    this.historyUpdated = (
-      changeInfo: History.OnTitleChangedChangedType
-    ): void => {
-      client.notifyWithData(changeInfo, EventType.historyUpdated);
-    };
-
     this.windowActivated = (windowId: number): void => {
       client.notifyWithData(windowId, EventType.windowActivated);
     };
@@ -256,7 +215,6 @@ class HandleFunctions implements IHandleFunctions {
 
 interface ListenerHolder {
   addListener(params: any): void;
-  removeListener(params: any): void;
 }
 
 export enum EventType {
@@ -268,7 +226,6 @@ export enum EventType {
   zoomChanged = "zoomChanged",
   historyCreated = "historyCreated",
   historyRemoved = "historyRemoved",
-  historyUpdated = "historyUpdated",
   windowActivated = "windowActivated",
   windowCreated = "windowCreated",
   windowRemoved = "windowRemoved",
