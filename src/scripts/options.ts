@@ -8,10 +8,14 @@ const saveOptions = async () => {
 
   const statusLabel = document.getElementById("status") as HTMLElement;
 
-  await config.saveHost(host).catch(() => {
+  const result = await config.saveHost(host).catch(() => {
     statusLabel.textContent = "Failed saving options.";
+    return false;
   });
-  statusLabel.textContent = "Options saved.";
+
+  if (result !== false) {
+    statusLabel.textContent = "Options saved.";
+  }
 
   setTimeout(() => {
     statusLabel.textContent = "";
