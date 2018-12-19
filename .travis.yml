@@ -45,3 +45,4 @@ jobs:
               draft: true
               on:
                   repo: notomo/ctrlb
+                  all_branches: true
