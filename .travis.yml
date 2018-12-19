@@ -23,12 +23,12 @@ jobs:
           after_success:
               - codecov
         - stage: deploy
-          if: type != pull_request AND branch = master
+          # if: type != pull_request AND branch = master
           install:
               - npm ci
           script:
-              - npm run ext:build:chrome
-              - EXTENSION_ID=${EXTENSION_ID} CLIENT_SECRET=${CLIENT_SECRET} CLIENT_ID=${CLIENT_ID} REFRESH_TOKEN=${REFRESH_TOKEN} node ./deploy.js
+              # - npm run ext:build:chrome
+              # - EXTENSION_ID=${EXTENSION_ID} CLIENT_SECRET=${CLIENT_SECRET} CLIENT_ID=${CLIENT_ID} REFRESH_TOKEN=${REFRESH_TOKEN} node ./deploy.js
               - git config --local user.name "travis-ci"
               - git config --local user.email "travis-ci@example.com"
               - export TRAVIS_TAG=v`npm run --silent version`
@@ -42,5 +42,6 @@ jobs:
               skip_cleanup: true
               file_glob: true
               file: web-ext-artifacts/*
+              draft: true
               on:
                   repo: notomo/ctrlb
