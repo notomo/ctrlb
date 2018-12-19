@@ -31,9 +31,9 @@ jobs:
               # - EXTENSION_ID=${EXTENSION_ID} CLIENT_SECRET=${CLIENT_SECRET} CLIENT_ID=${CLIENT_ID} REFRESH_TOKEN=${REFRESH_TOKEN} node ./deploy.js
               - git config --local user.name "travis-ci"
               - git config --local user.email "travis-ci@example.com"
+              - npm run build:prod
               - export TRAVIS_TAG=v`npm run --silent version`
               - git tag $TRAVIS_TAG
-              - npm run build:prod
               - npx web-ext sign --api-key=${FIREFOX_API_KEY} --api-secret=${FIREFOX_API_SECRET} --source-dir=dist
           deploy:
               provider: releases
@@ -42,7 +42,6 @@ jobs:
               skip_cleanup: true
               file_glob: true
               file: web-ext-artifacts/*.xpi
-              draft: true
               on:
                   repo: notomo/ctrlb
                   all_branches: true
