@@ -8,7 +8,7 @@ ctrlb is a web extension for providing web browser control api through WebSocket
 
 ## Install
 - [chrome web store](https://chrome.google.com/webstore/detail/ctrlb/ppeimjidflleifdpgigjikmgmidmmnoh?hl=ja&gl=JP)
-- addons.mozilla.org(TODO)
+- [xpi for Firefox](https://github.com/notomo/ctrlb/releases)
 
 ## Usage
 1. Set the server host by web extension option.
