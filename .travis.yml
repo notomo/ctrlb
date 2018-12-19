@@ -7,6 +7,10 @@ cache:
     directories:
         - "$HOME/.npm"
 
+branches:
+    except:
+        - "/^v[0-9\\.]+/"
+
 jobs:
     include:
         - stage: test
@@ -25,3 +29,19 @@ jobs:
           script:
               - npm run ext:build:chrome
               - EXTENSION_ID=${EXTENSION_ID} CLIENT_SECRET=${CLIENT_SECRET} CLIENT_ID=${CLIENT_ID} REFRESH_TOKEN=${REFRESH_TOKEN} node ./deploy.js
+              - git config --local user.name "travis-ci"
+              - git config --local user.email "travis-ci@example.com"
+              - npm run build:prod
+              - export TRAVIS_TAG=v`npm run --silent version`
+              - git tag $TRAVIS_TAG
+              - npx web-ext sign --api-key=${FIREFOX_API_KEY} --api-secret=${FIREFOX_API_SECRET} --source-dir=dist
+          deploy:
+              provider: releases
+              api_key:
+                  secure: RSoDWwP0bT3Bboy/RqNCLchVM2NgcaGqC+krzOvfh3Zj1DMzX4Mrx0Z3i/3ZPhiP2VfsQYlXbx5H6bRKFb5RJmkKIsMH2QA6VVytFvgr3jFPxgqFVcj1lDHeHFJ9isyZJMQeRoSX+Il55vtp9XUoJFGDe0+TowE9pOfsyv8/i6wikE8WsQQFujCNQR+eNSEMoM71cqBBTdFUPihUV8DzaiIpk9NHm2vZgEu6hvy634S9hVCtc+3CgSsN4uLM/dri0kgsDGdwOcEOeeVpZ3pXl/zvRTTkTSiDRDCMl7nzQni091h6p+R2kXCgiv6pO3VUyE7etVVQ9Z6aKOfaaVTxzp0q0uo3F7mULQq8YMIPK5VKz7tZ9p5USjFVmwzOaHbI8NOxmN7s42sLvnFR3NKF4IxAblhqy6wldeEnASBa45bgAFREW1zDzFQGSKMoYAyDj6ayFtj/k4Tw63Oqj+Zheg6x7fiJWexeu2o87zgbd6sFNWYsBkmFzRTyXyuOjTkqjMnLVjBto/gojkP8kAjQTHvvu0n1GoT296lc6d4ZF5pxHkZcHiCqvH1O6R1o+Z0pbwBoTc5cwv/+OXHzfau2RF3B6QtJJvuXDf1LoVW+pSvIbTrJONnRkErKiqY5umJYlkS8UoUUQj0yqh97G+z1KhiUCXTOQ3ognDZBzIEkmOg=
+              skip_cleanup: true
+              file_glob: true
+              file: web-ext-artifacts/*.xpi
+              on:
+                  repo: notomo/ctrlb
+                  all_branches: true

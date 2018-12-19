@@ -31,7 +31,8 @@
     "watch": "webpack -w --mode development --env.CHROME",
     "format": "prettier --write 'src/scripts/**/*.ts'",
     "lint:ts": "tslint 'src/scripts/**/*.ts'",
-    "lint": "npm run lint:ts && npm run lint:manifest"
+    "lint": "npm run lint:ts && npm run lint:manifest",
+    "version": "node version.js"
   },
   "jest": {
     "moduleFileExtensions": [
