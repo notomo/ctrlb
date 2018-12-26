@@ -2,6 +2,7 @@
   "private": true,
   "devDependencies": {
     "@types/jest": "^22.2.3",
+    "@types/ws": "^6.0.1",
     "chrome-webstore-upload-cli": "^1.2.0",
     "copy-webpack-plugin": "^4.6.0",
     "eslint": "^4.19.1",
@@ -17,7 +18,8 @@
     "web-ext": "^2.9.2",
     "webextension-polyfill-ts": "^0.8.9",
     "webpack": "4.19.1",
-    "webpack-cli": "^2.1.5"
+    "webpack-cli": "^2.1.5",
+    "ws": "^6.1.2"
   },
   "dependencies": {},
   "scripts": {
@@ -25,6 +27,8 @@
     "build": "webpack --mode development --env.CHROME",
     "build:prod": "webpack --mode production",
     "lint:manifest": "web-ext lint --source-dir=dist",
+    "ext:run": "web-ext run --source-dir=dist --no-reload",
+    "ext:test": "jest  --testMatch=**/test/**/*\\.test\\.ts",
     "ext:build:firefox": "npm run build:prod && web-ext build --source-dir=dist --artifacts-dir=ext/firefox -o",
     "ext:build:chrome": "npm run build:prod --env.CHROME && web-ext build --source-dir=dist --artifacts-dir=ext/chrome -o",
     "ext": "npm run ext:build:chrome && npm run ext:build:firefox",
