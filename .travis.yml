@@ -7,6 +7,8 @@ cache:
     directories:
         - "$HOME/.npm"
 
+env:
+    - MOZ_HEADLESS=1
 addons:
     firefox: latest
 
