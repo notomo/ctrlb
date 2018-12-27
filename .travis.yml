@@ -7,6 +7,11 @@ cache:
     directories:
         - "$HOME/.npm"
 
+env:
+    - MOZ_HEADLESS=1
+addons:
+    firefox: latest
+
 branches:
     except:
         - "/^v[0-9\\.]+/"
@@ -20,6 +25,8 @@ jobs:
           script:
               - npm run build:prod && npm run lint
               - npm run test
+              - firefox -v
+              - npm run ext:test
           after_success:
               - codecov
         - stage: deploy
