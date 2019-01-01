@@ -1,0 +1,29 @@
+environment:
+    matrix:
+        - nodejs_version: '10'
+
+matrix:
+    fast_finish: true
+
+build: off
+shallow_clone: true
+
+# environment:
+#     MOZ_HEADLESS: 1
+
+install:
+    - ps: Install-Product node $env:nodejs_version
+    - npm install --global npm@latest
+    - set PATH=%APPDATA%\npm;%PATH%
+    - npm install
+
+test_script:
+    - node --version
+    - npm --version
+    - npm run build:prod && npm run lint
+    - npm run test -- --testMatch="**\src\**\*.test.ts"
+    # TODO: npm run ext:test windows support
+    # - npx jest --testMatch="**\test\**\*.test.ts"
+
+cache:
+    - '%APPDATA%\npm-cache'
