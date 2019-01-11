@@ -7,6 +7,10 @@ cache:
     directories:
         - "$HOME/.npm"
 
+os:
+    - linux
+    - osx
+
 env:
     - MOZ_HEADLESS=1
 addons:
@@ -30,7 +34,7 @@ jobs:
           after_success:
               - codecov
         - stage: deploy
-          if: type != pull_request AND branch = master
+          if: os = linux AND type != pull_request AND branch = master
           install:
               - npm ci
           script:
