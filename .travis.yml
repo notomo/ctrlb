@@ -7,21 +7,14 @@ cache:
     directories:
         - "$HOME/.npm"
 
-env:
-    - MOZ_HEADLESS=1
-addons:
-    firefox: latest
-
 branches:
     except:
         - "/^v[0-9\\.]+/"
 
-os:
-    - osx
-    - linux
 jobs:
     include:
-        - stage: test
+        - &test-stage
+          stage: test
           install:
               - npm ci
               - npm install -g codecov
@@ -30,8 +23,15 @@ jobs:
               - npm run test
               - firefox -v
               - npm run ext:test
-          after_success:
-              - codecov
+          after_success: codecov
+          os: linux
+          env:
+              - MOZ_HEADLESS=1
+          addons:
+              firefox: latest
+        - <<: *test-stage
+          os: osx
+          after_success: true
         - stage: deploy
           if: os = linux AND type != pull_request AND branch = master
           install:
