@@ -10,10 +10,10 @@ describe("HistoryActionGroup", () => {
     search = jest.fn();
     deleteUrl = jest.fn();
 
-    const HistoryClass = jest.fn<History.Static>(() => ({
+    const HistoryClass: jest.Mock<History.Static> = jest.fn(() => ({
       search: search,
       deleteUrl: deleteUrl,
-    }));
+    })) as any;
     const history = new HistoryClass();
 
     actionGroup = new HistoryActionGroup(history);

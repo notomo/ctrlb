@@ -47,16 +47,18 @@ describe("BookmarkActionGroup", () => {
     get = jest.fn();
     update = jest.fn();
 
-    const BookmarkTreeNodeClass = jest.fn<Bookmarks.BookmarkTreeNode>(() => ({
+    const BookmarkTreeNodeClass: jest.Mock<
+      Bookmarks.BookmarkTreeNode
+    > = jest.fn(() => ({
       parentId: "2",
       children: [],
-    }));
+    })) as any;
     const bookmarkTreeNode = new BookmarkTreeNodeClass();
 
     getTree = jest.fn().mockReturnValue([bookmarkTreeNode]);
     getSubTree = jest.fn().mockReturnValue([bookmarkTreeNode]);
 
-    const BookmarksClass = jest.fn<Bookmarks.Static>(() => ({
+    const BookmarksClass: jest.Mock<Bookmarks.Static> = jest.fn(() => ({
       open: open,
       get: get.mockReturnValue([{ id: bookmarkId, url: bookmarkUrl }]),
       remove: remove,
@@ -67,13 +69,13 @@ describe("BookmarkActionGroup", () => {
       update: update,
       getTree: getTree,
       getSubTree: getSubTree,
-    }));
+    })) as any;
     const bookmarks = new BookmarksClass();
 
-    const TabActionGroupClass = jest.fn<TabActionGroup>(() => ({
+    const TabActionGroupClass: jest.Mock<TabActionGroup> = jest.fn(() => ({
       open: tabGroupOpen,
       tabOpen: tabGroupTabOpen,
-    }));
+    })) as any;
     const tabActionGroup = new TabActionGroupClass();
 
     actionGroup = new BookmarkActionGroup(tabActionGroup, bookmarks);

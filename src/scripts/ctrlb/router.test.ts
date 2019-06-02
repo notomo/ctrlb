@@ -8,7 +8,7 @@ describe("Router", () => {
   let to: jest.Mock;
 
   beforeEach(() => {
-    const ValidatorClass = jest.fn<Validator>(() => ({}));
+    const ValidatorClass: jest.Mock<Validator> = jest.fn(() => ({})) as any;
     const validator = new ValidatorClass();
 
     router = new Router(validator);
@@ -30,9 +30,9 @@ describe("Router", () => {
     const url = "urlValue";
 
     to = jest.fn().mockReturnValue([url]);
-    const ValidatorClass = jest.fn<Validator>(() => ({
+    const ValidatorClass: jest.Mock<Validator> = jest.fn(() => ({
       to: to,
-    }));
+    })) as any;
     const validator = new ValidatorClass();
     router = new Router(validator);
 
