@@ -8,9 +8,9 @@ describe("Button", () => {
   beforeEach(() => {
     setIcon = jest.fn();
 
-    const BrowserActionClass = jest.fn<BrowserAction.Static>(() => ({
+    const BrowserActionClass: jest.Mock<BrowserAction.Static> = jest.fn(() => ({
       setIcon: setIcon,
-    }));
+    })) as any;
     const browserAction = new BrowserActionClass();
 
     button = new Button(browserAction);

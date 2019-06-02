@@ -10,10 +10,10 @@ describe("ZoomActionGroup", () => {
     setZoom = jest.fn();
     getZoom = jest.fn();
 
-    const TabsClass = jest.fn<Tabs.Static>(() => ({
+    const TabsClass: jest.Mock<Tabs.Static> = jest.fn(() => ({
       setZoom: setZoom,
       getZoom: getZoom.mockReturnValue(1.0),
-    }));
+    })) as any;
     const tabs = new TabsClass();
 
     actionGroup = new ZoomActionGroup(tabs);

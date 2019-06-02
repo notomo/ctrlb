@@ -8,9 +8,9 @@ describe("NavigationActionGroup", () => {
   beforeEach(() => {
     executeScript = jest.fn();
 
-    const TabsClass = jest.fn<Tabs.Static>(() => ({
+    const TabsClass: jest.Mock<Tabs.Static> = jest.fn(() => ({
       executeScript: executeScript,
-    }));
+    })) as any;
     const tabs = new TabsClass();
 
     actionGroup = new NavigationActionGroup(tabs);

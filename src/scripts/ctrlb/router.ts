@@ -24,7 +24,8 @@ export class Router {
     names: { [P in keyof T]: string }
   ): { (request: IRequest): K } {
     const routeAction = (request: IRequest) => {
-      const f = method.bind(bindTo);
+      // FIXME: remove `as any`
+      const f = method.bind(bindTo as any);
       const params = this.validator.to(request.params, types, names);
       return f(...params);
     };

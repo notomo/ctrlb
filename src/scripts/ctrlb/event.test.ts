@@ -3,7 +3,7 @@ import { SubscribeEventHandler } from "./event";
 
 describe("SubscribeEventHandler", () => {
   it("listen", async () => {
-    const ClientClass = jest.fn<Client>(() => ({}));
+    const ClientClass: jest.Mock<Client> = jest.fn(() => ({})) as any;
     const client = new ClientClass();
 
     const onActivated = {

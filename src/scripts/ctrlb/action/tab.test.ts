@@ -15,10 +15,10 @@ describe("TabActionGroup", () => {
   let tab: Tabs.Tab;
   const tabId = 1;
   const tabIndex = 2;
-  const TabClass = jest.fn<Tabs.Tab>((id, index) => ({
+  const TabClass: jest.Mock<Tabs.Tab> = jest.fn((id, index) => ({
     id: id,
     index: index,
-  }));
+  })) as any;
 
   beforeEach(() => {
     create = jest.fn();
@@ -34,7 +34,7 @@ describe("TabActionGroup", () => {
     tabList = [tab];
     query.mockReturnValue(tabList);
 
-    const TabsClass = jest.fn<Tabs.Static>(() => ({
+    const TabsClass: jest.Mock<Tabs.Static> = jest.fn(() => ({
       create: create,
       get: get,
       update: update,
@@ -43,7 +43,7 @@ describe("TabActionGroup", () => {
       move: move,
       remove: remove,
       duplicate: duplicate,
-    }));
+    })) as any;
 
     actionGroup = new TabActionGroup(new TabsClass());
   });

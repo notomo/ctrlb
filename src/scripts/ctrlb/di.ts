@@ -17,8 +17,34 @@ import { RequestFactory } from "./request";
 import { NotificationFactory } from "./notification";
 import { ResponseFactory } from "./response";
 
+interface Deps {
+  BookmarkActionGroup: BookmarkActionGroup;
+  HistoryActionGroup: HistoryActionGroup;
+  WindowActionGroup: WindowActionGroup;
+  NavigationActionGroup: NavigationActionGroup;
+  DownloadActionGroup: DownloadActionGroup;
+  TabActionGroup: TabActionGroup;
+  ScrollActionGroup: ScrollActionGroup;
+  ZoomActionGroup: ZoomActionGroup;
+  Router: Router;
+  Validator: Validator;
+  Config: Config;
+  SubscribeEventHandler: SubscribeEventHandler;
+  Client: Client;
+}
+
+type DepsFuncs = { [P in keyof Deps]: { (...args: any[]): Deps[P] } };
+type DepsCache = { [P in keyof Deps]: Deps[P] | null };
+const initDepsCache = (depsFuncs: DepsFuncs): DepsCache => {
+  const caches = {} as DepsCache;
+  Object.keys(depsFuncs).map(key => {
+    caches[key as keyof Deps] = null;
+  });
+  return caches;
+};
+
 export class Di {
-  protected static readonly deps: Deps = {
+  protected static readonly deps: DepsFuncs = {
     BookmarkActionGroup: () => {
       const tab = Di.get("TabActionGroup");
       return new BookmarkActionGroup(tab, browser.bookmarks);
@@ -91,58 +117,27 @@ export class Di {
     },
   };
 
-  protected static readonly cache: DepsCache = {
-    BookmarkActionGroup: null,
-    HistoryActionGroup: null,
-    WindowActionGroup: null,
-    NavigationActionGroup: null,
-    DownloadActionGroup: null,
-    TabActionGroup: null,
-    ScrollActionGroup: null,
-    ZoomActionGroup: null,
-    Router: null,
-    Validator: null,
-    Config: null,
-    SubscribeEventHandler: null,
-    Client: null,
-  };
+  protected static readonly cache: DepsCache = initDepsCache(Di.deps);
 
-  public static get(cls: "BookmarkActionGroup"): BookmarkActionGroup;
-  public static get(cls: "HistoryActionGroup"): HistoryActionGroup;
-  public static get(cls: "WindowActionGroup"): WindowActionGroup;
-  public static get(cls: "NavigationActionGroup"): NavigationActionGroup;
-  public static get(cls: "DownloadActionGroup"): DownloadActionGroup;
-  public static get(cls: "TabActionGroup"): TabActionGroup;
-  public static get(cls: "ScrollActionGroup"): ScrollActionGroup;
-  public static get(cls: "ZoomActionGroup"): ZoomActionGroup;
-  public static get(cls: "Router"): Router;
-  public static get(cls: "Validator"): Validator;
-  public static get(cls: "Config"): Config;
-  public static get(
-    cls: "SubscribeEventHandler",
-    cacheable: true,
-    client: Client
-  ): SubscribeEventHandler;
-  public static get(cls: "Client", cacheable: true, router: Router): Client;
-  public static get(
-    cls: keyof Deps,
+  public static get<ClassName extends keyof Deps>(
+    cls: ClassName,
     cacheable: boolean = true,
     ...args: any[]
-  ): ReturnType<Deps[keyof Deps]> {
+  ): Deps[ClassName] {
     const cache = this.cache[cls];
     if (cache !== null) {
-      return cache;
+      return cache as Deps[ClassName];
     }
-    const resolved = this.deps[cls](...args);
+    const resolved = this.deps[cls](...args) as Deps[ClassName];
     if (cacheable) {
       this.cache[cls] = resolved;
     }
     return resolved;
   }
 
-  public static set(
-    cls: keyof Deps,
-    value: ReturnType<Deps[keyof Deps]>
+  public static set<ClassName extends keyof Deps>(
+    cls: ClassName,
+    value: Deps[ClassName]
   ): void {
     this.cache[cls] = value;
   }
@@ -153,21 +148,3 @@ export class Di {
     }
   }
 }
-
-interface Deps {
-  BookmarkActionGroup: { (...args: any[]): BookmarkActionGroup };
-  HistoryActionGroup: { (...args: any[]): HistoryActionGroup };
-  WindowActionGroup: { (...args: any[]): WindowActionGroup };
-  NavigationActionGroup: { (...args: any[]): NavigationActionGroup };
-  DownloadActionGroup: { (...args: any[]): DownloadActionGroup };
-  TabActionGroup: { (...args: any[]): TabActionGroup };
-  ScrollActionGroup: { (...args: any[]): ScrollActionGroup };
-  ZoomActionGroup: { (...args: any[]): ZoomActionGroup };
-  Router: { (...args: any[]): Router };
-  Validator: { (...args: any[]): Validator };
-  Config: { (...args: any[]): Config };
-  SubscribeEventHandler: { (...args: any[]): SubscribeEventHandler };
-  Client: { (...args: any[]): Client };
-}
-
-type DepsCache = { [P in keyof Deps]: ReturnType<Deps[P]> | null };

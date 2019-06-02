@@ -17,13 +17,13 @@ describe("WindowActionGroup", () => {
     getAll = jest.fn();
     getLastFocused = jest.fn();
 
-    const WindowsClass = jest.fn<Windows.Static>(() => ({
+    const WindowsClass: jest.Mock<Windows.Static> = jest.fn(() => ({
       get: get,
       update: update,
       remove: remove,
       getAll: getAll,
       getLastFocused: getLastFocused.mockReturnValue({ id: windowId }),
-    }));
+    })) as any;
     const windows = new WindowsClass();
 
     actionGroup = new WindowActionGroup(windows);
