@@ -16,6 +16,7 @@ import { Button } from "./browserAction";
 import { RequestFactory } from "./request";
 import { NotificationFactory } from "./notification";
 import { ResponseFactory } from "./response";
+import { MessageHandler } from "./handler";
 
 interface Deps {
   BookmarkActionGroup: BookmarkActionGroup;
@@ -31,6 +32,7 @@ interface Deps {
   Config: Config;
   SubscribeEventHandler: SubscribeEventHandler;
   Client: Client;
+  MessageHandler: MessageHandler;
 }
 
 type DepsFuncs = { [P in keyof Deps]: { (...args: any[]): Deps[P] } };
@@ -100,15 +102,16 @@ export class Di {
         browser.downloads.onCreated
       );
     },
-    Client: (router: Router) => {
+    Client: (messageHandler: MessageHandler) => {
       const connector = new Connector();
       const button = new Button(browser.browserAction);
+      return new Client(connector, button, messageHandler);
+    },
+    MessageHandler: (router: Router) => {
       const requestFactory = new RequestFactory();
       const notificationFactory = new NotificationFactory();
       const responseFactory = new ResponseFactory();
-      return new Client(
-        connector,
-        button,
+      return new MessageHandler(
         router,
         requestFactory,
         notificationFactory,

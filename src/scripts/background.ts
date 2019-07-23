@@ -5,7 +5,8 @@ import { Di } from "./ctrlb/di";
 const config = Di.get("Config");
 
 config.getHost().then((host: string) => {
-  const client = Di.get("Client", true, router);
+  const messageHandler = Di.get("MessageHandler", false, router);
+  const client = Di.get("Client", false, messageHandler);
   client.open(host);
 
   browser.browserAction.onClicked.addListener(async () => {

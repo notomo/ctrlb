@@ -1,5 +1,4 @@
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const HardSourceWebpackPlugin = require("hard-source-webpack-plugin");
 
 module.exports = (env, options) => {
   const isChrome = env !== undefined && "CHROME" in env;
@@ -44,11 +43,7 @@ module.exports = (env, options) => {
     output: {
       filename: "./scripts/[name].js",
     },
-    cache: true,
-    plugins: [
-      new HardSourceWebpackPlugin(),
-      new CopyWebpackPlugin(copyPluginConfig),
-    ],
+    plugins: [new CopyWebpackPlugin(copyPluginConfig)],
     module: {
       rules: [
         {
