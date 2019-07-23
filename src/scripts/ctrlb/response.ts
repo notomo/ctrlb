@@ -8,17 +8,29 @@ import {
   ParseError,
 } from "./error";
 
+export interface JsonSerializable {
+  toJson(): string;
+}
+
 export class Response {
   constructor(
     protected readonly data: {},
     protected readonly requestId?: string
   ) {}
 
-  public toJson(): string {
-    return JSON.stringify({
-      body: { data: this.data },
+  public json(eventName?: EventType): {} {
+    const body = {
+      data: this.data,
+      eventName: eventName,
+    };
+    return {
+      body: body,
       id: this.requestId,
-    });
+    };
+  }
+
+  public toJson(): string {
+    return JSON.stringify(this.json());
   }
 
   public toJsonWithEventType(eventName: EventType): string {
@@ -37,15 +49,27 @@ export class ErrorResponse {
     protected readonly requestId?: string
   ) {}
 
-  public toJson(): string {
-    return JSON.stringify({
+  public json(): {} {
+    return {
       error: {
         code: this.error.code,
         message: this.error.toString(),
         data: { name: this.error.name, stack: this.error.stack },
       },
       id: this.requestId,
-    });
+    };
+  }
+
+  public toJson(): string {
+    return JSON.stringify(this.json());
+  }
+}
+
+export class BatchResponse {
+  constructor(protected readonly allResponses: ReadonlyArray<{}>) {}
+
+  public toJson(): string {
+    return JSON.stringify(this.allResponses);
   }
 }
 
@@ -70,5 +94,31 @@ export class ResponseFactory {
 
     const error = new ServerError("Uncaught error");
     return new ErrorResponse(error, requestId);
+  }
+
+  public createBatch(
+    results: ReadonlyArray<[Response | null, ErrorResponse | null, boolean]>
+  ): [BatchResponse | null, BatchResponse | null, boolean] {
+    const allResponses = [];
+    const errResponses = [];
+    let isAllNotification = true;
+    for (const result of results) {
+      if (result[1] !== null) {
+        const json = result[1].json();
+        allResponses.push(json);
+        errResponses.push(json);
+      } else if (result[0] !== null) {
+        allResponses.push(result[0].json());
+      }
+      if (!result[2]) {
+        isAllNotification = false;
+      }
+    }
+
+    const batchResponse =
+      allResponses.length === 0 ? null : new BatchResponse(allResponses);
+    const errBatchResponse =
+      errResponses.length === 0 ? null : new BatchResponse(errResponses);
+    return [batchResponse, errBatchResponse, isAllNotification];
   }
 }
