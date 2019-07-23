@@ -1,9 +1,6 @@
 import { EventType } from "./event";
 import { Button } from "./browserAction";
-import { RequestFactory, Request } from "./request";
-import { NotificationFactory } from "./notification";
-import { ResponseFactory } from "./response";
-import { Router } from "./router";
+import { MessageHandler } from "./handler";
 
 export class Client {
   protected socket: WebSocket | null;
@@ -11,10 +8,7 @@ export class Client {
   constructor(
     protected readonly connector: Connector,
     protected readonly button: Button,
-    protected readonly router: Router,
-    protected readonly requestFactory: RequestFactory,
-    protected readonly notificationFactory: NotificationFactory,
-    protected readonly responseFactory: ResponseFactory
+    protected readonly messageHandler: MessageHandler
   ) {
     this.socket = null;
   }
@@ -45,33 +39,30 @@ export class Client {
 
   protected onOpen() {
     this.button.enable();
-    this.sendMessage(this.responseFactory.create({}).toJson());
+    const response = this.messageHandler.handleNotifyWithData({});
+    this.sendMessage(response.toJson());
   }
 
   protected async onMessage(ev: MessageEvent) {
-    let request: Request;
-    try {
-      request = this.requestFactory.createFromJson(ev.data);
-    } catch (e) {
-      const errorJson = this.responseFactory.createError(e).toJson();
-      this.sendMessage(errorJson);
-      console.error(errorJson);
+    const [
+      response,
+      errResponse,
+      isNotification,
+    ] = await this.messageHandler.handle(ev.data);
+    if (isNotification && errResponse !== null) {
+      const responseJson = errResponse.toJson();
+      console.error(responseJson);
+      return;
+    } else if (errResponse !== null) {
+      const responseJson = errResponse.toJson();
+      console.error(responseJson);
+      this.sendMessage(responseJson);
+      return;
+    } else if (response === null) {
       return;
     }
 
-    const result = await this.router.match(request).catch(e => {
-      const errorJson = this.responseFactory
-        .createError(e, request.id)
-        .toJson();
-      this.sendMessage(errorJson);
-      console.error(errorJson);
-    });
-
-    if (result === undefined) {
-      return;
-    }
-
-    this.sendMessage(this.responseFactory.create(result, request.id).toJson());
+    this.sendMessage(response.toJson());
   }
 
   public async notifyWithData(
@@ -82,9 +73,8 @@ export class Client {
       return false;
     }
 
-    this.sendMessage(
-      this.responseFactory.create(data).toJsonWithEventType(eventName)
-    );
+    const response = this.messageHandler.handleNotifyWithData(data);
+    this.sendMessage(response.toJsonWithEventType(eventName));
     return true;
   }
 
@@ -97,12 +87,22 @@ export class Client {
       return false;
     }
 
-    const notification = this.notificationFactory.create(method, params);
-    const result = await this.router.match(notification);
-
-    this.sendMessage(
-      this.responseFactory.create(result).toJsonWithEventType(eventName)
+    const [response, errResponse] = await this.messageHandler.handleNotify(
+      method,
+      params
     );
+
+    if (errResponse !== null) {
+      const responseJson = errResponse.toJson();
+      console.error(responseJson);
+      return false;
+    }
+
+    if (response === null) {
+      return false;
+    }
+
+    this.sendMessage(response.toJsonWithEventType(eventName));
     return true;
   }
 }

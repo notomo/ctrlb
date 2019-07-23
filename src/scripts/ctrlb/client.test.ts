@@ -1,10 +1,8 @@
 import { Client, Connector } from "./client";
 import { Button } from "./browserAction";
 import { EventType } from "./event";
-import { Router } from "./router";
-import { ResponseFactory, Response } from "./response";
-import { NotificationFactory } from "./notification";
-import { RequestFactory } from "./request";
+import { Response } from "./response";
+import { MessageHandler } from "./handler";
 
 describe("Client", () => {
   it("notify returns false if closed", async () => {
@@ -13,32 +11,12 @@ describe("Client", () => {
     const ButtonClass: jest.Mock<Button> = jest.fn(() => ({})) as any;
     const button = new ButtonClass();
 
-    const RouterClass: jest.Mock<Router> = jest.fn(() => ({})) as any;
-    const router = new RouterClass();
-
-    const RequestFactoryClass: jest.Mock<RequestFactory> = jest.fn(
+    const MessageHandlerClass: jest.Mock<MessageHandler> = jest.fn(
       () => ({})
     ) as any;
-    const requestFactory = new RequestFactoryClass();
+    const messageHandler = new MessageHandlerClass();
 
-    const NotificationFactoryClass: jest.Mock<NotificationFactory> = jest.fn(
-      () => ({})
-    ) as any;
-    const notificationFactory = new NotificationFactoryClass();
-
-    const ResponseFactoryClass: jest.Mock<ResponseFactory> = jest.fn(
-      () => ({})
-    ) as any;
-    const responseFactory = new ResponseFactoryClass();
-
-    const client = new Client(
-      connector,
-      button,
-      router,
-      requestFactory,
-      notificationFactory,
-      responseFactory
-    );
+    const client = new Client(connector, button, messageHandler);
 
     expect(await client.notify("", EventType.tabActivated)).toBe(false);
   });
@@ -63,19 +41,6 @@ describe("Client", () => {
     })) as any;
     const button = new ButtonClass();
 
-    const RouterClass: jest.Mock<Router> = jest.fn(() => ({})) as any;
-    const router = new RouterClass();
-
-    const RequestFactoryClass: jest.Mock<RequestFactory> = jest.fn(
-      () => ({})
-    ) as any;
-    const requestFactory = new RequestFactoryClass();
-
-    const NotificationFactoryClass: jest.Mock<NotificationFactory> = jest.fn(
-      () => ({})
-    ) as any;
-    const notificationFactory = new NotificationFactoryClass();
-
     const responseJson = "{}";
     const toJson = jest.fn().mockReturnValue(responseJson);
     const ResponseClass: jest.Mock<Response> = jest.fn(() => ({
@@ -83,20 +48,13 @@ describe("Client", () => {
     })) as any;
     const response = new ResponseClass();
 
-    const create = jest.fn().mockReturnValue(response);
-    const ResponseFactoryClass: jest.Mock<ResponseFactory> = jest.fn(() => ({
-      create: create,
+    const handleNotifyWithData = jest.fn().mockReturnValue(response);
+    const MessageHandlerClass: jest.Mock<MessageHandler> = jest.fn(() => ({
+      handleNotifyWithData: handleNotifyWithData,
     })) as any;
-    const responseFactory = new ResponseFactoryClass();
+    const messageHandler = new MessageHandlerClass();
 
-    const client = new Client(
-      connector,
-      button,
-      router,
-      requestFactory,
-      notificationFactory,
-      responseFactory
-    );
+    const client = new Client(connector, button, messageHandler);
 
     client.open("dummyhost");
     expect(socket.onclose).not.toBeNull();
