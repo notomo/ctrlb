@@ -1,6 +1,11 @@
 import { RequestFactory } from "./request";
 import { NotificationFactory } from "./notification";
-import { ResponseFactory, Response, ErrorResponse } from "./response";
+import {
+  ResponseFactory,
+  Response,
+  ErrorResponse,
+  JsonSerializable,
+} from "./response";
 import { Router } from "./router";
 import { InvalidRequest, ParseError } from "./error";
 
@@ -14,7 +19,7 @@ export class MessageHandler {
 
   public async handle(
     jsonString: any
-  ): Promise<[Response | null, ErrorResponse | null, boolean]> {
+  ): Promise<[JsonSerializable | null, JsonSerializable | null, boolean]> {
     if (typeof jsonString !== "string") {
       const err = new InvalidRequest("Invalid Request");
       const errResponse = this.responseFactory.createError(err);
@@ -30,6 +35,22 @@ export class MessageHandler {
       return [null, errResponse, false];
     }
 
+    if (!Array.isArray(decodedJson)) {
+      return this.handleJson(decodedJson);
+    }
+
+    const results = await Promise.all(
+      decodedJson.map(json => {
+        return this.handleJson(json);
+      })
+    );
+
+    return this.responseFactory.createBatch(results);
+  }
+
+  protected async handleJson(
+    decodedJson: any
+  ): Promise<[Response | null, ErrorResponse | null, boolean]> {
     const id = decodedJson.id;
     if (typeof id !== "string") {
       const notification = this.notificationFactory.createFromJson(decodedJson);
